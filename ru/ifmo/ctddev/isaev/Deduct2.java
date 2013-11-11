@@ -72,10 +72,10 @@ public class Deduct2 extends Homework {
             }
             if (!f) {
                 for (int i = 0; i < proofed.size(); i++) {
-                    for (int j = 0; j < proofed.size(); j++) {
-                        if (modusPonens(proofed.get(i), proofed.get(j), expr)) {
-                            out.println("(1->2)->((1->(2->3))->(1->3))".replace("1", alpha.asString()).replace("2", proofed.get(j).asString().toString()).replace("3", proofed.get(i).asString()));
-                            out.println("((1->(2->3))->(1->3))".replace("1", alpha.asString()).replace("2", proofed.get(j).asString().toString()).replace("3", proofed.get(i).asString()));
+                    for (Expression aProofed : proofed) {
+                        if (modusPonens(proofed.get(i), aProofed, expr)) {
+                            out.println("(1->2)->((1->(2->3))->(1->3))".replace("1", alpha.asString()).replace("2", proofed.get(i).asString().toString()).replace("3", expr.asString()));
+                            out.println("((1->(2->3))->(1->3))".replace("1", alpha.asString()).replace("2", proofed.get(i).asString().toString()).replace("3",expr.asString()));
                             out.println(new LogicalThen(alpha, expr).asString());
                         }
                     }

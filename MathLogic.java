@@ -53,6 +53,7 @@ public class MathLogic {
             work.out.close();
         } catch (FileNotFoundException e) {
             System.out.println("file not found");
+            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         } catch (LexingException e) {
