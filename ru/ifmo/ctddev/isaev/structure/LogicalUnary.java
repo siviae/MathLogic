@@ -27,6 +27,6 @@ public abstract class LogicalUnary implements Expression {
 
     @Override
     public StringBuilder asString() {
-        return operand.asString().append(Lexeme.RIGHT_P.token).insert(0, Lexeme.LEFT_P.token).insert(0,token);
+        return operand.asString().append(Lexeme.RIGHT_P.token).insert(0, Lexeme.LEFT_P.token).insert(0,token.token);
     }
 }

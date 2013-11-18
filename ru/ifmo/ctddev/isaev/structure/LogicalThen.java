@@ -28,6 +28,12 @@ public class LogicalThen extends LogicalBinary {
     public boolean hasSameType(Expression other) {
         return other instanceof LogicalThen;
     }
+
+    @Override
+    public boolean evaluate() {
+        return !left.evaluate() || right.evaluate();
+    }
+
     @Override
     public Expression substitute(HashMap<String, Expression> variables) {
         return new LogicalThen(left.substitute(variables),right.substitute(variables));

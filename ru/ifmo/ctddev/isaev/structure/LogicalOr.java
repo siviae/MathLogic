@@ -29,6 +29,11 @@ public class LogicalOr extends LogicalBinary {
     }
 
     @Override
+    public boolean evaluate() {
+        return left.evaluate() || right.evaluate();
+    }
+
+    @Override
     public Expression substitute(HashMap<String, Expression> variables) {
         return new LogicalOr(left.substitute(variables),right.substitute(variables));
     }

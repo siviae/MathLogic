@@ -42,6 +42,11 @@ public class NumExpression implements Expression {
     }
 
     @Override
+    public boolean evaluate() {
+        return false;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
     public StringBuilder asString() {
         return new StringBuilder(number).append("}").insert(0, "{");
     }

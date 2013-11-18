@@ -14,5 +14,6 @@ public interface Expression {
     boolean matchAxiomScheme(Expression expr, HashMap<Integer,Expression> known);
     Expression substitute(HashMap<String, Expression> variables);
     boolean hasSameType(Expression other);
+    boolean evaluate();
     StringBuilder asString();
 }

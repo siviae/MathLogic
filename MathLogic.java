@@ -1,6 +1,7 @@
 import ru.ifmo.ctddev.isaev.Checker1;
 import ru.ifmo.ctddev.isaev.Deduct2;
 import ru.ifmo.ctddev.isaev.Homework;
+import ru.ifmo.ctddev.isaev.Proof3;
 import ru.ifmo.ctddev.isaev.exception.LexingException;
 import ru.ifmo.ctddev.isaev.exception.ParsingException;
 import ru.ifmo.ctddev.isaev.parser.Lexer;
@@ -30,6 +31,7 @@ public class MathLogic {
                 break;
             }
             case "3": {
+                work = new Proof3();
                 break;
             }
             case "4": {

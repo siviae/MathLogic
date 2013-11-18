@@ -20,7 +20,7 @@ public class Parser {
 
     public Expression parse(String[] tokens) throws ParsingException {
         this.tokens = tokens;
-        this.position=0;
+        this.position = 0;
         return expr();
     }
 
@@ -72,7 +72,11 @@ public class Parser {
 
             Expression result = expr();
             if (!tokens[position].equals(Lexeme.RIGHT_P.token)) {
-                throw new ParsingException("you have unclosed brackets");
+                StringBuilder sb = new StringBuilder();
+                for (String s : tokens) {
+                    sb.append(s);
+                }
+                throw new ParsingException("you have unclosed brackets in expression " + sb.toString());
             } else {
                 position++;
             }

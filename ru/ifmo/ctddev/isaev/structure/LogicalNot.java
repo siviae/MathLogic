@@ -27,6 +27,12 @@ public class LogicalNot extends LogicalUnary {
     public boolean hasSameType(Expression other) {
         return other instanceof LogicalNot;
     }
+
+    @Override
+    public boolean evaluate() {
+        return !operand.evaluate();
+    }
+
     @Override
     public Expression substitute(HashMap<String, Expression> variables) {
         return new LogicalNot(operand.substitute(variables));

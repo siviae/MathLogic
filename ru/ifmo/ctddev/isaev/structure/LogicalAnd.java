@@ -33,4 +33,9 @@ public class LogicalAnd extends LogicalBinary {
     public boolean hasSameType(Expression other) {
         return other instanceof LogicalAnd;
     }
+
+    @Override
+    public boolean evaluate() {
+        return left.evaluate()&&right.evaluate();
+    }
 }

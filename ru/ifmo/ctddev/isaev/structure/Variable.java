@@ -38,6 +38,11 @@ public class Variable implements Expression {
     }
 
     @Override
+    public boolean evaluate() {
+        return value;
+    }
+
+    @Override
     public StringBuilder asString() {
         return new StringBuilder(token);
     }
