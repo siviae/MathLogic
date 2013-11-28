@@ -16,4 +16,7 @@ public interface Expression {
     boolean hasSameType(Expression other);
     boolean evaluate();
     StringBuilder asString();
+    @Override
+    public String toString();
+    StringBuilder asJavaExpr();
 }

@@ -22,13 +22,13 @@ import java.io.PrintWriter;
 public abstract class Homework {
     public  BufferedReader in;
     public  PrintWriter out;
-    protected  Lexer lexer = new Lexer();
-    protected  Parser parser = new Parser();
+    protected static Lexer lexer = new Lexer();
+    protected static Parser parser = new Parser();
     protected  int row;
 
 
 
-    public Expression parse(String s) throws LexingException, ParsingException {
+    public static Expression parse(String s) throws LexingException, ParsingException {
         String[] lexems = lexer.lex(s);
         return parser.parse(lexems);
     }

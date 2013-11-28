@@ -114,7 +114,11 @@ public enum AxiomScheme {
         this.expr = expr;
     }
 
-    public  boolean match(Expression expr) {
+    public boolean match(Expression expr) {
         return this.expr.matchAxiomScheme(expr, new HashMap<Integer, Expression>());
+    }
+
+    public Expression substitute(HashMap<String, Expression> map) {
+        return this.expr.substitute(map);
     }
 }

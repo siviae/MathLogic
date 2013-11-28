@@ -59,17 +59,80 @@ public class Proof3 extends Homework {
             }
         }
         List<Expression> proof = new ArrayList<>();
-        proof.add(theorem);
-       while(variables.size()>0){
-           Variable v = (Variable) variables.remove(variables.size()-1);
-           deduct = new Deduct2(variables,v);
-           List<Expression> proof1 = deduct.move1HypoToProof(proof);
-           deduct.setAlpha(new LogicalNot(v));
-           List<Expression> proof2 = deduct.move1HypoToProof(proof);
+    //    proof.add(theorem);
+        List<ArrayList<Expression>> tnd = new ArrayList<>();
+
+        for (Expression v : vars.values()) {
+            tnd.add(tertiumNonDatur((Variable) v));
+        }
+        boolean f = true;
+        while (variables.size() > 0) {
+            Variable v = (Variable) variables.remove(variables.size() - 1);
+            Expression notV = new LogicalNot(v);
+            deduct = new Deduct2(variables, v);
+            List<Expression> proof1;
+            List<Expression> proof2;
+            if (f) {
+                proof.add(new LogicalThen(v, theorem));
+                proof.add(new LogicalThen(notV, theorem));
+                f = false;
+            } else {
+                proof1 = deduct.move1HypoToProof(proof);
+                deduct.setAlpha(notV);
+                proof2 = deduct.move1HypoToProof(proof);
+                proof.clear();
+                proof.addAll(proof1);
+                proof.addAll(proof2);
+            }
+            HashMap<String, Expression> map = new HashMap<>();
+            map.put("1", v);
+            map.put("2", notV);
+            map.put("3", theorem);
+            proof.add(AxiomScheme.SC_8.substitute(map));
+            proof.add(new LogicalThen(new LogicalThen(notV, theorem), new LogicalThen(new LogicalOr(v, notV), theorem)));
+            proof.add(new LogicalThen(new LogicalOr(v, notV), theorem));
+            proof.add(theorem);
+        }
+        for (ArrayList<Expression> arr : tnd) {
+            for (Expression e : arr) {
+                out.println(e.asString());
+            }
+        }
+        for (Expression expression : proof) {
+            out.println(expression.asString());
+        }
+
+    }
+
+    private ArrayList<Expression> tertiumNonDatur(Variable v) {
+        LogicalNot notV = new LogicalNot(v);
+        ArrayList<Expression> result = new ArrayList<>();
+        try {
+            result.add(parse("A->A|!A".replace("A", v.token)));
+
+            for (InsaneHardcodedLemma4_4 s : InsaneHardcodedLemma4_4.values()) {
+                result.add(s.replace(v, new LogicalOr(v, notV)));
+            }
+            result.add(parse("!(A|!A)->!A".replace("A", v.token)));
+
+            result.add(parse("!A->A|!A".replace("A", v.token)));
+            for (InsaneHardcodedLemma4_4 s : InsaneHardcodedLemma4_4.values()) {
+                result.add(s.replace(new LogicalNot(v), new LogicalOr(v, notV)));
+            }
+            result.add(parse("!(A|!A)->!!A".replace("A", v.token)));
 
 
-       }
+            result.add(parse("(!(A|!A)->!A)->(!(A|!A)->!!A)->(!!(A|!A))".replace("A", v.token)));
+            result.add(parse("(!(A|!A)->!!A)->!!(A|!A)".replace("A", v.token)));
+            result.add(parse("!!(A|!A)".replace("A", v.token)));
+            result.add(parse("!!(A|!A)->(A|!A)".replace("A", v.token)));
+            result.add(parse("A|!A".replace("A", v.token)));
 
-
+        } catch (LexingException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        } catch (ParsingException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
+        return result;
     }
 }

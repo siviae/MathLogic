@@ -33,7 +33,7 @@ public class NumExpression implements Expression {
 
     @Override
     public Expression substitute(HashMap<String, Expression> variables) {
-        return null;
+        return variables.containsKey(Integer.toString(number)) ? variables.get(Integer.toString(number)) : this;
     }
 
     @Override
@@ -49,6 +49,11 @@ public class NumExpression implements Expression {
     @Override
     public StringBuilder asString() {
         return new StringBuilder(number).append("}").insert(0, "{");
+    }
+
+    @Override
+    public StringBuilder asJavaExpr() {
+        return new StringBuilder("new NumExpression(").append(number).append(")");
     }
 
 }

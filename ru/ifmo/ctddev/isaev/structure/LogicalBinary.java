@@ -33,4 +33,14 @@ public abstract class LogicalBinary implements Expression {
     public StringBuilder asString() {
         return left.asString().append(token.token).append(right.asString()).append(Lexeme.RIGHT_P.token).insert(0, Lexeme.LEFT_P.token);
     }
+
+    @Override
+    public StringBuilder asJavaExpr() {
+        return new StringBuilder("new ").append(getClass().getSimpleName()).append("(").append(left.asJavaExpr()).append(",").append(right.asJavaExpr()).append(")");
+    }
+
+    @Override
+    public String toString() {
+        return asString().toString();    //To change body of overridden methods use File | Settings | File Templates.
+    }
 }

@@ -27,6 +27,16 @@ public abstract class LogicalUnary implements Expression {
 
     @Override
     public StringBuilder asString() {
-        return operand.asString().append(Lexeme.RIGHT_P.token).insert(0, Lexeme.LEFT_P.token).insert(0,token.token);
+        return operand.asString().append(Lexeme.RIGHT_P.token).insert(0, Lexeme.LEFT_P.token).insert(0, token.token);
+    }
+
+    @Override
+    public StringBuilder asJavaExpr() {
+        return new StringBuilder("new ").append(getClass().getSimpleName()).append("(").append(operand.asJavaExpr()).append(")");
+    }
+
+    @Override
+    public String toString() {
+        return asString().toString();
     }
 }

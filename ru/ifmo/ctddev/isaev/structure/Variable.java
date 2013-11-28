@@ -47,5 +47,13 @@ public class Variable implements Expression {
         return new StringBuilder(token);
     }
 
+    @Override
+    public StringBuilder asJavaExpr() {
+        return new StringBuilder("new Variable(\"").append(token).append("\")");
+    }
 
+    @Override
+    public String toString() {
+        return asString().toString();
+    }
 }
