@@ -14,8 +14,8 @@ import java.util.ArrayList;
 public class Lexer {
     private String target;
 
-    public String[] lex(String target) throws LexingException {
-        this.target = target.replaceAll("\\s+", "");
+    public String[] lex(String t) throws LexingException {
+        this.target = t.replaceAll("\\s+", "");
         ArrayList<String> result = new ArrayList<String>();
         int l = 0;
         int r = 0;

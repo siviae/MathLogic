@@ -2,11 +2,15 @@ import ru.ifmo.ctddev.isaev.Checker1;
 import ru.ifmo.ctddev.isaev.Deduct2;
 import ru.ifmo.ctddev.isaev.Homework;
 import ru.ifmo.ctddev.isaev.Proof3;
+import ru.ifmo.ctddev.isaev.exception.IncorrectProofException;
 import ru.ifmo.ctddev.isaev.exception.LexingException;
 import ru.ifmo.ctddev.isaev.exception.ParsingException;
 import ru.ifmo.ctddev.isaev.parser.Lexer;
 import ru.ifmo.ctddev.isaev.parser.Parser;
 import ru.ifmo.ctddev.isaev.structure.Expression;
+
+import static ru.ifmo.ctddev.isaev.General.in;
+import static ru.ifmo.ctddev.isaev.General.out;
 
 import java.io.*;
 
@@ -47,21 +51,17 @@ public class MathLogic {
                 break;
         }
         try {
-            work.in = new BufferedReader(new FileReader(args[1]));
+            in = new BufferedReader(new FileReader(args[1]));
             String[] arr = args[1].split("\\.");
-            work.out = new PrintWriter(new FileWriter(arr[0] + ".out"));
+            out = new PrintWriter(new FileWriter(arr[0] + ".out"));
             work.doSomething();
-            work.in.close();
-            work.out.close();
+            in.close();
+            out.close();
         } catch (FileNotFoundException e) {
             System.out.println("file not found");
             e.printStackTrace();
-        } catch (IOException e) {
+        } catch (IOException | LexingException | ParsingException | IncorrectProofException e) {
             e.printStackTrace();
-        } catch (LexingException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-        } catch (ParsingException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
     }
 }

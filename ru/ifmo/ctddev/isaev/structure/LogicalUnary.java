@@ -11,7 +11,7 @@ import java.util.HashMap;
  * Time: 20:36
  * To change this template use File | Settings | File Templates.
  */
-public abstract class LogicalUnary implements Expression {
+public abstract class LogicalUnary extends AbstractExpression {
     public Expression operand;
     public Lexeme token;
 
@@ -38,5 +38,25 @@ public abstract class LogicalUnary implements Expression {
     @Override
     public String toString() {
         return asString().toString();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof LogicalUnary)) return false;
+
+        LogicalUnary that = (LogicalUnary) o;
+
+        if (!operand.equals(that.operand)) return false;
+        if (token != that.token) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = operand.hashCode();
+        result = 31 * result + token.hashCode();
+        return result;
     }
 }

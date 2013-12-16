@@ -2,7 +2,9 @@ package ru.ifmo.ctddev.isaev.structure;
 
 import ru.ifmo.ctddev.isaev.parser.Lexeme;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -38,4 +40,11 @@ public class LogicalAnd extends LogicalBinary {
     public boolean evaluate() {
         return left.evaluate()&&right.evaluate();
     }
+
+    @Override
+    public List<Expression> getParticularProof(ArrayList<Expression> hypos) {
+
+        return null;
+    }
+
 }

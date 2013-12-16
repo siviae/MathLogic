@@ -1,9 +1,13 @@
 package ru.ifmo.ctddev.isaev;
 
+import ru.ifmo.ctddev.isaev.exception.IncorrectProofException;
 import ru.ifmo.ctddev.isaev.exception.LexingException;
 import ru.ifmo.ctddev.isaev.exception.ParsingException;
+import ru.ifmo.ctddev.isaev.helpers.AxiomScheme;
+import ru.ifmo.ctddev.isaev.helpers.InsaneHardcodedContrapositionRule;
 import ru.ifmo.ctddev.isaev.structure.*;
 
+import static ru.ifmo.ctddev.isaev.General.*;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -32,7 +36,7 @@ public class Proof3 extends Homework {
     }
 
     @Override
-    public void doSomething() throws IOException, ParsingException, LexingException {
+    public void doSomething() throws IOException, ParsingException, LexingException, IncorrectProofException {
         Expression theorem = parse(in.readLine());
         getVars(theorem);
         int n = (int) Math.pow(2, vars.size());
@@ -58,81 +62,73 @@ public class Proof3 extends Homework {
                 System.exit(0);
             }
         }
-        List<Expression> proof = new ArrayList<>();
-    //    proof.add(theorem);
+        List<Expression> proofed = new ArrayList<>();
         List<ArrayList<Expression>> tnd = new ArrayList<>();
 
         for (Expression v : vars.values()) {
             tnd.add(tertiumNonDatur((Variable) v));
         }
         boolean f = true;
-        while (variables.size() > 0) {
-            Variable v = (Variable) variables.remove(variables.size() - 1);
-            Expression notV = new LogicalNot(v);
-            deduct = new Deduct2(variables, v);
-            List<Expression> proof1;
-            List<Expression> proof2;
-            if (f) {
-                proof.add(new LogicalThen(v, theorem));
-                proof.add(new LogicalThen(notV, theorem));
-                f = false;
-            } else {
-                proof1 = deduct.move1HypoToProof(proof);
-                deduct.setAlpha(notV);
-                proof2 = deduct.move1HypoToProof(proof);
-                proof.clear();
-                proof.addAll(proof1);
-                proof.addAll(proof2);
-            }
-            HashMap<String, Expression> map = new HashMap<>();
-            map.put("1", v);
-            map.put("2", notV);
-            map.put("3", theorem);
-            proof.add(AxiomScheme.SC_8.substitute(map));
-            proof.add(new LogicalThen(new LogicalThen(notV, theorem), new LogicalThen(new LogicalOr(v, notV), theorem)));
-            proof.add(new LogicalThen(new LogicalOr(v, notV), theorem));
-            proof.add(theorem);
-        }
+
         for (ArrayList<Expression> arr : tnd) {
             for (Expression e : arr) {
                 out.println(e.asString());
             }
         }
-        for (Expression expression : proof) {
-            out.println(expression.asString());
+        while (variables.size() > 0) {
+            Variable v = (Variable) variables.remove(variables.size() - 1);
+            Expression notV = new LogicalNot(v);
+            Expression e1 = new LogicalThen(v, theorem);
+            Expression e2 = new LogicalThen(notV, theorem);
+            List<Expression> proof1 = e1.getParticularProof((ArrayList<Expression>) variables.clone());
+            proof1 = deduct.move1HypoToProof(proof1);
+            for (Expression e : proof1) {
+                out.println(e.toString());
+            }
+            List<Expression> proof2 = e2.getParticularProof((ArrayList<Expression>) variables.clone());
+            proof2 = deduct.move1HypoToProof(proof2);
+            for (Expression e : proof2) {
+                out.println(e.toString());
+            }
+            proofed.add(e1);
+            proofed.add(e2);
+
+            HashMap<String, Expression> map = new HashMap<>();
+            map.put("1", v);
+            map.put("2", notV);
+            map.put("3", theorem);
+            out.println(AxiomScheme.SC_8.substitute(map));
+            out.println(new LogicalThen(new LogicalThen(notV, theorem), new LogicalThen(new LogicalOr(v, notV), theorem)));
+            out.println(new LogicalThen(new LogicalOr(v, notV), theorem));
+            out.println(theorem);
         }
+
 
     }
 
     private ArrayList<Expression> tertiumNonDatur(Variable v) {
         LogicalNot notV = new LogicalNot(v);
         ArrayList<Expression> result = new ArrayList<>();
-        try {
-            result.add(parse("A->A|!A".replace("A", v.token)));
+        result.add(parse("A->A|!A".replace("A", v.token)));
 
-            for (InsaneHardcodedLemma4_4 s : InsaneHardcodedLemma4_4.values()) {
-                result.add(s.replace(v, new LogicalOr(v, notV)));
-            }
-            result.add(parse("!(A|!A)->!A".replace("A", v.token)));
-
-            result.add(parse("!A->A|!A".replace("A", v.token)));
-            for (InsaneHardcodedLemma4_4 s : InsaneHardcodedLemma4_4.values()) {
-                result.add(s.replace(new LogicalNot(v), new LogicalOr(v, notV)));
-            }
-            result.add(parse("!(A|!A)->!!A".replace("A", v.token)));
-
-
-            result.add(parse("(!(A|!A)->!A)->(!(A|!A)->!!A)->(!!(A|!A))".replace("A", v.token)));
-            result.add(parse("(!(A|!A)->!!A)->!!(A|!A)".replace("A", v.token)));
-            result.add(parse("!!(A|!A)".replace("A", v.token)));
-            result.add(parse("!!(A|!A)->(A|!A)".replace("A", v.token)));
-            result.add(parse("A|!A".replace("A", v.token)));
-
-        } catch (LexingException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-        } catch (ParsingException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        for (InsaneHardcodedContrapositionRule s : InsaneHardcodedContrapositionRule.values()) {
+            result.add(s.replace(v, new LogicalOr(v, notV)));
         }
+        result.add(parse("!(A|!A)->!A".replace("A", v.token)));
+
+        result.add(parse("!A->A|!A".replace("A", v.token)));
+        for (InsaneHardcodedContrapositionRule s : InsaneHardcodedContrapositionRule.values()) {
+            result.add(s.replace(new LogicalNot(v), new LogicalOr(v, notV)));
+        }
+        result.add(parse("!(A|!A)->!!A".replace("A", v.token)));
+
+
+        result.add(parse("(!(A|!A)->!A)->(!(A|!A)->!!A)->(!!(A|!A))".replace("A", v.token)));
+        result.add(parse("(!(A|!A)->!!A)->!!(A|!A)".replace("A", v.token)));
+        result.add(parse("!!(A|!A)".replace("A", v.token)));
+        result.add(parse("!!(A|!A)->(A|!A)".replace("A", v.token)));
+        result.add(parse("A|!A".replace("A", v.token)));
+
         return result;
     }
 }

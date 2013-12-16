@@ -1,4 +1,6 @@
-package ru.ifmo.ctddev.isaev.structure;
+package ru.ifmo.ctddev.isaev.helpers;
+
+import ru.ifmo.ctddev.isaev.structure.*;
 
 import java.util.HashMap;
 

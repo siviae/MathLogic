@@ -7,7 +7,7 @@ package ru.ifmo.ctddev.isaev.exception;
  * Time: 20:46
  * To change this template use File | Settings | File Templates.
  */
-public class ParsingException extends Throwable {
+public class ParsingException extends Exception {
     public ParsingException(String s) {
         super(s);
     }

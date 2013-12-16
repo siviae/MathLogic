@@ -1,6 +1,8 @@
 package ru.ifmo.ctddev.isaev.structure;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -9,7 +11,7 @@ import java.util.HashMap;
  * Time: 13:35
  * To change this template use File | Settings | File Templates.
  */
-public class NumExpression implements Expression {
+public class NumExpression extends AbstractExpression {
     public int number;
 
     public NumExpression(int number) {
@@ -54,6 +56,11 @@ public class NumExpression implements Expression {
     @Override
     public StringBuilder asJavaExpr() {
         return new StringBuilder("new NumExpression(").append(number).append(")");
+    }
+
+    @Override
+    public List<Expression> getParticularProof(ArrayList<Expression> hypos) {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
 }

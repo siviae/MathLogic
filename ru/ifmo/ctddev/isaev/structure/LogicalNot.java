@@ -2,7 +2,9 @@ package ru.ifmo.ctddev.isaev.structure;
 
 import ru.ifmo.ctddev.isaev.parser.Lexeme;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -31,6 +33,11 @@ public class LogicalNot extends LogicalUnary {
     @Override
     public boolean evaluate() {
         return !operand.evaluate();
+    }
+
+    @Override
+    public List<Expression> getParticularProof(ArrayList<Expression> hypos) {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override

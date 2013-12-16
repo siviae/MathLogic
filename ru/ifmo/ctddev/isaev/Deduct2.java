@@ -1,10 +1,13 @@
 package ru.ifmo.ctddev.isaev;
 
+import ru.ifmo.ctddev.isaev.exception.IncorrectProofException;
 import ru.ifmo.ctddev.isaev.exception.LexingException;
 import ru.ifmo.ctddev.isaev.exception.ParsingException;
-import ru.ifmo.ctddev.isaev.structure.AxiomScheme;
+import ru.ifmo.ctddev.isaev.helpers.AxiomScheme;
 import ru.ifmo.ctddev.isaev.structure.Expression;
 import ru.ifmo.ctddev.isaev.structure.LogicalThen;
+
+import static ru.ifmo.ctddev.isaev.General.*;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -24,8 +27,12 @@ public class Deduct2 extends Homework {
     private List<Expression> proofed = new ArrayList<>();
     private Expression alpha;
 
-    public void setAlpha(Expression alpha) {
-        this.alpha = alpha;
+    public void setHypos(List<Expression> hypos) {
+        this.hypos = hypos;
+    }
+
+    public void setProofed(List<Expression> proofed) {
+        this.proofed = proofed;
     }
 
     public Deduct2() {
@@ -33,11 +40,12 @@ public class Deduct2 extends Homework {
 
     public Deduct2(List<Expression> hypos, Expression alpha) {
         this.hypos = hypos;
-        this.alpha = alpha;
+        this.hypos.add(alpha);
     }
 
-    public List<Expression> move1HypoToProof(List<Expression> proof) throws ParsingException, LexingException {
+    public List<Expression> move1HypoToProof(List<Expression> proof) throws IncorrectProofException {
         List<Expression> result = new ArrayList<>();
+        alpha = hypos.remove(hypos.size() - 1);
         for (Expression expr : proof) {
             boolean f = false;
             for (Expression e : hypos) {
@@ -58,49 +66,46 @@ public class Deduct2 extends Homework {
                 result.add(expr);
                 result.add(new LogicalThen(expr, new LogicalThen(alpha, expr)));
                 result.add(new LogicalThen(alpha, expr));
+                proofed.add(expr);
             }
             if (!f && expr.match(alpha)) {
-                result.add(parse("*->(*->*)".replace("*", alpha.asString())));
-                result.add(parse("*->(*->*)->*".replace("*", alpha.asString())));
-                result.add(parse("(*->(*->*))->((*->((*->*)->*))->(*->*))".replace("*", alpha.asString())));
-                result.add(parse("((*->((*->*)->*))->(*->*))".replace("*", alpha.asString())));
-                result.add(parse("*->*".replace("*", alpha.asString())));
+                result.addAll(proofAThenA(alpha));
                 f = true;
+                proofed.add(expr);
             }
             if (!f) {
                 for (int i = 0; i < proofed.size(); i++) {
-                    for (Expression aProofed : proofed) {
+                    for (Expression aProofed : proofed)
                         if (modusPonens(proofed.get(i), aProofed, expr)) {
                             result.add(parse("(1->2)->((1->(2->3))->(1->3))".replace("1", alpha.asString()).replace("2", proofed.get(i).asString()).replace("3", expr.asString())));
-                            result.add(parse("((1->(2->3))->(1->3))".replace("1", alpha.asString()).replace("2", proofed.get(i).asString()).replace("3", expr.asString())));
+                            result.add(parse("(1->(2->3))->(1->3)".replace("1", alpha.asString()).replace("2", proofed.get(i).asString()).replace("3", expr.asString())));
                             result.add(new LogicalThen(alpha, expr));
+                            f = true;
                         }
-                    }
                 }
+                proofed.add(expr);
             }
-            proofed.add(expr);
+            if (!f) {
+                throw new IncorrectProofException(expr.toString());
+            }
         }
 
         return result;
     }
 
     @Override
-    public void doSomething() throws IOException, ParsingException, LexingException {
+    public void doSomething() throws IOException, ParsingException, LexingException, IncorrectProofException {
         String[] temp = in.readLine().split(Pattern.quote("|-"));
         if (temp.length > 2) {
             throw new IOException("more than one |- in first line");
         }
         String[] s = temp[0].split(",");
-        for (int i = 0; i < s.length; i++) {
-            if (i == s.length - 1) {
-                alpha = parse(s[i]);
-            } else {
-                hypos.add(parse(s[i]));
-            }
+        for (String value : s) {
+            hypos.add(parse(value));
         }
         List<Expression> proof = new ArrayList<>();
         String s1 = in.readLine();
-        while (s1 != null) {
+        while (s1 != null && !s1.replace("\\s+", "").isEmpty()) {
             proof.add(parse(s1));
             s1 = in.readLine();
         }
@@ -108,5 +113,9 @@ public class Deduct2 extends Homework {
         for (Expression e : newProof) {
             out.println(e.asString());
         }
+    }
+
+    public boolean haveZeroHypos() {
+        return hypos.size() == 0;
     }
 }

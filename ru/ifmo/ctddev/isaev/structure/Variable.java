@@ -1,6 +1,8 @@
 package ru.ifmo.ctddev.isaev.structure;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -9,7 +11,7 @@ import java.util.HashMap;
  * Time: 20:34
  * To change this template use File | Settings | File Templates.
  */
-public class Variable implements Expression {
+public class Variable extends AbstractExpression{
     public String token;
     public boolean value;
 
@@ -53,7 +55,32 @@ public class Variable implements Expression {
     }
 
     @Override
+    public List<Expression> getParticularProof(ArrayList<Expression> hypos) {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
     public String toString() {
         return asString().toString();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Variable)) return false;
+
+        Variable variable = (Variable) o;
+
+        if (value != variable.value) return false;
+        if (!token.equals(variable.token)) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = token.hashCode();
+        result = 31 * result + (value ? 1 : 0);
+        return result;
     }
 }

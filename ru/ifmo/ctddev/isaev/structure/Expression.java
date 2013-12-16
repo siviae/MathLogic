@@ -1,6 +1,8 @@
 package ru.ifmo.ctddev.isaev.structure;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -19,4 +21,6 @@ public interface Expression {
     @Override
     public String toString();
     StringBuilder asJavaExpr();
+
+    List<Expression> getParticularProof(ArrayList<Expression> hypos);
 }

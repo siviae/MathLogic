@@ -11,7 +11,7 @@ import java.util.HashMap;
  * Time: 20:35
  * To change this template use File | Settings | File Templates.
  */
-public abstract class LogicalBinary implements Expression {
+public abstract class LogicalBinary extends AbstractExpression {
     public Expression left;
     public Expression right;
     public Lexeme token;
@@ -42,5 +42,27 @@ public abstract class LogicalBinary implements Expression {
     @Override
     public String toString() {
         return asString().toString();    //To change body of overridden methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof LogicalBinary)) return false;
+
+        LogicalBinary that = (LogicalBinary) o;
+
+        if (!left.equals(that.left)) return false;
+        if (!right.equals(that.right)) return false;
+        if (token != that.token) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = left.hashCode();
+        result = 31 * result + right.hashCode();
+        result = 31 * result + token.hashCode();
+        return result;
     }
 }
