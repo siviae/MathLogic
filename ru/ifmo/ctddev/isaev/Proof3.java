@@ -7,11 +7,12 @@ import ru.ifmo.ctddev.isaev.helpers.AxiomScheme;
 import ru.ifmo.ctddev.isaev.helpers.InsaneHardcodedContrapositionRule;
 import ru.ifmo.ctddev.isaev.structure.*;
 
-import static ru.ifmo.ctddev.isaev.General.*;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+
+import static ru.ifmo.ctddev.isaev.General.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -27,11 +28,11 @@ public class Proof3 extends Homework {
     private void getVars(Expression e) {
         if (e instanceof Variable && !vars.containsKey(((Variable) e).token)) {
             vars.put(((Variable) e).token, (Variable) e);
-        } else if (e instanceof LogicalUnary) {
-            getVars(((LogicalUnary) e).operand);
-        } else if (e instanceof LogicalBinary) {
-            getVars(((LogicalBinary) e).left);
-            getVars(((LogicalBinary) e).right);
+        } else if (e instanceof Unary) {
+            getVars(((Unary) e).operand);
+        } else if (e instanceof Binary) {
+            getVars(((Binary) e).left);
+            getVars(((Binary) e).right);
         }
     }
 
@@ -44,7 +45,7 @@ public class Proof3 extends Homework {
         for (int i = 0; i < n; i++) {
             int k = i;
             for (Expression v : vars.values()) {
-                ((Variable) v).value = k % 2 == 1;
+                ((Variable) v).currentValue = k % 2 == 1;
                 k /= 2;
             }
             theorem = theorem.substitute(vars);
@@ -52,7 +53,7 @@ public class Proof3 extends Homework {
             if (!f) {
                 StringBuilder sb = new StringBuilder("Высказывание ложно при ");
                 for (int j = 0; j < variables.size(); j++) {
-                    sb.append(((Variable) variables.get(j)).token).append("=").append(((Variable) variables.get(j)).value ? "И" : "Л");
+                    sb.append(((Variable) variables.get(j)).token).append("=").append(((Variable) variables.get(j)).currentValue ? "И" : "Л");
                     if (j != variables.size() - 1) {
                         sb.append(", ");
                     }
@@ -77,9 +78,9 @@ public class Proof3 extends Homework {
         }
         while (variables.size() > 0) {
             Variable v = (Variable) variables.remove(variables.size() - 1);
-            Expression notV = new LogicalNot(v);
-            Expression e1 = new LogicalThen(v, theorem);
-            Expression e2 = new LogicalThen(notV, theorem);
+            Expression notV = new Not(v);
+            Expression e1 = new Then(v, theorem);
+            Expression e2 = new Then(notV, theorem);
             List<Expression> proof1 = e1.getParticularProof((ArrayList<Expression>) variables.clone());
             proof1 = deduct.move1HypoToProof(proof1);
             for (Expression e : proof1) {
@@ -98,8 +99,8 @@ public class Proof3 extends Homework {
             map.put("2", notV);
             map.put("3", theorem);
             out.println(AxiomScheme.SC_8.substitute(map));
-            out.println(new LogicalThen(new LogicalThen(notV, theorem), new LogicalThen(new LogicalOr(v, notV), theorem)));
-            out.println(new LogicalThen(new LogicalOr(v, notV), theorem));
+            out.println(new Then(new Then(notV, theorem), new Then(new Or(v, notV), theorem)));
+            out.println(new Then(new Or(v, notV), theorem));
             out.println(theorem);
         }
 
@@ -107,18 +108,18 @@ public class Proof3 extends Homework {
     }
 
     private ArrayList<Expression> tertiumNonDatur(Variable v) {
-        LogicalNot notV = new LogicalNot(v);
+        Not notV = new Not(v);
         ArrayList<Expression> result = new ArrayList<>();
         result.add(parse("A->A|!A".replace("A", v.token)));
 
         for (InsaneHardcodedContrapositionRule s : InsaneHardcodedContrapositionRule.values()) {
-            result.add(s.replace(v, new LogicalOr(v, notV)));
+            result.add(s.replace(v, new Or(v, notV)));
         }
         result.add(parse("!(A|!A)->!A".replace("A", v.token)));
 
         result.add(parse("!A->A|!A".replace("A", v.token)));
         for (InsaneHardcodedContrapositionRule s : InsaneHardcodedContrapositionRule.values()) {
-            result.add(s.replace(new LogicalNot(v), new LogicalOr(v, notV)));
+            result.add(s.replace(new Not(v), new Or(v, notV)));
         }
         result.add(parse("!(A|!A)->!!A".replace("A", v.token)));
 

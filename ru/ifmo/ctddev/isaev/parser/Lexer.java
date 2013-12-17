@@ -4,6 +4,8 @@ import ru.ifmo.ctddev.isaev.exception.LexingException;
 
 import java.util.ArrayList;
 
+import static ru.ifmo.ctddev.isaev.General.isUppercaseVariable;
+
 /**
  * Created with IntelliJ IDEA.
  * User: Xottab
@@ -13,6 +15,8 @@ import java.util.ArrayList;
  */
 public class Lexer {
     private String target;
+
+
 
     public String[] lex(String t) throws LexingException {
         this.target = t.replaceAll("\\s+", "");
@@ -31,30 +35,17 @@ public class Lexer {
                     f = false;
                 }
             }
-            if (f && isVariable(target.substring(l, r))) {
-                while (r < target.length() & isVariable(target.substring(l, r))) {
+            if (f && isUppercaseVariable(temp)) {
+                while (r < target.length() && isUppercaseVariable(target.substring(l, r+1))) {
                     ++r;
                 }
-                temp = target.substring(l, --r);
+                temp = target.substring(l, r);
                 result.add(temp);
                 l = r;
             }
         }
         if (l - r > 0) throw new LexingException();
         return result.toArray(new String[result.size()]);
-    }
-
-    public static boolean isVariable(String temp) {
-        if (Character.getType(temp.charAt(0)) != Character.UPPERCASE_LETTER) return false;
-        if (temp.length() > 1) {
-            try {
-                Integer.parseInt(temp.substring(1, temp.length()));
-                return true;
-            } catch (NumberFormatException e) {
-                return false;
-            }
-        }
-        return true;
     }
 
 }

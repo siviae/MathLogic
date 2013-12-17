@@ -10,29 +10,29 @@ import java.util.List;
  * Created with IntelliJ IDEA.
  * User: Xottab
  * Date: 05.11.13
- * Time: 20:32
+ * Time: 20:33
  * To change this template use File | Settings | File Templates.
  */
-public class LogicalOr extends LogicalBinary {
-    public LogicalOr(Expression left, Expression right) {
-        super(left, right);
-        this.token = Lexeme.OR;
+public class Not extends Unary {
+    public Not(Expression operand) {
+        super(operand);
+        this.token = Lexeme.NOT;
     }
 
     @Override
     public boolean match(Expression other) {
         return hasSameType(other)
-                && ((LogicalOr) other).left.match(left)
-                && ((LogicalOr) other).right.match(right);
+                && ((Not) other).operand.match(operand);
     }
+
     @Override
     public boolean hasSameType(Expression other) {
-        return other instanceof LogicalOr;
+        return other instanceof Not;
     }
 
     @Override
     public boolean evaluate() {
-        return left.evaluate() || right.evaluate();
+        return !operand.evaluate();
     }
 
     @Override
@@ -42,7 +42,6 @@ public class LogicalOr extends LogicalBinary {
 
     @Override
     public Expression substitute(HashMap<String, Expression> variables) {
-        return new LogicalOr(left.substitute(variables),right.substitute(variables));
+        return new Not(operand.substitute(variables));
     }
-
 }

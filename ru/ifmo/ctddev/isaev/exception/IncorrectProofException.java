@@ -6,6 +6,6 @@ package ru.ifmo.ctddev.isaev.exception;
  */
 public class IncorrectProofException extends Exception {
     public IncorrectProofException(String s) {
-        super("Cant generate proof for "+s);
+        super("Cant generate proof for " + s);
     }
 }

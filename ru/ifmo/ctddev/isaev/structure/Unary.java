@@ -11,18 +11,19 @@ import java.util.HashMap;
  * Time: 20:36
  * To change this template use File | Settings | File Templates.
  */
-public abstract class LogicalUnary extends AbstractExpression {
+public abstract class Unary extends AbstractExpression {
     public Expression operand;
     public Lexeme token;
 
-    public LogicalUnary(Expression operand) {
+    public Unary(Expression operand) {
         this.operand = operand;
     }
+    public Unary(){}
 
     @Override
     public boolean matchAxiomScheme(Expression expr, HashMap<Integer, Expression> known) {
         return hasSameType(expr)
-                && operand.matchAxiomScheme(((LogicalUnary) expr).operand, known);
+                && operand.matchAxiomScheme(((Unary) expr).operand, known);
     }
 
     @Override
@@ -43,9 +44,9 @@ public abstract class LogicalUnary extends AbstractExpression {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof LogicalUnary)) return false;
+        if (!(o instanceof Unary)) return false;
 
-        LogicalUnary that = (LogicalUnary) o;
+        Unary that = (Unary) o;
 
         if (!operand.equals(that.operand)) return false;
         if (token != that.token) return false;

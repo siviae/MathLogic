@@ -13,38 +13,37 @@ import java.util.List;
  * Time: 20:32
  * To change this template use File | Settings | File Templates.
  */
-public class LogicalAnd extends LogicalBinary {
-    public LogicalAnd(Expression left, Expression right) {
+public class Or extends Binary {
+    public Or(Expression left, Expression right) {
         super(left, right);
-        this.token = Lexeme.AND;
+        this.token = Lexeme.OR;
     }
 
     @Override
     public boolean match(Expression other) {
         return hasSameType(other)
-                && ((LogicalAnd) other).left.match(left)
-                && ((LogicalAnd) other).right.match(right);
-    }
-
-    @Override
-    public Expression substitute(HashMap<String, Expression> variables) {
-        return new LogicalAnd(left.substitute(variables),right.substitute(variables));
+                && ((Or) other).left.match(left)
+                && ((Or) other).right.match(right);
     }
 
     @Override
     public boolean hasSameType(Expression other) {
-        return other instanceof LogicalAnd;
+        return other instanceof Or;
     }
 
     @Override
     public boolean evaluate() {
-        return left.evaluate()&&right.evaluate();
+        return left.evaluate() || right.evaluate();
     }
 
     @Override
     public List<Expression> getParticularProof(ArrayList<Expression> hypos) {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
 
-        return null;
+    @Override
+    public Expression substitute(HashMap<String, Expression> variables) {
+        return new Or(left.substitute(variables), right.substitute(variables));
     }
 
 }

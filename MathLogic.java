@@ -1,18 +1,12 @@
-import ru.ifmo.ctddev.isaev.Checker1;
-import ru.ifmo.ctddev.isaev.Deduct2;
-import ru.ifmo.ctddev.isaev.Homework;
-import ru.ifmo.ctddev.isaev.Proof3;
+import ru.ifmo.ctddev.isaev.*;
 import ru.ifmo.ctddev.isaev.exception.IncorrectProofException;
 import ru.ifmo.ctddev.isaev.exception.LexingException;
 import ru.ifmo.ctddev.isaev.exception.ParsingException;
-import ru.ifmo.ctddev.isaev.parser.Lexer;
-import ru.ifmo.ctddev.isaev.parser.Parser;
-import ru.ifmo.ctddev.isaev.structure.Expression;
+
+import java.io.*;
 
 import static ru.ifmo.ctddev.isaev.General.in;
 import static ru.ifmo.ctddev.isaev.General.out;
-
-import java.io.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -27,10 +21,12 @@ public class MathLogic {
     public static void main(String[] args) {
         switch (args[0]) {
             case "1": {
+                General.setMode(1);
                 work = new Checker1();
                 break;
             }
             case "2": {
+                General.setMode(1);
                 work = new Deduct2();
                 break;
             }

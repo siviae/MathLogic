@@ -1,9 +1,14 @@
 package ru.ifmo.ctddev.isaev.parser;
 
+import ru.ifmo.ctddev.isaev.General;
 import ru.ifmo.ctddev.isaev.exception.ParsingException;
 import ru.ifmo.ctddev.isaev.structure.*;
 
 import java.util.ArrayList;
+import java.util.List;
+
+import static ru.ifmo.ctddev.isaev.General.isLowercaseVariable;
+import static ru.ifmo.ctddev.isaev.General.isUppercaseVariable;
 
 /**
  * Created with IntelliJ IDEA.
@@ -16,11 +21,15 @@ public class Parser {
 
     private String[] tokens;
     private int position = 0;
-
+    private int mode;
 
     public Expression parse(String[] tokens) throws ParsingException {
         this.tokens = tokens;
+        this.mode = General.getMode();
         this.position = 0;
+        if (mode < 1 | mode > 2) {
+            throw new ParsingException("undefined parsing mode");
+        }
         return expr();
     }
 
@@ -36,7 +45,7 @@ public class Parser {
             result = arr.get(arr.size() - 1);
             int i = arr.size() - 2;
             while (i >= 0) {
-                result = new LogicalThen(arr.get(i), result);
+                result = new Then(arr.get(i), result);
                 i--;
             }
         }
@@ -47,7 +56,7 @@ public class Parser {
         Expression result = conj();
         while (position < tokens.length && tokens[position].equals(Lexeme.OR.token)) {
             position++;
-            result = new LogicalOr(result, conj());
+            result = new Or(result, conj());
         }
         return result;
     }
@@ -56,16 +65,80 @@ public class Parser {
         Expression result = unary();
         while (position < tokens.length && tokens[position].equals(Lexeme.AND.token)) {
             position++;
-            result = new LogicalAnd(result, unary());
+            result = new And(result, unary());
         }
         return result;
     }
 
-    private Expression unary() throws ParsingException {
-        if (Lexer.isVariable(tokens[position])) {
-            Expression result = new Variable(tokens[position]);
+    private Term term() throws ParsingException {
+        boolean brackets = false;
+        if (tokens[position].equals(Lexeme.LEFT_P.token)) {
             position++;
-            return result;
+            brackets = true;
+        }
+        Term result;
+        if (isLowercaseVariable(tokens[position])) {
+            result = new Term(var().toString());
+        } else
+            throw new ParsingException("cannot parse term without name");
+
+        if (tokens[position].equals(Lexeme.LEFT_P.token)) {
+            position++;
+            List<Term> arguments = new ArrayList<>(3);
+            arguments.add(term());
+            while (tokens[position].equals(Lexeme.COMMA.token)) {
+                position++;
+                arguments.add(term());
+            }
+            position++;
+            result.arguments = arguments.toArray(new Term[arguments.size()]);
+        }
+
+        if (brackets) {
+            position++;
+        }
+        return result;
+    }
+
+    private Predicate predicate() throws ParsingException {
+        Predicate result;
+        if (isUppercaseVariable(tokens[position])) {
+            result = new Predicate(var().toString());
+        } else
+            throw new ParsingException("cannot predicate without name");
+
+        if (tokens[position].equals(Lexeme.LEFT_P.token)) {
+            position++;
+            List<Term> arguments = new ArrayList<>(3);
+            arguments.add(term());
+            while (tokens[position].equals(Lexeme.COMMA.token)) {
+                position++;
+                arguments.add(term());
+            }
+            position++;
+            result.arguments = arguments.toArray(new Term[arguments.size()]);
+        }
+        return result;
+    }
+
+    private Variable var() {
+        Variable result = new Variable(tokens[position]);
+        position++;
+        return result;
+    }
+
+    private Expression unary() throws ParsingException {
+        if (mode == 1) {
+            if (isUppercaseVariable(tokens[position])) {
+                return var();
+            }
+        } else {
+            if (isLowercaseVariable(tokens[position])) {
+                return var();
+            }
+            if (isUppercaseVariable(tokens[position])) {
+                return predicate();
+            }
         }
         if (tokens[position].equals(Lexeme.LEFT_P.token)) {
             position++;
@@ -85,7 +158,19 @@ public class Parser {
 
         if (tokens[position].equals(Lexeme.NOT.token)) {
             position++;
-            return new LogicalNot(unary());
+            return new Not(unary());
+        }
+        if (mode > 1) {
+            if (tokens[position].equals(Lexeme.FORALL.token)) {
+                position++;
+                Variable v = var();
+                return new ForAll(v, unary());
+            }
+            if (tokens[position].equals(Lexeme.EXISTS.token)) {
+                position++;
+                Variable v = var();
+                return new Exists(v, unary());
+            }
         }
         throw new ParsingException("unexpected symbol");
     }

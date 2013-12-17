@@ -1,7 +1,5 @@
 package ru.ifmo.ctddev.isaev;
 
-import ru.ifmo.ctddev.isaev.exception.LexingException;
-import ru.ifmo.ctddev.isaev.exception.ParsingException;
 import ru.ifmo.ctddev.isaev.parser.Lexer;
 import ru.ifmo.ctddev.isaev.parser.Parser;
 import ru.ifmo.ctddev.isaev.structure.Expression;
@@ -18,9 +16,17 @@ import java.util.List;
 public class General {
     public static BufferedReader in;
     public static PrintWriter out;
-
     protected static Lexer lexer = new Lexer();
     protected static Parser parser = new Parser();
+    private static int currentMode;
+
+    public static void setMode(int currentMode) {
+        General.currentMode = currentMode;
+    }
+
+    public static int getMode() {
+        return currentMode;
+    }
 
     public static Expression parse(String s) {
         Expression expression = null;
@@ -52,5 +58,25 @@ public class General {
             result.add(parse(s));
         }
         return result;
+    }
+
+    public static boolean isLowercaseVariable(String temp) {
+        return Character.isLowerCase(temp.charAt(0)) && looksLikeSomething(temp);
+    }
+
+    private static boolean looksLikeSomething(String temp) {
+        if (temp.length() > 1) {
+            try {
+                Integer.parseInt(temp.substring(1, temp.length()));
+                return true;
+            } catch (NumberFormatException e) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public static boolean isUppercaseVariable(String temp) {
+        return Character.isUpperCase(temp.charAt(0)) && looksLikeSomething(temp);
     }
 }

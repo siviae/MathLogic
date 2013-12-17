@@ -1,15 +1,13 @@
 package ru.ifmo.ctddev.isaev;
 
-import ru.ifmo.ctddev.isaev.exception.LexingException;
-import ru.ifmo.ctddev.isaev.exception.ParsingException;
 import ru.ifmo.ctddev.isaev.helpers.AxiomScheme;
 import ru.ifmo.ctddev.isaev.structure.Expression;
 
-import static ru.ifmo.ctddev.isaev.General.*;
-
-import java.io.*;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import static ru.ifmo.ctddev.isaev.General.*;
 
 /**
  * Created with IntelliJ IDEA.

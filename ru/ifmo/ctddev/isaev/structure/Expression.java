@@ -13,13 +13,20 @@ import java.util.List;
  */
 public interface Expression {
     boolean match(Expression other);
-    boolean matchAxiomScheme(Expression expr, HashMap<Integer,Expression> known);
+
+    boolean matchAxiomScheme(Expression expr, HashMap<Integer, Expression> known);
+
     Expression substitute(HashMap<String, Expression> variables);
+
     boolean hasSameType(Expression other);
+
     boolean evaluate();
+
     StringBuilder asString();
+
     @Override
     public String toString();
+
     StringBuilder asJavaExpr();
 
     List<Expression> getParticularProof(ArrayList<Expression> hypos);

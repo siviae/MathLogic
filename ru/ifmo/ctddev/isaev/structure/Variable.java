@@ -11,9 +11,9 @@ import java.util.List;
  * Time: 20:34
  * To change this template use File | Settings | File Templates.
  */
-public class Variable extends AbstractExpression{
+public class Variable extends AbstractExpression {
     public String token;
-    public boolean value;
+    public boolean currentValue;
 
     public Variable(String token) {
         this.token = token;
@@ -41,7 +41,7 @@ public class Variable extends AbstractExpression{
 
     @Override
     public boolean evaluate() {
-        return value;
+        return currentValue;
     }
 
     @Override
@@ -71,7 +71,7 @@ public class Variable extends AbstractExpression{
 
         Variable variable = (Variable) o;
 
-        if (value != variable.value) return false;
+        if (currentValue != variable.currentValue) return false;
         if (!token.equals(variable.token)) return false;
 
         return true;
@@ -80,7 +80,7 @@ public class Variable extends AbstractExpression{
     @Override
     public int hashCode() {
         int result = token.hashCode();
-        result = 31 * result + (value ? 1 : 0);
+        result = 31 * result + (currentValue ? 1 : 0);
         return result;
     }
 }

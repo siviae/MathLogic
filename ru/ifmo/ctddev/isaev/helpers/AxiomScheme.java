@@ -12,80 +12,80 @@ import java.util.HashMap;
  * To change this template use File | Settings | File Templates.
  */
 public enum AxiomScheme {
-    SC_1(new LogicalThen(
+    SC_1(new Then(
             new NumExpression(1),
-            new LogicalThen(
+            new Then(
                     new NumExpression(2),
                     new NumExpression(1)))),
-    SC_2(new LogicalThen(
-            new LogicalThen(
+    SC_2(new Then(
+            new Then(
                     new NumExpression(1),
                     new NumExpression(2)
             ),
-            new LogicalThen(
-                    new LogicalThen(
+            new Then(
+                    new Then(
                             new NumExpression(1),
-                            new LogicalThen(
+                            new Then(
                                     new NumExpression(2),
                                     new NumExpression(3)
                             )
                     ),
-                    new LogicalThen(
+                    new Then(
                             new NumExpression(1),
                             new NumExpression(3)
                     )
             )
     )),
-    SC_3(new LogicalThen(
+    SC_3(new Then(
             new NumExpression(1),
-            new LogicalThen(
+            new Then(
                     new NumExpression(2),
-                    new LogicalAnd(
+                    new And(
                             new NumExpression(1),
                             new NumExpression(2)
                     )
             )
     )),
-    SC_4(new LogicalThen(
-            new LogicalAnd(
+    SC_4(new Then(
+            new And(
                     new NumExpression(1),
                     new NumExpression(2)
             ),
             new NumExpression(1)
     )),
-    SC_5(new LogicalThen(
-            new LogicalAnd(
+    SC_5(new Then(
+            new And(
                     new NumExpression(1),
                     new NumExpression(2)
             ),
             new NumExpression(2)
     )),
-    SC_6(new LogicalThen(
+    SC_6(new Then(
             new NumExpression(1),
-            new LogicalOr(
+            new Or(
                     new NumExpression(1),
                     new NumExpression(2)
             )
     )),
-    SC_7(new LogicalThen(
+    SC_7(new Then(
             new NumExpression(2),
-            new LogicalOr(
+            new Or(
                     new NumExpression(1),
                     new NumExpression(2)
             )
     )),
-    SC_8(new LogicalThen(
-            new LogicalThen(
+    SC_8(new Then(
+            new Then(
                     new NumExpression(1),
                     new NumExpression(3)
             ),
-            new LogicalThen(
-                    new LogicalThen(
+            new Then(
+                    new Then(
                             new NumExpression(2),
                             new NumExpression(3)
                     ),
-                    new LogicalThen(
-                            new LogicalOr(
+                    new Then(
+                            new Or(
                                     new NumExpression(1),
                                     new NumExpression(2)
                             ),
@@ -93,20 +93,20 @@ public enum AxiomScheme {
                     )
             )
     )),
-    SC_9(new LogicalThen(
-            new LogicalThen(
+    SC_9(new Then(
+            new Then(
                     new NumExpression(1),
                     new NumExpression(2)
             ),
-            new LogicalThen(
-                    new LogicalThen(
+            new Then(
+                    new Then(
                             new NumExpression(1),
-                            new LogicalNot(new NumExpression(2))
+                            new Not(new NumExpression(2))
                     ),
-                    new LogicalNot(new NumExpression(1)))
+                    new Not(new NumExpression(1)))
     )),
-    SC_10(new LogicalThen(
-            new LogicalNot(new LogicalNot(new NumExpression(1))),
+    SC_10(new Then(
+            new Not(new Not(new NumExpression(1))),
             new NumExpression(1)));
 
     private Expression expr;

@@ -15,8 +15,8 @@ public enum Lexeme {
     EXISTS("?"),
     FORALL("@"),
     LEFT_P("("),
-    RIGHT_P(")");
-
+    RIGHT_P(")"),
+    COMMA(",");
     public final String token;
 
     private Lexeme(final String token) {

@@ -1,13 +1,8 @@
 package ru.ifmo.ctddev.isaev.helpers;
 
 import ru.ifmo.ctddev.isaev.structure.Expression;
-import ru.ifmo.ctddev.isaev.structure.LogicalNot;
-import ru.ifmo.ctddev.isaev.structure.LogicalThen;
-import ru.ifmo.ctddev.isaev.structure.Variable;
 
-import static ru.ifmo.ctddev.isaev.General.*;
-
-import java.util.HashMap;
+import static ru.ifmo.ctddev.isaev.General.parse;
 
 /**
  * Created with IntelliJ IDEA.
@@ -93,8 +88,6 @@ public enum InsaneHardcodedContrapositionRule {
     R_72("(((A->B)->(!(B)->((A->!(B))->!(A))))->(((A->B)->((!(B)->((A->!(B))->!(A)))->(!(B)->!(A))))->((A->B)->(!(B)->!(A)))))"),
     R_73("(((A->B)->((!(B)->((A->!(B))->!(A)))->(!(B)->!(A))))->((A->B)->(!(B)->!(A))))"),
     R_74("((A->B)->(!(B)->!(A)))");
-
-
     private String s;
 
 

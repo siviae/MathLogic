@@ -11,12 +11,12 @@ import java.util.HashMap;
  * Time: 20:35
  * To change this template use File | Settings | File Templates.
  */
-public abstract class LogicalBinary extends AbstractExpression {
+public abstract class Binary extends AbstractExpression {
     public Expression left;
     public Expression right;
     public Lexeme token;
 
-    protected LogicalBinary(Expression left, Expression right) {
+    protected Binary(Expression left, Expression right) {
         this.left = left;
         this.right = right;
     }
@@ -24,8 +24,8 @@ public abstract class LogicalBinary extends AbstractExpression {
     @Override
     public boolean matchAxiomScheme(Expression expr, HashMap<Integer, Expression> known) {
         return hasSameType(expr)
-                && left.matchAxiomScheme(((LogicalBinary) expr).left, known)
-                && right.matchAxiomScheme(((LogicalBinary) expr).right, known);
+                && left.matchAxiomScheme(((Binary) expr).left, known)
+                && right.matchAxiomScheme(((Binary) expr).right, known);
     }
 
 
@@ -47,9 +47,9 @@ public abstract class LogicalBinary extends AbstractExpression {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof LogicalBinary)) return false;
+        if (!(o instanceof Binary)) return false;
 
-        LogicalBinary that = (LogicalBinary) o;
+        Binary that = (Binary) o;
 
         if (!left.equals(that.left)) return false;
         if (!right.equals(that.right)) return false;
