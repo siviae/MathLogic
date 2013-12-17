@@ -32,15 +32,12 @@ public class Lexer {
                 }
             }
             if (f && isVariable(target.substring(l, r))) {
-                if (r + 1 < target.length() && isVariable(target.substring(l, r + 1))) {
+                while (r < target.length() & isVariable(target.substring(l, r))) {
                     ++r;
-                    result.add(target.substring(l, r));
-                    l = r;
-                } else {
-                    result.add(temp);
-                    l = r;
                 }
-
+                temp = target.substring(l, --r);
+                result.add(temp);
+                l = r;
             }
         }
         if (l - r > 0) throw new LexingException();
@@ -48,11 +45,16 @@ public class Lexer {
     }
 
     public static boolean isVariable(String temp) {
-        boolean f = true;
-        if (temp.length() > 2) f = false;
-        if (Character.getType(temp.charAt(0)) != Character.UPPERCASE_LETTER) f = false;
-        if (temp.length() == 2 && !Character.isDigit(temp.charAt(1))) f = false;
-        return f;
+        if (Character.getType(temp.charAt(0)) != Character.UPPERCASE_LETTER) return false;
+        if (temp.length() > 1) {
+            try {
+                Integer.parseInt(temp.substring(1, temp.length()));
+                return true;
+            } catch (NumberFormatException e) {
+                return false;
+            }
+        }
+        return true;
     }
 
 }
