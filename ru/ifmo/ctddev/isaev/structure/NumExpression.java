@@ -1,6 +1,7 @@
 package ru.ifmo.ctddev.isaev.structure;
 
-import java.util.ArrayList;
+import ru.ifmo.ctddev.isaev.exception.ProofGeneratingException;
+
 import java.util.HashMap;
 import java.util.List;
 
@@ -34,7 +35,7 @@ public class NumExpression extends AbstractExpression {
     }
 
     @Override
-    public Expression substitute(HashMap<String, Expression> variables) {
+    public Expression substitute(HashMap<String, ? extends Expression> variables) {
         return variables.containsKey(Integer.toString(number)) ? variables.get(Integer.toString(number)) : this;
     }
 
@@ -59,8 +60,13 @@ public class NumExpression extends AbstractExpression {
     }
 
     @Override
-    public List<Expression> getParticularProof(ArrayList<Expression> hypos) {
+    public List<Expression> getParticularProof(List<? extends Expression> hypos) throws ProofGeneratingException {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public HashMap<String, Variable> getVars() {
+        return null;
     }
 
 }

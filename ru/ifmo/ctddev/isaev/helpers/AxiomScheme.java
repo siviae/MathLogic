@@ -1,6 +1,10 @@
 package ru.ifmo.ctddev.isaev.helpers;
 
 import ru.ifmo.ctddev.isaev.structure.*;
+import ru.ifmo.ctddev.isaev.structure.logic.And;
+import ru.ifmo.ctddev.isaev.structure.logic.Not;
+import ru.ifmo.ctddev.isaev.structure.logic.Or;
+import ru.ifmo.ctddev.isaev.structure.logic.Then;
 
 import java.util.HashMap;
 

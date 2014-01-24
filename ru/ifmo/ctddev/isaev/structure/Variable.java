@@ -1,7 +1,9 @@
 package ru.ifmo.ctddev.isaev.structure;
 
-import java.util.ArrayList;
+import ru.ifmo.ctddev.isaev.exception.ProofGeneratingException;
+
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -30,7 +32,7 @@ public class Variable extends AbstractExpression {
     }
 
     @Override
-    public Expression substitute(HashMap<String, Expression> variables) {
+    public Expression substitute(HashMap<String, ? extends Expression> variables) {
         return variables.containsKey(token) ? variables.get(token) : new Variable(token);
     }
 
@@ -55,13 +57,8 @@ public class Variable extends AbstractExpression {
     }
 
     @Override
-    public List<Expression> getParticularProof(ArrayList<Expression> hypos) {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
-    public String toString() {
-        return asString().toString();
+    public List<Expression> getParticularProof(List<? extends Expression> hypos) throws ProofGeneratingException {
+        return new LinkedList<>();
     }
 
     @Override
@@ -75,6 +72,13 @@ public class Variable extends AbstractExpression {
         if (!token.equals(variable.token)) return false;
 
         return true;
+    }
+
+    @Override
+    public HashMap<String, Variable> getVars() {
+        HashMap<String, Variable> vars = new HashMap<>();
+        vars.put(token, this);
+        return vars;
     }
 
     @Override

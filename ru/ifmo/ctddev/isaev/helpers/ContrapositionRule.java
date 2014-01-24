@@ -11,7 +11,7 @@ import static ru.ifmo.ctddev.isaev.General.parse;
  * Time: 17:21
  * To change this template use File | Settings | File Templates.
  */
-public enum InsaneHardcodedContrapositionRule {
+public enum ContrapositionRule {
 
     //O_o
     R_1("((A->B)->((A->!(B))->!(A)))"),
@@ -91,7 +91,7 @@ public enum InsaneHardcodedContrapositionRule {
     private String s;
 
 
-    private InsaneHardcodedContrapositionRule(String s) {
+    private ContrapositionRule(String s) {
         this.s = s;
     }
 

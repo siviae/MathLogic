@@ -5,4 +5,8 @@ package ru.ifmo.ctddev.isaev.structure;
  * Date: 29.11.13
  */
 public abstract class AbstractExpression implements Expression {
+    @Override
+    public String toString() {
+        return asString().toString();
+    }
 }

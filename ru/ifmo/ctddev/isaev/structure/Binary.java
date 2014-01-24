@@ -1,8 +1,10 @@
 package ru.ifmo.ctddev.isaev.structure;
 
+import ru.ifmo.ctddev.isaev.exception.ProofGeneratingException;
 import ru.ifmo.ctddev.isaev.parser.Lexeme;
 
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -28,20 +30,21 @@ public abstract class Binary extends AbstractExpression {
                 && right.matchAxiomScheme(((Binary) expr).right, known);
     }
 
-
     @Override
     public StringBuilder asString() {
         return left.asString().append(token.token).append(right.asString()).append(Lexeme.RIGHT_P.token).insert(0, Lexeme.LEFT_P.token);
     }
 
     @Override
-    public StringBuilder asJavaExpr() {
-        return new StringBuilder("new ").append(getClass().getSimpleName()).append("(").append(left.asJavaExpr()).append(",").append(right.asJavaExpr()).append(")");
+    public HashMap<String, Variable> getVars() {
+        HashMap<String, Variable> h = left.getVars();
+        h.putAll(right.getVars());
+        return h;
     }
 
     @Override
-    public String toString() {
-        return asString().toString();    //To change body of overridden methods use File | Settings | File Templates.
+    public StringBuilder asJavaExpr() {
+        return new StringBuilder("new ").append(getClass().getSimpleName()).append("(").append(left.asJavaExpr()).append(",").append(right.asJavaExpr()).append(")");
     }
 
     @Override
@@ -56,6 +59,13 @@ public abstract class Binary extends AbstractExpression {
         if (token != that.token) return false;
 
         return true;
+    }
+
+    @Override
+    public List<Expression> getParticularProof(List<? extends Expression> hypos) throws ProofGeneratingException {
+        List<Expression> result = left.getParticularProof(hypos);
+        result.addAll(right.getParticularProof(hypos));
+        return result;
     }
 
     @Override

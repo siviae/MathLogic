@@ -17,7 +17,6 @@ public class Lexer {
     private String target;
 
 
-
     public String[] lex(String t) throws LexingException {
         this.target = t.replaceAll("\\s+", "");
         ArrayList<String> result = new ArrayList<String>();
@@ -36,7 +35,7 @@ public class Lexer {
                 }
             }
             if (f && isUppercaseVariable(temp)) {
-                while (r < target.length() && isUppercaseVariable(target.substring(l, r+1))) {
+                while (r < target.length() && isUppercaseVariable(target.substring(l, r + 1))) {
                     ++r;
                 }
                 temp = target.substring(l, r);

@@ -3,13 +3,19 @@ package ru.ifmo.ctddev.isaev;
 import ru.ifmo.ctddev.isaev.exception.IncorrectProofException;
 import ru.ifmo.ctddev.isaev.exception.LexingException;
 import ru.ifmo.ctddev.isaev.exception.ParsingException;
+import ru.ifmo.ctddev.isaev.exception.ProofGeneratingException;
 import ru.ifmo.ctddev.isaev.helpers.AxiomScheme;
-import ru.ifmo.ctddev.isaev.helpers.InsaneHardcodedContrapositionRule;
-import ru.ifmo.ctddev.isaev.structure.*;
+import ru.ifmo.ctddev.isaev.helpers.ContrapositionRule;
+import ru.ifmo.ctddev.isaev.structure.Expression;
+import ru.ifmo.ctddev.isaev.structure.Variable;
+import ru.ifmo.ctddev.isaev.structure.logic.Not;
+import ru.ifmo.ctddev.isaev.structure.logic.Or;
+import ru.ifmo.ctddev.isaev.structure.logic.Then;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 
 import static ru.ifmo.ctddev.isaev.General.*;
@@ -22,26 +28,48 @@ import static ru.ifmo.ctddev.isaev.General.*;
  * To change this template use File | Settings | File Templates.
  */
 public class Proof3 extends Homework {
-    HashMap<String, Expression> vars = new HashMap<>();
+    HashMap<String, Variable> vars = new HashMap<>();
     Deduct2 deduct;
 
-    private void getVars(Expression e) {
-        if (e instanceof Variable && !vars.containsKey(((Variable) e).token)) {
-            vars.put(((Variable) e).token, (Variable) e);
-        } else if (e instanceof Unary) {
-            getVars(((Unary) e).operand);
-        } else if (e instanceof Binary) {
-            getVars(((Binary) e).left);
-            getVars(((Binary) e).right);
+    private List<Expression> getProof(Expression theorem, List<Expression> hypothesis, int currentPosition) throws ProofGeneratingException, IncorrectProofException {
+        List<Expression> proof = new LinkedList<>();
+        Expression v = hypothesis.get(currentPosition);
+        Expression notV = new Not(v);
+        List<Expression> proof1;
+        List<Expression> proof2;
+
+        if (currentPosition == hypothesis.size() - 1) {
+            deduct.setHypos(hypothesis);
+            proof1 = deduct.move1HypoToProof(theorem.getParticularProof(hypothesis));
+            hypothesis.set(currentPosition, notV);
+            deduct.setHypos(hypothesis);
+            proof2 = deduct.move1HypoToProof(theorem.getParticularProof(hypothesis));
+        } else {
+            deduct.setHypos(hypothesis);
+            proof1 = deduct.move1HypoToProof(getProof(theorem, hypothesis, currentPosition + 1));
+            hypothesis.set(currentPosition, notV);
+            deduct.setHypos(hypothesis);
+            proof2 = deduct.move1HypoToProof(getProof(theorem, hypothesis, currentPosition + 1));
         }
+        proof.addAll(proof1);
+        proof.addAll(proof2);
+        HashMap<String, Expression> map = new HashMap<>();
+        map.put("1", v);
+        map.put("2", notV);
+        map.put("3", theorem);
+        proof.add(AxiomScheme.SC_8.substitute(map));
+        proof.add(new Then(new Then(notV, theorem), new Then(new Or(v, notV), theorem)));
+        proof.add(new Then(new Or(v, notV), theorem));
+        proof.add(theorem);
+        return proof;
     }
 
     @Override
-    public void doSomething() throws IOException, ParsingException, LexingException, IncorrectProofException {
+    public void doSomething() throws IOException, ParsingException, LexingException, IncorrectProofException, ProofGeneratingException {
         Expression theorem = parse(in.readLine());
-        getVars(theorem);
+        vars = theorem.getVars();
         int n = (int) Math.pow(2, vars.size());
-        ArrayList<Expression> variables = new ArrayList<>(vars.values());
+        List<Variable> variables = new ArrayList<>(vars.values());
         for (int i = 0; i < n; i++) {
             int k = i;
             for (Expression v : vars.values()) {
@@ -53,7 +81,7 @@ public class Proof3 extends Homework {
             if (!f) {
                 StringBuilder sb = new StringBuilder("Высказывание ложно при ");
                 for (int j = 0; j < variables.size(); j++) {
-                    sb.append(((Variable) variables.get(j)).token).append("=").append(((Variable) variables.get(j)).currentValue ? "И" : "Л");
+                    sb.append(variables.get(j).token).append("=").append(variables.get(j).currentValue ? "И" : "Л");
                     if (j != variables.size() - 1) {
                         sb.append(", ");
                     }
@@ -63,7 +91,6 @@ public class Proof3 extends Homework {
                 System.exit(0);
             }
         }
-        List<Expression> proofed = new ArrayList<>();
         List<ArrayList<Expression>> tnd = new ArrayList<>();
 
         for (Expression v : vars.values()) {
@@ -76,35 +103,11 @@ public class Proof3 extends Homework {
                 out.println(e.asString());
             }
         }
-        while (variables.size() > 0) {
-            Variable v = (Variable) variables.remove(variables.size() - 1);
-            Expression notV = new Not(v);
-            Expression e1 = new Then(v, theorem);
-            Expression e2 = new Then(notV, theorem);
-            List<Expression> proof1 = e1.getParticularProof((ArrayList<Expression>) variables.clone());
-            proof1 = deduct.move1HypoToProof(proof1);
-            for (Expression e : proof1) {
-                out.println(e.toString());
-            }
-            List<Expression> proof2 = e2.getParticularProof((ArrayList<Expression>) variables.clone());
-            proof2 = deduct.move1HypoToProof(proof2);
-            for (Expression e : proof2) {
-                out.println(e.toString());
-            }
-            proofed.add(e1);
-            proofed.add(e2);
-
-            HashMap<String, Expression> map = new HashMap<>();
-            map.put("1", v);
-            map.put("2", notV);
-            map.put("3", theorem);
-            out.println(AxiomScheme.SC_8.substitute(map));
-            out.println(new Then(new Then(notV, theorem), new Then(new Or(v, notV), theorem)));
-            out.println(new Then(new Or(v, notV), theorem));
-            out.println(theorem);
+        List<Expression> hypothesis = new ArrayList<Expression>(variables);
+        List<Expression> proof = getProof(theorem, hypothesis, 0);
+        for (Expression e : proof) {
+            out.println(e.toString());
         }
-
-
     }
 
     private ArrayList<Expression> tertiumNonDatur(Variable v) {
@@ -112,13 +115,13 @@ public class Proof3 extends Homework {
         ArrayList<Expression> result = new ArrayList<>();
         result.add(parse("A->A|!A".replace("A", v.token)));
 
-        for (InsaneHardcodedContrapositionRule s : InsaneHardcodedContrapositionRule.values()) {
+        for (ContrapositionRule s : ContrapositionRule.values()) {
             result.add(s.replace(v, new Or(v, notV)));
         }
         result.add(parse("!(A|!A)->!A".replace("A", v.token)));
 
         result.add(parse("!A->A|!A".replace("A", v.token)));
-        for (InsaneHardcodedContrapositionRule s : InsaneHardcodedContrapositionRule.values()) {
+        for (ContrapositionRule s : ContrapositionRule.values()) {
             result.add(s.replace(new Not(v), new Or(v, notV)));
         }
         result.add(parse("!(A|!A)->!!A".replace("A", v.token)));

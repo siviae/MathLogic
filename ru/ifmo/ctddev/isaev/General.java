@@ -17,18 +17,15 @@ public class General {
     public static BufferedReader in;
     public static PrintWriter out;
     protected static Lexer lexer = new Lexer();
-    protected static Parser parser = new Parser();
+    private static Parser parser;
     private static int currentMode;
 
-    public static void setMode(int currentMode) {
-        General.currentMode = currentMode;
-    }
-
-    public static int getMode() {
-        return currentMode;
+    public static void setParser(Parser parser) {
+        General.parser = parser;
     }
 
     public static Expression parse(String s) {
+
         Expression expression = null;
         try {
             String[] lexems = lexer.lex(s);

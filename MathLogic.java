@@ -2,6 +2,8 @@ import ru.ifmo.ctddev.isaev.*;
 import ru.ifmo.ctddev.isaev.exception.IncorrectProofException;
 import ru.ifmo.ctddev.isaev.exception.LexingException;
 import ru.ifmo.ctddev.isaev.exception.ParsingException;
+import ru.ifmo.ctddev.isaev.exception.ProofGeneratingException;
+import ru.ifmo.ctddev.isaev.parser.LogicParser;
 
 import java.io.*;
 
@@ -21,16 +23,17 @@ public class MathLogic {
     public static void main(String[] args) {
         switch (args[0]) {
             case "1": {
-                General.setMode(1);
+                General.setParser(new LogicParser());
                 work = new Checker1();
                 break;
             }
             case "2": {
-                General.setMode(1);
+                General.setParser(new LogicParser());
                 work = new Deduct2();
                 break;
             }
             case "3": {
+                General.setParser(new LogicParser());
                 work = new Proof3();
                 break;
             }
@@ -56,7 +59,7 @@ public class MathLogic {
         } catch (FileNotFoundException e) {
             System.out.println("file not found");
             e.printStackTrace();
-        } catch (IOException | LexingException | ParsingException | IncorrectProofException e) {
+        } catch (IOException | LexingException | ParsingException | IncorrectProofException | ProofGeneratingException e) {
             e.printStackTrace();
         }
     }

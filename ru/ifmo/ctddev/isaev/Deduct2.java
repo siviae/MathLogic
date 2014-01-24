@@ -5,7 +5,7 @@ import ru.ifmo.ctddev.isaev.exception.LexingException;
 import ru.ifmo.ctddev.isaev.exception.ParsingException;
 import ru.ifmo.ctddev.isaev.helpers.AxiomScheme;
 import ru.ifmo.ctddev.isaev.structure.Expression;
-import ru.ifmo.ctddev.isaev.structure.Then;
+import ru.ifmo.ctddev.isaev.structure.logic.Then;
 
 import java.io.IOException;
 import java.util.ArrayList;

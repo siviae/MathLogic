@@ -3,8 +3,9 @@ package ru.ifmo.ctddev.isaev;
 import ru.ifmo.ctddev.isaev.exception.IncorrectProofException;
 import ru.ifmo.ctddev.isaev.exception.LexingException;
 import ru.ifmo.ctddev.isaev.exception.ParsingException;
+import ru.ifmo.ctddev.isaev.exception.ProofGeneratingException;
 import ru.ifmo.ctddev.isaev.structure.Expression;
-import ru.ifmo.ctddev.isaev.structure.Then;
+import ru.ifmo.ctddev.isaev.structure.logic.Then;
 
 import java.io.IOException;
 
@@ -19,7 +20,7 @@ public abstract class Homework {
     protected int row;
 
 
-    public abstract void doSomething() throws IOException, ParsingException, LexingException, IncorrectProofException;
+    public abstract void doSomething() throws IOException, ParsingException, LexingException, IncorrectProofException, ProofGeneratingException;
 
     public static boolean modusPonens(Expression A, Expression aThenB, Expression B) {
         if (aThenB instanceof Then) {

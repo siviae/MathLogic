@@ -1,8 +1,10 @@
 package ru.ifmo.ctddev.isaev.structure;
 
+import ru.ifmo.ctddev.isaev.exception.ProofGeneratingException;
 import ru.ifmo.ctddev.isaev.parser.Lexeme;
 
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -18,7 +20,9 @@ public abstract class Unary extends AbstractExpression {
     public Unary(Expression operand) {
         this.operand = operand;
     }
-    public Unary(){}
+
+    public Unary() {
+    }
 
     @Override
     public boolean matchAxiomScheme(Expression expr, HashMap<Integer, Expression> known) {
@@ -37,8 +41,13 @@ public abstract class Unary extends AbstractExpression {
     }
 
     @Override
-    public String toString() {
-        return asString().toString();
+    public HashMap<String, Variable> getVars() {
+        return operand.getVars();
+    }
+
+    @Override
+    public List<Expression> getParticularProof(List<? extends Expression> hypos) throws ProofGeneratingException {
+        return operand.getParticularProof(hypos);
     }
 
     @Override
