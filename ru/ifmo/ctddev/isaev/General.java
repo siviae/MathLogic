@@ -1,6 +1,8 @@
 package ru.ifmo.ctddev.isaev;
 
+import ru.ifmo.ctddev.isaev.helpers.AThenA;
 import ru.ifmo.ctddev.isaev.parser.Lexer;
+import ru.ifmo.ctddev.isaev.parser.LogicParser;
 import ru.ifmo.ctddev.isaev.parser.Parser;
 import ru.ifmo.ctddev.isaev.structure.Expression;
 
@@ -17,7 +19,7 @@ public class General {
     public static BufferedReader in;
     public static PrintWriter out;
     protected static Lexer lexer = new Lexer();
-    private static Parser parser;
+    private static Parser parser = new LogicParser();
     private static int currentMode;
 
     public static void setParser(Parser parser) {
@@ -38,21 +40,12 @@ public class General {
         return expression;
     }
 
-    public static List<String> proofAThenA(String alpha) {
-        List<String> result = new ArrayList<>();
-        result.add("*->(*->*)".replace("*", alpha));
-        result.add("*->(*->*)->*".replace("*", alpha));
-        result.add("(*->(*->*))->((*->((*->*)->*))->(*->*))".replace("*", alpha));
-        result.add("((*->((*->*)->*))->(*->*))".replace("*", alpha));
-        result.add("*->*".replace("*", alpha));
-        return result;
-    }
+
 
     public static List<Expression> proofAThenA(Expression alpha) {
         List<Expression> result = new ArrayList<>();
-        List<String> strings = proofAThenA(alpha.toString());
-        for (String s : strings) {
-            result.add(parse(s));
+        for (AThenA e: AThenA.values()) {
+            result.add(e.replace(alpha));
         }
         return result;
     }

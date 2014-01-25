@@ -5,11 +5,14 @@ import ru.ifmo.ctddev.isaev.exception.LexingException;
 import ru.ifmo.ctddev.isaev.exception.ParsingException;
 import ru.ifmo.ctddev.isaev.helpers.AxiomScheme;
 import ru.ifmo.ctddev.isaev.structure.Expression;
+import ru.ifmo.ctddev.isaev.structure.NumExpression;
 import ru.ifmo.ctddev.isaev.structure.logic.Then;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 import static ru.ifmo.ctddev.isaev.General.*;
@@ -26,6 +29,7 @@ public class Deduct2 extends Homework {
     private List<Expression> hypos = new ArrayList<>();
     private List<Expression> proofed = new ArrayList<>();
     private Expression alpha;
+    private Map<String, Expression> map = new HashMap<>();
 
     public Deduct2() {
     }
@@ -36,16 +40,20 @@ public class Deduct2 extends Homework {
     }
 
     public void setHypos(List<Expression> hypos) {
-        this.hypos = hypos;
+        this.hypos = new ArrayList<>(hypos);
+        this.alpha = this.hypos.remove(hypos.size() - 1);
+    }
+
+    public void setAlpha(Expression alpha) {
+        this.alpha = alpha;
     }
 
     public void setProofed(List<Expression> proofed) {
-        this.proofed = proofed;
+        this.proofed = new ArrayList<>(proofed);
     }
 
     public List<Expression> move1HypoToProof(List<Expression> proof) throws IncorrectProofException {
         List<Expression> result = new ArrayList<>();
-        alpha = hypos.remove(hypos.size() - 1);
         for (Expression expr : proof) {
             boolean f = false;
             for (Expression e : hypos) {
@@ -66,27 +74,63 @@ public class Deduct2 extends Homework {
                 result.add(expr);
                 result.add(new Then(expr, new Then(alpha, expr)));
                 result.add(new Then(alpha, expr));
-                proofed.add(expr);
             }
             if (!f && expr.match(alpha)) {
                 result.addAll(proofAThenA(alpha));
                 f = true;
-                proofed.add(expr);
             }
             if (!f) {
-                for (int i = 0; i < proofed.size(); i++) {
-                    for (Expression aProofed : proofed)
+                for (int i = proofed.size() - 1; i >= 0; i--) {
+                    if (proofed.get(i).equals(expr)) {
+                        f = true;
+                        break;
+                    }
+                    for (int j = proofed.size() - 1; j >= 0; j--) {
+                        Expression aProofed = proofed.get(j);
                         if (modusPonens(proofed.get(i), aProofed, expr)) {
-                            result.add(parse("(1->2)->((1->(2->3))->(1->3))".replace("1", alpha.asString()).replace("2", proofed.get(i).asString()).replace("3", expr.asString())));
-                            result.add(parse("(1->(2->3))->(1->3)".replace("1", alpha.asString()).replace("2", proofed.get(i).asString()).replace("3", expr.asString())));
-                            result.add(new Then(alpha, expr));
+                            map.put("1", alpha);
+                            map.put("2", proofed.get(i));
+                            map.put("3", expr);
+                            result.add(
+                                    new Then(
+                                            new Then(
+                                                    new NumExpression(1),
+                                                    new NumExpression(2)),
+                                            new Then(
+                                                    new Then(
+                                                            new NumExpression(1),
+                                                            new Then(
+                                                                    new NumExpression(2),
+                                                                    new NumExpression(3))),
+                                                    new Then(
+                                                            new NumExpression(1),
+                                                            new NumExpression(3)))).substitute(map));
+                            result.add(
+                                    new Then(
+                                            new Then(
+                                                    new NumExpression(1),
+                                                    new Then(
+                                                            new NumExpression(2),
+                                                            new NumExpression(3))),
+                                            new Then(
+                                                    new NumExpression(1),
+                                                    new NumExpression(3))).substitute(map));
+                            result.add(new Then(alpha, expr).substitute(map));
                             f = true;
+                            break;
                         }
+                    }
                 }
-                proofed.add(expr);
             }
             if (!f) {
+                for (Expression e : proofed) {
+                    out.println(e.asString());
+                }
+                out.println("до этого всё было ок");
+                out.println("Не получилось доказать: " + expr.asString());
                 throw new IncorrectProofException(expr.toString());
+            } else {
+                proofed.add(expr);
             }
         }
 
@@ -103,6 +147,7 @@ public class Deduct2 extends Homework {
         for (String value : s) {
             hypos.add(parse(value));
         }
+        alpha = hypos.remove(hypos.size() - 1);
         List<Expression> proof = new ArrayList<>();
         String s1 = in.readLine();
         while (s1 != null && !s1.replace("\\s+", "").isEmpty()) {

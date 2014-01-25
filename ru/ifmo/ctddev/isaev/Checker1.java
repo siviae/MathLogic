@@ -24,6 +24,7 @@ public class Checker1 extends Homework {
         List<Expression> proofed = new ArrayList<>();
         String temp = in.readLine();
         row = 1;
+        boolean ok = true;
         while (temp != null) {
             boolean f = false;
             Expression expr = parse(temp);
@@ -34,9 +35,10 @@ public class Checker1 extends Homework {
                 }
             }
             if (!f) {
-                for (int i = 0; i < proofed.size(); i++) {
+                for (int i = proofed.size() - 1; i >= 0; i--) {
                     f = proofed.get(i).match(expr);
-                    for (Expression aProofed : proofed) {
+                    for (int j = proofed.size() - 1; j >= 0; j--) {
+                        Expression aProofed = proofed.get(j);
                         f = f || modusPonens(proofed.get(i), aProofed, expr);
                     }
                     if (f) break;
@@ -44,17 +46,17 @@ public class Checker1 extends Homework {
             }
             if (!f) {
                 out.println("Доказательство некорректно начиная с " + row + " высказывания.");
-                out.close();
-                System.exit(0);
+                ok = false;
+                break;
             }
             proofed.add(expr);
             row++;
             temp = in.readLine();
 
         }
-        out.println("Доказательство корректно.");
-        out.close();
-        System.exit(0);
+        if (ok) {
+            out.println("Доказательство корректно.");
+        }
 
     }
 }

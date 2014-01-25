@@ -21,6 +21,7 @@ public class MathLogic {
     private static Homework work;
 
     public static void main(String[] args) {
+        long startTime = System.currentTimeMillis();
         switch (args[0]) {
             case "1": {
                 General.setParser(new LogicParser());
@@ -55,13 +56,17 @@ public class MathLogic {
             out = new PrintWriter(new FileWriter(arr[0] + ".out"));
             work.doSomething();
             in.close();
-            out.close();
+
         } catch (FileNotFoundException e) {
             System.out.println("file not found");
             e.printStackTrace();
         } catch (IOException | LexingException | ParsingException | IncorrectProofException | ProofGeneratingException e) {
             e.printStackTrace();
         }
+        long endTime = System.currentTimeMillis();
+        out.println();
+        out.println("... Программа завершила свою работу за " + (endTime - startTime) + " мс");
+        out.close();
     }
 }
 

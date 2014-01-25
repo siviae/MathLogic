@@ -4,10 +4,9 @@ import ru.ifmo.ctddev.isaev.exception.ProofGeneratingException;
 import ru.ifmo.ctddev.isaev.parser.Lexeme;
 import ru.ifmo.ctddev.isaev.structure.Binary;
 import ru.ifmo.ctddev.isaev.structure.Expression;
-import ru.ifmo.ctddev.isaev.structure.NumExpression;
 
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created with IntelliJ IDEA.
@@ -30,8 +29,8 @@ public class And extends Binary {
     }
 
     @Override
-    public Expression substitute(HashMap<String, ? extends Expression> variables) {
-        return new And(left.substitute(variables), right.substitute(variables));
+    public Expression substituteAndCopy(Map<String, ? extends Expression> variables) {
+        return new And(left.substituteAndCopy(variables), right.substituteAndCopy(variables));
     }
 
     @Override
@@ -47,15 +46,18 @@ public class And extends Binary {
     @Override
     public List<Expression> getParticularProof(List<? extends Expression> hypos) throws ProofGeneratingException {
         List<Expression> result = super.getParticularProof(hypos);
+
+        boolean l = left.evaluate();
+        boolean r = right.evaluate();
         Expression a = left;
         Expression b = right;
-        if (this.match(new And(new NumExpression(1), new NumExpression(2)))) {
+        if (l & r) {
             result.add(new Then(a, new Then(b, new And(a, b))));
             result.add(a);
             result.add(b);
             result.add(new Then(b, new And(a, b)));
             result.add(new And(a, b));
-        } else if (this.match(new And(new Not(new NumExpression(1)), new NumExpression(2)))) {
+        } else if (!l&r) {
             result.add(new Then(new Then(new And(a, b), a), new Then(new Then(new And(a, b), new Not(a)), new Not(new And(a, b)))));
             result.add(new Then(new And(a, b), a));
             result.add(new Then(new Then(new And(a, b), new Not(a)), new Not(new And(a, b))));
@@ -63,7 +65,7 @@ public class And extends Binary {
             result.add(new Not(a));
             result.add(new Then(new And(a, b), new Not(a)));
             result.add(new Not(new And(a, b)));
-        } else if (this.match(new And(new NumExpression(1), new Not(new NumExpression(2))))) {
+        } else if (l&!r) {
             result.add(new Then(new Then(new And(a, b), b), new Then(new Then(new And(a, b), new Not(b)), new Not(new And(a, b)))));
             result.add(new Then(new And(a, b), b));
             result.add(new Then(new Then(new And(a, b), new Not(b)), new Not(new And(a, b))));
@@ -71,7 +73,7 @@ public class And extends Binary {
             result.add(new Not(b));
             result.add(new Then(new And(a, b), new Not(b)));
             result.add(new Not(new And(a, b)));
-        } else if (this.match(new And(new Not(new NumExpression(1)), new Not(new NumExpression(2))))) {
+        } else if (!l&!r) {
             result.add(new Then(new Then(new And(a, b), a), new Then(new Then(new And(a, b), new Not(a)), new Not(new And(a, b)))));
             result.add(new Then(new And(a, b), a));
             result.add(new Then(new Then(new And(a, b), new Not(a)), new Not(new And(a, b))));
@@ -79,7 +81,7 @@ public class And extends Binary {
             result.add(new Not(a));
             result.add(new Then(new And(a, b), new Not(a)));
             result.add(new Not(new And(a, b)));
-        }
+        } else throw new ProofGeneratingException("no expressions were added, incorrect behavior");
         return result;
     }
 

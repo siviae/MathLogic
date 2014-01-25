@@ -5,6 +5,7 @@ import ru.ifmo.ctddev.isaev.exception.ProofGeneratingException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created with IntelliJ IDEA.
@@ -14,11 +15,14 @@ import java.util.List;
  * To change this template use File | Settings | File Templates.
  */
 public interface Expression {
+
     boolean match(Expression other);
 
     boolean matchAxiomScheme(Expression expr, HashMap<Integer, Expression> known);
 
-    Expression substitute(HashMap<String, ? extends Expression> variables);
+    Expression substituteAndCopy(Map<String, ? extends Expression> variables);
+
+    Expression substitute(Map<String, ? extends Expression> variables);
 
     boolean hasSameType(Expression other);
 

@@ -125,6 +125,6 @@ public enum AxiomScheme {
     }
 
     public Expression substitute(HashMap<String, Expression> map) {
-        return this.expr.substitute(map);
+        return this.expr.substituteAndCopy(map);
     }
 }

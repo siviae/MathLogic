@@ -8,4 +8,7 @@ public class ProofGeneratingException extends Exception{
     public ProofGeneratingException() {
         super("Cant proof this");
     }
+    public ProofGeneratingException(String message) {
+        super(message);
+    }
 }

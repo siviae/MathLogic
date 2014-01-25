@@ -5,6 +5,7 @@ import ru.ifmo.ctddev.isaev.parser.Lexeme;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created with IntelliJ IDEA.
@@ -32,7 +33,12 @@ public abstract class Unary extends AbstractExpression {
 
     @Override
     public StringBuilder asString() {
-        return operand.asString().append(Lexeme.RIGHT_P.token).insert(0, Lexeme.LEFT_P.token).insert(0, token.token);
+        StringBuilder s = operand.asString();
+       if (operand instanceof Binary) {
+            s.insert(0, Lexeme.LEFT_P.token);
+            s.append(Lexeme.RIGHT_P.token);
+        }
+        return s.insert(0, token.token);
     }
 
     @Override
@@ -49,18 +55,19 @@ public abstract class Unary extends AbstractExpression {
     public List<Expression> getParticularProof(List<? extends Expression> hypos) throws ProofGeneratingException {
         return operand.getParticularProof(hypos);
     }
+    @Override
+    public Expression substitute(Map<String, ? extends Expression> variables) {
+        operand=operand.substitute(variables);
+        return this;
+    }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof Unary)) return false;
-
         Unary that = (Unary) o;
+        return operand.equals(that.operand) && token == that.token;
 
-        if (!operand.equals(that.operand)) return false;
-        if (token != that.token) return false;
-
-        return true;
     }
 
     @Override

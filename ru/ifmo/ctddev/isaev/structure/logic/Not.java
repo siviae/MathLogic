@@ -3,11 +3,10 @@ package ru.ifmo.ctddev.isaev.structure.logic;
 import ru.ifmo.ctddev.isaev.exception.ProofGeneratingException;
 import ru.ifmo.ctddev.isaev.parser.Lexeme;
 import ru.ifmo.ctddev.isaev.structure.Expression;
-import ru.ifmo.ctddev.isaev.structure.NumExpression;
 import ru.ifmo.ctddev.isaev.structure.Unary;
 
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created with IntelliJ IDEA.
@@ -42,7 +41,7 @@ public class Not extends Unary {
     public List<Expression> getParticularProof(List<? extends Expression> hypos) throws ProofGeneratingException {
         List<Expression> result = super.getParticularProof(hypos);
         Expression a = operand;
-        if (this.match(new Not(new Not(new NumExpression(1))))) {
+        if (operand.evaluate()) {
             result.add(new Then(new Then(new Not(a), a), new Then(new Then(new Not(a), new Not(a)), new Not(new Not(a)))));
             result.add(new Then(a, new Then(new Not(a), a)));
             result.add(a);
@@ -54,14 +53,14 @@ public class Not extends Unary {
             result.add(new Then(new Not(a), new Then(new Then(new Not(a), new Not(a)), new Not(a))));
             result.add(new Then(new Not(a), new Not(a)));
             result.add(new Not(new Not(a)));
-        } else if (this.match(new Not(new NumExpression(1)))) {
+        } else if (!operand.evaluate()) {
             result.add(new Not(a));
-        }
+        } else throw new ProofGeneratingException("no expressions were added, incorrect behavior");
         return result;
     }
 
     @Override
-    public Expression substitute(HashMap<String, ? extends Expression> variables) {
-        return new Not(operand.substitute(variables));
+    public Expression substituteAndCopy(Map<String, ? extends Expression> variables) {
+        return new Not(operand.substituteAndCopy(variables));
     }
 }

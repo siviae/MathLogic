@@ -5,6 +5,7 @@ import ru.ifmo.ctddev.isaev.parser.Lexeme;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created with IntelliJ IDEA.
@@ -32,7 +33,17 @@ public abstract class Binary extends AbstractExpression {
 
     @Override
     public StringBuilder asString() {
-        return left.asString().append(token.token).append(right.asString()).append(Lexeme.RIGHT_P.token).insert(0, Lexeme.LEFT_P.token);
+        StringBuilder s = left.asString();
+        StringBuilder s2 = right.asString();
+        if (left instanceof Binary) {
+            s.insert(0, Lexeme.LEFT_P.token);
+            s.append(Lexeme.RIGHT_P.token);
+        }
+        if (right instanceof Binary) {
+            s2.insert(0, Lexeme.LEFT_P.token);
+            s2.append(Lexeme.RIGHT_P.token);
+        }
+        return s.append(token.token).append(s2)/*.append(Lexeme.RIGHT_P.token).insert(0,Lexeme.LEFT_P.token)*/;
     }
 
     @Override
@@ -51,14 +62,9 @@ public abstract class Binary extends AbstractExpression {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof Binary)) return false;
-
         Binary that = (Binary) o;
+        return left.equals(that.left) && right.equals(that.right) && token == that.token;
 
-        if (!left.equals(that.left)) return false;
-        if (!right.equals(that.right)) return false;
-        if (token != that.token) return false;
-
-        return true;
     }
 
     @Override
@@ -66,6 +72,13 @@ public abstract class Binary extends AbstractExpression {
         List<Expression> result = left.getParticularProof(hypos);
         result.addAll(right.getParticularProof(hypos));
         return result;
+    }
+
+    @Override
+    public Expression substitute(Map<String, ? extends Expression> variables) {
+        left=left.substitute(variables);
+        right=right.substitute(variables);
+        return this;
     }
 
     @Override

@@ -4,6 +4,7 @@ import ru.ifmo.ctddev.isaev.exception.ProofGeneratingException;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * User: Xottab
@@ -27,7 +28,7 @@ public class Term extends Variable {
     }
 
     @Override
-    public Expression substitute(HashMap<String, ? extends Expression> variables) {
+    public Expression substituteAndCopy(Map<String, ? extends Expression> variables) {
         return null;
     }
 

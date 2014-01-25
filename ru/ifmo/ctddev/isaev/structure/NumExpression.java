@@ -4,6 +4,7 @@ import ru.ifmo.ctddev.isaev.exception.ProofGeneratingException;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created with IntelliJ IDEA.
@@ -35,8 +36,13 @@ public class NumExpression extends AbstractExpression {
     }
 
     @Override
-    public Expression substitute(HashMap<String, ? extends Expression> variables) {
+    public Expression substituteAndCopy(Map<String, ? extends Expression> variables) {
         return variables.containsKey(Integer.toString(number)) ? variables.get(Integer.toString(number)) : this;
+    }
+
+    @Override
+    public Expression substitute(Map<String, ? extends Expression> variables) {
+        return substituteAndCopy(variables);
     }
 
     @Override

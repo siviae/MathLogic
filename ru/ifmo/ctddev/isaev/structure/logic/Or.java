@@ -4,10 +4,9 @@ import ru.ifmo.ctddev.isaev.exception.ProofGeneratingException;
 import ru.ifmo.ctddev.isaev.parser.Lexeme;
 import ru.ifmo.ctddev.isaev.structure.Binary;
 import ru.ifmo.ctddev.isaev.structure.Expression;
-import ru.ifmo.ctddev.isaev.structure.NumExpression;
 
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created with IntelliJ IDEA.
@@ -42,21 +41,23 @@ public class Or extends Binary {
     @Override
     public List<Expression> getParticularProof(List<? extends Expression> hypos) throws ProofGeneratingException {
         List<Expression> result = super.getParticularProof(hypos);
+        boolean l = left.evaluate();
+        boolean r = right.evaluate();
         Expression a = left;
         Expression b = right;
-        if (this.match(new And(new NumExpression(1), new NumExpression(2)))) {
+        if (l & r) {
             result.add(new Then(a, new Or(a, b)));
             result.add(a);
             result.add(new Or(a, b));
-        } else if (this.match(new And(new Not(new NumExpression(1)), new NumExpression(2)))) {
+        } else if (!l & r) {
             result.add(new Then(b, new Or(a, b)));
             result.add(b);
             result.add(new Or(a, b));
-        } else if (this.match(new And(new NumExpression(1), new Not(new NumExpression(2))))) {
+        } else if (l & !r) {
             result.add(new Then(a, new Or(a, b)));
             result.add(a);
             result.add(new Or(a, b));
-        } else if (this.match(new And(new Not(new NumExpression(1)), new Not(new NumExpression(2))))) {
+        } else if (!l & !r) {
             result.add(new Then(a, new Then(a, a)));
             result.add(new Then(new Then(a, new Then(a, a)), new Then(new Then(a, new Then(new Then(a, a), a)), new Then(a, a))));
             result.add(new Then(new Then(a, new Then(new Then(a, a), a)), new Then(a, a)));
@@ -114,13 +115,13 @@ public class Or extends Binary {
             result.add(new Then(new Then(new Or(a, b), new And(new Not(a), new Not(b))), new Then(new Then(new Or(a, b), new Not(new And(new Not(a), new Not(b)))), new Not(new Or(a, b)))));
             result.add(new Then(new Then(new Or(a, b), new Not(new And(new Not(a), new Not(b)))), new Not(new Or(a, b))));
             result.add(new Not(new Or(a, b)));
-        }
+        } else throw new ProofGeneratingException("no expressions were added, incorrect behavior");
         return result;
     }
 
     @Override
-    public Expression substitute(HashMap<String, ? extends Expression> variables) {
-        return new Or(left.substitute(variables), right.substitute(variables));
+    public Expression substituteAndCopy(Map<String, ? extends Expression> variables) {
+        return new Or(left.substituteAndCopy(variables), right.substituteAndCopy(variables));
     }
 
 }

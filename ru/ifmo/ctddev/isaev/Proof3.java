@@ -7,6 +7,7 @@ import ru.ifmo.ctddev.isaev.exception.ProofGeneratingException;
 import ru.ifmo.ctddev.isaev.helpers.AxiomScheme;
 import ru.ifmo.ctddev.isaev.helpers.ContrapositionRule;
 import ru.ifmo.ctddev.isaev.structure.Expression;
+import ru.ifmo.ctddev.isaev.structure.NumExpression;
 import ru.ifmo.ctddev.isaev.structure.Variable;
 import ru.ifmo.ctddev.isaev.structure.logic.Not;
 import ru.ifmo.ctddev.isaev.structure.logic.Or;
@@ -15,8 +16,8 @@ import ru.ifmo.ctddev.isaev.structure.logic.Then;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import static ru.ifmo.ctddev.isaev.General.*;
 
@@ -28,31 +29,44 @@ import static ru.ifmo.ctddev.isaev.General.*;
  * To change this template use File | Settings | File Templates.
  */
 public class Proof3 extends Homework {
-    HashMap<String, Variable> vars = new HashMap<>();
-    Deduct2 deduct;
+    Map<String, Variable> vars = new HashMap<>();
+    Map<String, Expression> subst = new HashMap<>();
+    Deduct2 deduct = new Deduct2();
+    List<Expression> tndProofs = new ArrayList<>();
+    List<Expression> tnds = new ArrayList<>();
 
     private List<Expression> getProof(Expression theorem, List<Expression> hypothesis, int currentPosition) throws ProofGeneratingException, IncorrectProofException {
-        List<Expression> proof = new LinkedList<>();
+        ArrayList<Expression> proof = new ArrayList<>();
         Expression v = hypothesis.get(currentPosition);
         Expression notV = new Not(v);
+
         List<Expression> proof1;
         List<Expression> proof2;
 
         if (currentPosition == hypothesis.size() - 1) {
             deduct.setHypos(hypothesis);
-            proof1 = deduct.move1HypoToProof(theorem.getParticularProof(hypothesis));
+            deduct.setProofed(tnds);
+            proof1 = theorem.getParticularProof(hypothesis);
+            proof1 = deduct.move1HypoToProof(proof1);
             hypothesis.set(currentPosition, notV);
             deduct.setHypos(hypothesis);
-            proof2 = deduct.move1HypoToProof(theorem.getParticularProof(hypothesis));
+            deduct.setProofed(tnds);
+            proof2 = theorem.getParticularProof(hypothesis);
+            proof2 = deduct.move1HypoToProof(proof2);
         } else {
-            deduct.setHypos(hypothesis);
-            proof1 = deduct.move1HypoToProof(getProof(theorem, hypothesis, currentPosition + 1));
+            proof1 = getProof(theorem, hypothesis, currentPosition + 1);
+            deduct.setHypos(hypothesis.subList(0, currentPosition + 1));
+            deduct.setProofed(tnds);
+            proof1 = deduct.move1HypoToProof(proof1);
             hypothesis.set(currentPosition, notV);
-            deduct.setHypos(hypothesis);
-            proof2 = deduct.move1HypoToProof(getProof(theorem, hypothesis, currentPosition + 1));
+            proof2 = getProof(theorem, hypothesis, currentPosition + 1);
+            deduct.setHypos(hypothesis.subList(0, currentPosition + 1));
+            deduct.setProofed(tnds);
+            proof2 = deduct.move1HypoToProof(proof2);
         }
         proof.addAll(proof1);
         proof.addAll(proof2);
+        hypothesis.set(currentPosition, v);
         HashMap<String, Expression> map = new HashMap<>();
         map.put("1", v);
         map.put("2", notV);
@@ -76,12 +90,12 @@ public class Proof3 extends Homework {
                 ((Variable) v).currentValue = k % 2 == 1;
                 k /= 2;
             }
-            theorem = theorem.substitute(vars);
+            theorem = theorem.substituteAndCopy(vars);
             boolean f = theorem.evaluate();
             if (!f) {
                 StringBuilder sb = new StringBuilder("Высказывание ложно при ");
                 for (int j = 0; j < variables.size(); j++) {
-                    sb.append(variables.get(j).token).append("=").append(variables.get(j).currentValue ? "И" : "Л");
+                    sb.append(variables.get(j).name).append("=").append(variables.get(j).currentValue ? "И" : "Л");
                     if (j != variables.size() - 1) {
                         sb.append(", ");
                     }
@@ -91,47 +105,55 @@ public class Proof3 extends Homework {
                 System.exit(0);
             }
         }
-        List<ArrayList<Expression>> tnd = new ArrayList<>();
 
         for (Expression v : vars.values()) {
-            tnd.add(tertiumNonDatur((Variable) v));
-        }
-        boolean f = true;
-
-        for (ArrayList<Expression> arr : tnd) {
-            for (Expression e : arr) {
-                out.println(e.asString());
+            tndProofs.addAll(tertiumNonDatur((Variable) v));
+            Expression tnd = new Or(v, new Not(v));
+            tnds.add(tnd);
+            for (Expression v1 : vars.values()) {
+                tnds.add(new Then(tnd, new Then(v1, tnd)));
+                tnds.add(new Then(tnd, new Then(new Not(v1), tnd)));
+                tnds.add(new Then(v1, tnd));
+                tnds.add(new Then(new Not(v1), tnd));
             }
         }
         List<Expression> hypothesis = new ArrayList<Expression>(variables);
         List<Expression> proof = getProof(theorem, hypothesis, 0);
+
+        for (Expression e : tndProofs) {
+            out.println(e.toString());
+        }
+        for (Expression e : tnds) {
+            out.println(e.toString());
+        }
         for (Expression e : proof) {
             out.println(e.toString());
         }
     }
 
     private ArrayList<Expression> tertiumNonDatur(Variable v) {
+        subst.put("1", v);
         Not notV = new Not(v);
         ArrayList<Expression> result = new ArrayList<>();
-        result.add(parse("A->A|!A".replace("A", v.token)));
 
+        result.add(new Then(new NumExpression(1), new Or(new NumExpression(1), new Not(new NumExpression(1)))).substitute(subst));
         for (ContrapositionRule s : ContrapositionRule.values()) {
             result.add(s.replace(v, new Or(v, notV)));
         }
-        result.add(parse("!(A|!A)->!A".replace("A", v.token)));
+        result.add(new Then(new Not(new Or(new NumExpression(1), new Not(new NumExpression(1)))), new Not(new NumExpression(1))).substitute(subst));
 
-        result.add(parse("!A->A|!A".replace("A", v.token)));
+        result.add(new Then(new Not(new NumExpression(1)), new Or(new NumExpression(1), new Not(new NumExpression(1)))).substitute(subst));
         for (ContrapositionRule s : ContrapositionRule.values()) {
             result.add(s.replace(new Not(v), new Or(v, notV)));
         }
-        result.add(parse("!(A|!A)->!!A".replace("A", v.token)));
+        result.add(new Then(new Not(new Or(new NumExpression(1), new Not(new NumExpression(1)))), new Not(new Not(new NumExpression(1)))).substitute(subst));
 
 
-        result.add(parse("(!(A|!A)->!A)->(!(A|!A)->!!A)->(!!(A|!A))".replace("A", v.token)));
-        result.add(parse("(!(A|!A)->!!A)->!!(A|!A)".replace("A", v.token)));
-        result.add(parse("!!(A|!A)".replace("A", v.token)));
-        result.add(parse("!!(A|!A)->(A|!A)".replace("A", v.token)));
-        result.add(parse("A|!A".replace("A", v.token)));
+        result.add(new Then(new Then(new Not(new Or(new NumExpression(1), new Not(new NumExpression(1)))), new Not(new NumExpression(1))), new Then(new Then(new Not(new Or(new NumExpression(1), new Not(new NumExpression(1)))), new Not(new Not(new NumExpression(1)))), new Not(new Not(new Or(new NumExpression(1), new Not(new NumExpression(1))))))).substitute(subst));
+        result.add(new Then(new Then(new Not(new Or(new NumExpression(1), new Not(new NumExpression(1)))), new Not(new Not(new NumExpression(1)))), new Not(new Not(new Or(new NumExpression(1), new Not(new NumExpression(1)))))).substitute(subst));
+        result.add(new Not(new Not(new Or(new NumExpression(1), new Not(new NumExpression(1))))).substitute(subst));
+        result.add(new Then(new Not(new Not(new Or(new NumExpression(1), new Not(new NumExpression(1))))), new Or(new NumExpression(1), new Not(new NumExpression(1)))).substitute(subst));
+        result.add(new Or(new NumExpression(1), new Not(new NumExpression(1))).substitute(subst));
 
         return result;
     }
