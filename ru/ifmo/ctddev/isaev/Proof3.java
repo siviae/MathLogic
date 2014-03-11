@@ -40,18 +40,20 @@ public class Proof3 extends Homework {
         Expression v = hypothesis.get(currentPosition);
         Expression notV = new Not(v);
 
-        List<Expression> proof1;
-        List<Expression> proof2;
+        List<Expression> proof1 = new ArrayList<>();
+        List<Expression> proof2 = new ArrayList<>();
 
         if (currentPosition == hypothesis.size() - 1) {
             deduct.setHypos(hypothesis);
             deduct.setProofed(tnds);
-            proof1 = theorem.getParticularProof(hypothesis);
+            proof1.addAll(tnds);
+            proof1.addAll(theorem.getParticularProof(hypothesis));
             proof1 = deduct.move1HypoToProof(proof1);
             hypothesis.set(currentPosition, notV);
             deduct.setHypos(hypothesis);
             deduct.setProofed(tnds);
-            proof2 = theorem.getParticularProof(hypothesis);
+            proof2.addAll(tnds);
+            proof2.addAll(theorem.getParticularProof(hypothesis));
             proof2 = deduct.move1HypoToProof(proof2);
         } else {
             proof1 = getProof(theorem, hypothesis, currentPosition + 1);
@@ -110,12 +112,6 @@ public class Proof3 extends Homework {
             tndProofs.addAll(tertiumNonDatur((Variable) v));
             Expression tnd = new Or(v, new Not(v));
             tnds.add(tnd);
-            for (Expression v1 : vars.values()) {
-                tnds.add(new Then(tnd, new Then(v1, tnd)));
-                tnds.add(new Then(tnd, new Then(new Not(v1), tnd)));
-                tnds.add(new Then(v1, tnd));
-                tnds.add(new Then(new Not(v1), tnd));
-            }
         }
         List<Expression> hypothesis = new ArrayList<Expression>(variables);
         List<Expression> proof = getProof(theorem, hypothesis, 0);

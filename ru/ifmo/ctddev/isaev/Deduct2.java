@@ -65,6 +65,12 @@ public class Deduct2 extends Homework {
         k2 = 0;
         k3 = 0;
         List<Expression> result = new ArrayList<>();
+        for (Expression e : proofed) {
+            result.add(e);
+            result.add(new Then(e, new Then(alpha, e)));
+            result.add(new Then(alpha, e));
+        }
+
         for (int l = 0; l < proof.size(); l++) {
             Expression expr = proof.get(l);
 
@@ -75,6 +81,7 @@ public class Deduct2 extends Homework {
                     break;
                 }
             }
+
             if (!f) {
                 for (AxiomScheme scheme : AxiomScheme.values()) {
                     if (scheme.match(expr)) {
@@ -139,6 +146,17 @@ public class Deduct2 extends Homework {
                     }
                 }
             }
+
+/*
+            if (!f) {
+                for (Expression e : proofed) {
+                    if (e.match(expr)) {
+                        f = true;
+                        break;
+                    }
+                }
+            }*/
+
             if (!f) {
                 for (Expression e : proofed) {
                     out.println(e.asString());
