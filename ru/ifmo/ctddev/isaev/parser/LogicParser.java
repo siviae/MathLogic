@@ -8,9 +8,7 @@ import ru.ifmo.ctddev.isaev.structure.logic.Or;
 import ru.ifmo.ctddev.isaev.structure.logic.Then;
 
 import java.util.ArrayList;
-import java.util.List;
 
-import static ru.ifmo.ctddev.isaev.General.isLowercaseVariable;
 import static ru.ifmo.ctddev.isaev.General.isUppercaseVariable;
 
 /**
@@ -27,7 +25,7 @@ public class LogicParser extends Parser {
         Expression result = disj();
         ArrayList<Expression> arr = new ArrayList<>();
         arr.add(result);
-        while (position < tokens.length && tokens[position].equals(Lexeme.THEN.token)) {
+        while (position < tokens.length && tokens[position].equals(Lexeme.THEN.s)) {
             position++;
             arr.add(disj());
         }
@@ -42,27 +40,27 @@ public class LogicParser extends Parser {
         return result;
     }
 
-    private Expression disj() throws ParsingException {
+    protected Expression disj() throws ParsingException {
         Expression result = conj();
-        while (position < tokens.length && tokens[position].equals(Lexeme.OR.token)) {
+        while (position < tokens.length && tokens[position].equals(Lexeme.OR.s)) {
             position++;
             result = new Or(result, conj());
         }
         return result;
     }
 
-    private Expression conj() throws ParsingException {
+    protected Expression conj() throws ParsingException {
         Expression result = unary();
-        while (position < tokens.length && tokens[position].equals(Lexeme.AND.token)) {
+        while (position < tokens.length && tokens[position].equals(Lexeme.AND.s)) {
             position++;
             result = new And(result, unary());
         }
         return result;
     }
 
-    private Term term() throws ParsingException {
+   /* private Term term() throws ParsingException {
         boolean brackets = false;
-        if (tokens[position].equals(Lexeme.LEFT_P.token)) {
+        if (tokens[position].equals(Lexeme.LEFT_P.s)) {
             position++;
             brackets = true;
         }
@@ -72,11 +70,11 @@ public class LogicParser extends Parser {
         } else
             throw new ParsingException("cannot parse term without name");
 
-        if (tokens[position].equals(Lexeme.LEFT_P.token)) {
+        if (tokens[position].equals(Lexeme.LEFT_P.s)) {
             position++;
             List<Term> arguments = new ArrayList<>(3);
             arguments.add(term());
-            while (tokens[position].equals(Lexeme.COMMA.token)) {
+            while (tokens[position].equals(Lexeme.COMMA.s)) {
                 position++;
                 arguments.add(term());
             }
@@ -97,11 +95,11 @@ public class LogicParser extends Parser {
         } else
             throw new ParsingException("cannot predicate without name");
 
-        if (tokens[position].equals(Lexeme.LEFT_P.token)) {
+        if (tokens[position].equals(Lexeme.LEFT_P.s)) {
             position++;
             List<Term> arguments = new ArrayList<>(3);
             arguments.add(term());
-            while (tokens[position].equals(Lexeme.COMMA.token)) {
+            while (tokens[position].equals(Lexeme.COMMA.s)) {
                 position++;
                 arguments.add(term());
             }
@@ -109,23 +107,23 @@ public class LogicParser extends Parser {
             result.arguments = arguments.toArray(new Term[arguments.size()]);
         }
         return result;
-    }
+    }*/
 
-    private Variable var() {
+    protected Variable var() {
         Variable result = new Variable(tokens[position]);
         position++;
         return result;
     }
 
-    private Expression unary() throws ParsingException {
+    protected Expression unary() throws ParsingException {
         if (isUppercaseVariable(tokens[position])) {
             return var();
         }
-        if (tokens[position].equals(Lexeme.LEFT_P.token)) {
+        if (tokens[position].equals(Lexeme.LEFT_P.s)) {
             position++;
 
             Expression result = expr();
-            if (!tokens[position].equals(Lexeme.RIGHT_P.token)) {
+            if (!tokens[position].equals(Lexeme.RIGHT_P.s)) {
                 StringBuilder sb = new StringBuilder();
                 for (String s : tokens) {
                     sb.append(s);
@@ -137,7 +135,7 @@ public class LogicParser extends Parser {
             return result;
         }
 
-        if (tokens[position].equals(Lexeme.NOT.token)) {
+        if (tokens[position].equals(Lexeme.NOT.s)) {
             position++;
             return new Not(unary());
         }

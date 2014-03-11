@@ -23,12 +23,7 @@ public abstract class Homework {
     public abstract void doSomething() throws IOException, ParsingException, LexingException, IncorrectProofException, ProofGeneratingException;
 
     public static boolean modusPonens(Expression A, Expression aThenB, Expression B) {
-        if (aThenB instanceof Then) {
-            return A.match(((Then) aThenB).left)
-                    && B.match(((Then) aThenB).right);
-        } else {
-            return false;
-        }
+        return aThenB instanceof Then && A.match(((Then) aThenB).getLeft()) && B.match(((Then) aThenB).getRight());
     }
 
 

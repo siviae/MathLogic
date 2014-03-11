@@ -4,6 +4,7 @@ import ru.ifmo.ctddev.isaev.exception.ProofGeneratingException;
 import ru.ifmo.ctddev.isaev.parser.Lexeme;
 import ru.ifmo.ctddev.isaev.structure.Expression;
 import ru.ifmo.ctddev.isaev.structure.Unary;
+import ru.ifmo.ctddev.isaev.structure.Variable;
 
 import java.util.List;
 import java.util.Map;
@@ -28,8 +29,8 @@ public class Not extends Unary {
     }
 
     @Override
-    public boolean hasSameType(Expression other) {
-        return other instanceof Not;
+    public boolean canSubstitute(Variable v){
+        return operand.canSubstitute(v);
     }
 
     @Override

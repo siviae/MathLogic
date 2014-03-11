@@ -4,7 +4,7 @@ import ru.ifmo.ctddev.isaev.exception.LexingException;
 
 import java.util.ArrayList;
 
-import static ru.ifmo.ctddev.isaev.General.isUppercaseVariable;
+import static ru.ifmo.ctddev.isaev.General.isVariable;
 
 /**
  * Created with IntelliJ IDEA.
@@ -28,14 +28,15 @@ public class Lexer {
             f = true;
             String temp = target.substring(l, r);
             for (Lexeme lex : Lexeme.values()) {
-                if (temp.equals(lex.token)) {
+                if (temp.equals(lex.s)) {
                     result.add(temp);
                     l = r;
                     f = false;
+                    break;
                 }
             }
-            if (f && isUppercaseVariable(temp)) {
-                while (r < target.length() && isUppercaseVariable(target.substring(l, r + 1))) {
+            if (f && isVariable(temp)) {
+                while (r < target.length() && isVariable(target.substring(l, r + 1))) {
                     ++r;
                 }
                 temp = target.substring(l, r);

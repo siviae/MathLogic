@@ -17,101 +17,101 @@ import java.util.HashMap;
  */
 public enum AxiomScheme {
     SC_1(new Then(
-            new NumExpression(1),
+            new NumExpr(1),
             new Then(
-                    new NumExpression(2),
-                    new NumExpression(1)))),
+                    new NumExpr(2),
+                    new NumExpr(1)))),
     SC_2(new Then(
             new Then(
-                    new NumExpression(1),
-                    new NumExpression(2)
+                    new NumExpr(1),
+                    new NumExpr(2)
             ),
             new Then(
                     new Then(
-                            new NumExpression(1),
+                            new NumExpr(1),
                             new Then(
-                                    new NumExpression(2),
-                                    new NumExpression(3)
+                                    new NumExpr(2),
+                                    new NumExpr(3)
                             )
                     ),
                     new Then(
-                            new NumExpression(1),
-                            new NumExpression(3)
+                            new NumExpr(1),
+                            new NumExpr(3)
                     )
             )
     )),
     SC_3(new Then(
-            new NumExpression(1),
+            new NumExpr(1),
             new Then(
-                    new NumExpression(2),
+                    new NumExpr(2),
                     new And(
-                            new NumExpression(1),
-                            new NumExpression(2)
+                            new NumExpr(1),
+                            new NumExpr(2)
                     )
             )
     )),
     SC_4(new Then(
             new And(
-                    new NumExpression(1),
-                    new NumExpression(2)
+                    new NumExpr(1),
+                    new NumExpr(2)
             ),
-            new NumExpression(1)
+            new NumExpr(1)
     )),
     SC_5(new Then(
             new And(
-                    new NumExpression(1),
-                    new NumExpression(2)
+                    new NumExpr(1),
+                    new NumExpr(2)
             ),
-            new NumExpression(2)
+            new NumExpr(2)
     )),
     SC_6(new Then(
-            new NumExpression(1),
+            new NumExpr(1),
             new Or(
-                    new NumExpression(1),
-                    new NumExpression(2)
+                    new NumExpr(1),
+                    new NumExpr(2)
             )
     )),
     SC_7(new Then(
-            new NumExpression(2),
+            new NumExpr(2),
             new Or(
-                    new NumExpression(1),
-                    new NumExpression(2)
+                    new NumExpr(1),
+                    new NumExpr(2)
             )
     )),
     SC_8(new Then(
             new Then(
-                    new NumExpression(1),
-                    new NumExpression(3)
+                    new NumExpr(1),
+                    new NumExpr(3)
             ),
             new Then(
                     new Then(
-                            new NumExpression(2),
-                            new NumExpression(3)
+                            new NumExpr(2),
+                            new NumExpr(3)
                     ),
                     new Then(
                             new Or(
-                                    new NumExpression(1),
-                                    new NumExpression(2)
+                                    new NumExpr(1),
+                                    new NumExpr(2)
                             ),
-                            new NumExpression(3)
+                            new NumExpr(3)
                     )
             )
     )),
     SC_9(new Then(
             new Then(
-                    new NumExpression(1),
-                    new NumExpression(2)
+                    new NumExpr(1),
+                    new NumExpr(2)
             ),
             new Then(
                     new Then(
-                            new NumExpression(1),
-                            new Not(new NumExpression(2))
+                            new NumExpr(1),
+                            new Not(new NumExpr(2))
                     ),
-                    new Not(new NumExpression(1)))
+                    new Not(new NumExpr(1)))
     )),
     SC_10(new Then(
-            new Not(new Not(new NumExpression(1))),
-            new NumExpression(1)));
+            new Not(new Not(new NumExpr(1))),
+            new NumExpr(1)));
 
     private Expression expr;
 

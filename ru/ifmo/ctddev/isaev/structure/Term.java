@@ -10,11 +10,24 @@ import java.util.Map;
  * User: Xottab
  * Date: 17.12.13
  */
-public class Term extends Variable {
-    public Term[] arguments;
+public class Term extends AbstractExpression {
+    public void setArguments(Term[] arguments) {
+        this.arguments = arguments;
+    }
+
+    protected String name;
+    protected Term[] arguments;
+
+    public String getName() {
+        return name;
+    }
+
+    public Term[] getArguments() {
+        return arguments;
+    }
 
     public Term(String token) {
-        super(token);
+        this.name = token;
     }
 
     @Override
@@ -33,9 +46,14 @@ public class Term extends Variable {
     }
 
     @Override
-    public boolean hasSameType(Expression other) {
-        return false;
+    public Expression substitute(Map<String, ? extends Expression> variables) {
+        return null;
     }
+
+    /*@Override
+    public boolean hasSameType(Expression other) {
+        return other instanceof Term;
+    }*/
 
     @Override
     public boolean evaluate() {
@@ -44,7 +62,16 @@ public class Term extends Variable {
 
     @Override
     public StringBuilder asString() {
-        return null;
+        StringBuilder sb = new StringBuilder();
+        sb.append(name);
+        if (arguments.length != 0) {
+            sb.append("(");
+            for (int i = 0; i < arguments.length; i++) {
+                sb.append(arguments[i].asString()).append(i == arguments.length - 1 ? "" : ",");
+            }
+            sb.append(")");
+        }
+        return sb;
     }
 
     @Override
@@ -55,5 +82,18 @@ public class Term extends Variable {
     @Override
     public List<Expression> getParticularProof(List<? extends Expression> hypos) throws ProofGeneratingException {
         return null;
+    }
+
+    @Override
+    public HashMap<String, Variable> getVars() {
+        return null;
+    }
+
+    @Override
+    public boolean canSubstitute(Variable var) {
+        for (Term t : arguments) {
+            if (!t.canSubstitute(var)) return false;
+        }
+        return true;
     }
 }

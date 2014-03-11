@@ -13,13 +13,13 @@ public enum Lexeme {
     NOT("!"),
     THEN("->"),
     EXISTS("?"),
-    FORALL("@"),
+    FOR_ALL("@"),
     LEFT_P("("),
     RIGHT_P(")"),
     COMMA(",");
-    public final String token;
+    public final String s;
 
-    private Lexeme(final String token) {
-        this.token = token;
+    private Lexeme(final String s) {
+        this.s = s;
     }
 }

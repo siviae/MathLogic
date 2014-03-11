@@ -5,6 +5,9 @@ import ru.ifmo.ctddev.isaev.parser.Lexer;
 import ru.ifmo.ctddev.isaev.parser.LogicParser;
 import ru.ifmo.ctddev.isaev.parser.Parser;
 import ru.ifmo.ctddev.isaev.structure.Expression;
+import ru.ifmo.ctddev.isaev.structure.logic.Then;
+import ru.ifmo.ctddev.isaev.structure.predicate.Exists;
+import ru.ifmo.ctddev.isaev.structure.predicate.ForAll;
 
 import java.io.BufferedReader;
 import java.io.PrintWriter;
@@ -27,7 +30,6 @@ public class General {
     }
 
     public static Expression parse(String s) {
-
         Expression expression = null;
         try {
             String[] lexems = lexer.lex(s);
@@ -40,11 +42,9 @@ public class General {
         return expression;
     }
 
-
-
     public static List<Expression> proofAThenA(Expression alpha) {
         List<Expression> result = new ArrayList<>();
-        for (AThenA e: AThenA.values()) {
+        for (AThenA e : AThenA.values()) {
             result.add(e.replace(alpha));
         }
         return result;
@@ -68,5 +68,25 @@ public class General {
 
     public static boolean isUppercaseVariable(String temp) {
         return Character.isUpperCase(temp.charAt(0)) && looksLikeSomething(temp);
+    }
+
+    public static boolean isVariable(String temp) {
+        return Character.isLetter(temp.charAt(0)) && looksLikeSomething(temp);
+    }
+
+    public static boolean matchForAllPredicateAxiom(Expression e) {
+        if (!(e instanceof Then)) return false;
+        Then expr = (Then) e;
+        if (!(expr.getLeft() instanceof ForAll)) return false;
+        ForAll left = (ForAll) expr.getLeft();
+        return expr.getRight().canSubstitute(left.var);
+    }
+
+    public static boolean matchExistsPredicateAxiom(Expression e) {
+        if (!(e instanceof Then)) return false;
+        Then expr = (Then) e;
+        if (!(expr.getRight() instanceof Exists)) return false;
+        Exists right = (Exists) expr.getRight();
+        return expr.getLeft().canSubstitute(right.var);
     }
 }

@@ -35,4 +35,6 @@ public interface Expression {
     List<Expression> getParticularProof(List<? extends Expression> hypos) throws ProofGeneratingException;
 
     HashMap<String, Variable> getVars();
+
+    boolean canSubstitute(Variable var);
 }

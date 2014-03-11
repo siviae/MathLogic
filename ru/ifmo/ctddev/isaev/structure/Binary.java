@@ -15,9 +15,24 @@ import java.util.Map;
  * To change this template use File | Settings | File Templates.
  */
 public abstract class Binary extends AbstractExpression {
-    public Expression left;
-    public Expression right;
-    public Lexeme token;
+    protected Expression left;
+    protected Expression right;
+
+    public Lexeme getToken() {
+        return token;
+    }
+
+    public Expression getRight() {
+        return right;
+    }
+
+    public Expression getLeft() {
+        return left;
+    }
+
+    protected Lexeme token;
+
+
 
     protected Binary(Expression left, Expression right) {
         this.left = left;
@@ -36,14 +51,14 @@ public abstract class Binary extends AbstractExpression {
         StringBuilder s = left.asString();
         StringBuilder s2 = right.asString();
         if (left instanceof Binary) {
-            s.insert(0, Lexeme.LEFT_P.token);
-            s.append(Lexeme.RIGHT_P.token);
+            s.insert(0, Lexeme.LEFT_P.s);
+            s.append(Lexeme.RIGHT_P.s);
         }
         if (right instanceof Binary) {
-            s2.insert(0, Lexeme.LEFT_P.token);
-            s2.append(Lexeme.RIGHT_P.token);
+            s2.insert(0, Lexeme.LEFT_P.s);
+            s2.append(Lexeme.RIGHT_P.s);
         }
-        return s.append(token.token).append(s2)/*.append(Lexeme.RIGHT_P.token).insert(0,Lexeme.LEFT_P.token)*/;
+        return s.append(token.s).append(s2)/*.append(Lexeme.RIGHT_P.s).insert(0,Lexeme.LEFT_P.s)*/;
     }
 
     @Override
@@ -68,6 +83,18 @@ public abstract class Binary extends AbstractExpression {
     }
 
     @Override
+    public boolean match(Expression other) {
+        return hasSameType(other)
+                && ((Binary) other).left.match(left)
+                && ((Binary) other).right.match(right);
+    }
+
+    @Override
+    public boolean canSubstitute(Variable v) {
+        return left.canSubstitute(v) && right.canSubstitute(v);
+    }
+
+    @Override
     public List<Expression> getParticularProof(List<? extends Expression> hypos) throws ProofGeneratingException {
         List<Expression> result = left.getParticularProof(hypos);
         result.addAll(right.getParticularProof(hypos));
@@ -76,8 +103,8 @@ public abstract class Binary extends AbstractExpression {
 
     @Override
     public Expression substitute(Map<String, ? extends Expression> variables) {
-        left=left.substitute(variables);
-        right=right.substitute(variables);
+        left = left.substitute(variables);
+        right = right.substitute(variables);
         return this;
     }
 

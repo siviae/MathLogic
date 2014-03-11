@@ -22,18 +22,6 @@ public class Or extends Binary {
     }
 
     @Override
-    public boolean match(Expression other) {
-        return hasSameType(other)
-                && ((Or) other).left.match(left)
-                && ((Or) other).right.match(right);
-    }
-
-    @Override
-    public boolean hasSameType(Expression other) {
-        return other instanceof Or;
-    }
-
-    @Override
     public boolean evaluate() {
         return left.evaluate() || right.evaluate();
     }

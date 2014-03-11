@@ -13,10 +13,10 @@ import java.util.Map;
  * Time: 13:35
  * To change this template use File | Settings | File Templates.
  */
-public class NumExpression extends AbstractExpression {
+public class NumExpr extends AbstractExpression {
     public int number;
 
-    public NumExpression(int number) {
+    public NumExpr(int number) {
         this.number = number;
     }
 
@@ -62,7 +62,7 @@ public class NumExpression extends AbstractExpression {
 
     @Override
     public StringBuilder asJavaExpr() {
-        return new StringBuilder("new NumExpression(").append(number).append(")");
+        return new StringBuilder("new NumExpr(").append(number).append(")");
     }
 
     @Override
@@ -73,6 +73,11 @@ public class NumExpression extends AbstractExpression {
     @Override
     public HashMap<String, Variable> getVars() {
         return null;
+    }
+
+    @Override
+    public boolean canSubstitute(Variable var) {
+        return true;
     }
 
 }

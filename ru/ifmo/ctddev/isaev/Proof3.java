@@ -7,7 +7,7 @@ import ru.ifmo.ctddev.isaev.exception.ProofGeneratingException;
 import ru.ifmo.ctddev.isaev.helpers.AxiomScheme;
 import ru.ifmo.ctddev.isaev.helpers.ContrapositionRule;
 import ru.ifmo.ctddev.isaev.structure.Expression;
-import ru.ifmo.ctddev.isaev.structure.NumExpression;
+import ru.ifmo.ctddev.isaev.structure.NumExpr;
 import ru.ifmo.ctddev.isaev.structure.Variable;
 import ru.ifmo.ctddev.isaev.structure.logic.Not;
 import ru.ifmo.ctddev.isaev.structure.logic.Or;
@@ -87,7 +87,7 @@ public class Proof3 extends Homework {
         for (int i = 0; i < n; i++) {
             int k = i;
             for (Expression v : vars.values()) {
-                ((Variable) v).currentValue = k % 2 == 1;
+                ((Variable) v).setCurrentValue(k % 2 == 1);
                 k /= 2;
             }
             theorem = theorem.substituteAndCopy(vars);
@@ -95,7 +95,7 @@ public class Proof3 extends Homework {
             if (!f) {
                 StringBuilder sb = new StringBuilder("Высказывание ложно при ");
                 for (int j = 0; j < variables.size(); j++) {
-                    sb.append(variables.get(j).name).append("=").append(variables.get(j).currentValue ? "И" : "Л");
+                    sb.append(variables.get(j).getName()).append("=").append(variables.get(j).getCurrentValue() ? "И" : "Л");
                     if (j != variables.size() - 1) {
                         sb.append(", ");
                     }
@@ -129,6 +129,7 @@ public class Proof3 extends Homework {
         for (Expression e : proof) {
             out.println(e.toString());
         }
+        deduct.stat.close();
     }
 
     private ArrayList<Expression> tertiumNonDatur(Variable v) {
@@ -136,24 +137,24 @@ public class Proof3 extends Homework {
         Not notV = new Not(v);
         ArrayList<Expression> result = new ArrayList<>();
 
-        result.add(new Then(new NumExpression(1), new Or(new NumExpression(1), new Not(new NumExpression(1)))).substitute(subst));
+        result.add(new Then(new NumExpr(1), new Or(new NumExpr(1), new Not(new NumExpr(1)))).substitute(subst));
         for (ContrapositionRule s : ContrapositionRule.values()) {
             result.add(s.replace(v, new Or(v, notV)));
         }
-        result.add(new Then(new Not(new Or(new NumExpression(1), new Not(new NumExpression(1)))), new Not(new NumExpression(1))).substitute(subst));
+        result.add(new Then(new Not(new Or(new NumExpr(1), new Not(new NumExpr(1)))), new Not(new NumExpr(1))).substitute(subst));
 
-        result.add(new Then(new Not(new NumExpression(1)), new Or(new NumExpression(1), new Not(new NumExpression(1)))).substitute(subst));
+        result.add(new Then(new Not(new NumExpr(1)), new Or(new NumExpr(1), new Not(new NumExpr(1)))).substitute(subst));
         for (ContrapositionRule s : ContrapositionRule.values()) {
             result.add(s.replace(new Not(v), new Or(v, notV)));
         }
-        result.add(new Then(new Not(new Or(new NumExpression(1), new Not(new NumExpression(1)))), new Not(new Not(new NumExpression(1)))).substitute(subst));
+        result.add(new Then(new Not(new Or(new NumExpr(1), new Not(new NumExpr(1)))), new Not(new Not(new NumExpr(1)))).substitute(subst));
 
 
-        result.add(new Then(new Then(new Not(new Or(new NumExpression(1), new Not(new NumExpression(1)))), new Not(new NumExpression(1))), new Then(new Then(new Not(new Or(new NumExpression(1), new Not(new NumExpression(1)))), new Not(new Not(new NumExpression(1)))), new Not(new Not(new Or(new NumExpression(1), new Not(new NumExpression(1))))))).substitute(subst));
-        result.add(new Then(new Then(new Not(new Or(new NumExpression(1), new Not(new NumExpression(1)))), new Not(new Not(new NumExpression(1)))), new Not(new Not(new Or(new NumExpression(1), new Not(new NumExpression(1)))))).substitute(subst));
-        result.add(new Not(new Not(new Or(new NumExpression(1), new Not(new NumExpression(1))))).substitute(subst));
-        result.add(new Then(new Not(new Not(new Or(new NumExpression(1), new Not(new NumExpression(1))))), new Or(new NumExpression(1), new Not(new NumExpression(1)))).substitute(subst));
-        result.add(new Or(new NumExpression(1), new Not(new NumExpression(1))).substitute(subst));
+        result.add(new Then(new Then(new Not(new Or(new NumExpr(1), new Not(new NumExpr(1)))), new Not(new NumExpr(1))), new Then(new Then(new Not(new Or(new NumExpr(1), new Not(new NumExpr(1)))), new Not(new Not(new NumExpr(1)))), new Not(new Not(new Or(new NumExpr(1), new Not(new NumExpr(1))))))).substitute(subst));
+        result.add(new Then(new Then(new Not(new Or(new NumExpr(1), new Not(new NumExpr(1)))), new Not(new Not(new NumExpr(1)))), new Not(new Not(new Or(new NumExpr(1), new Not(new NumExpr(1)))))).substitute(subst));
+        result.add(new Not(new Not(new Or(new NumExpr(1), new Not(new NumExpr(1))))).substitute(subst));
+        result.add(new Then(new Not(new Not(new Or(new NumExpr(1), new Not(new NumExpr(1))))), new Or(new NumExpr(1), new Not(new NumExpr(1)))).substitute(subst));
+        result.add(new Or(new NumExpr(1), new Not(new NumExpr(1))).substitute(subst));
 
         return result;
     }

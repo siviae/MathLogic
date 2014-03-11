@@ -9,4 +9,8 @@ public abstract class AbstractExpression implements Expression {
     public String toString() {
         return asString().toString();
     }
+
+    public boolean hasSameType(Expression other) {
+        return this.getClass().getSimpleName().equals(other.getClass().getSimpleName());
+    }
 }

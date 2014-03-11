@@ -15,14 +15,19 @@ import java.util.Map;
  * To change this template use File | Settings | File Templates.
  */
 public abstract class Unary extends AbstractExpression {
-    public Expression operand;
-    public Lexeme token;
+    protected Expression operand;
+    protected Lexeme token;
 
     public Unary(Expression operand) {
         this.operand = operand;
     }
 
-    public Unary() {
+    public Expression getOperand() {
+        return operand;
+    }
+
+    public Lexeme getToken() {
+        return token;
     }
 
     @Override
@@ -35,10 +40,10 @@ public abstract class Unary extends AbstractExpression {
     public StringBuilder asString() {
         StringBuilder s = operand.asString();
        if (operand instanceof Binary) {
-            s.insert(0, Lexeme.LEFT_P.token);
-            s.append(Lexeme.RIGHT_P.token);
+            s.insert(0, Lexeme.LEFT_P.s);
+            s.append(Lexeme.RIGHT_P.s);
         }
-        return s.insert(0, token.token);
+        return s.insert(0, token.s);
     }
 
     @Override

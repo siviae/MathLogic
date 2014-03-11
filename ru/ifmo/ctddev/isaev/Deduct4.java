@@ -3,6 +3,7 @@ package ru.ifmo.ctddev.isaev;
 import ru.ifmo.ctddev.isaev.exception.IncorrectProofException;
 import ru.ifmo.ctddev.isaev.exception.LexingException;
 import ru.ifmo.ctddev.isaev.exception.ParsingException;
+import ru.ifmo.ctddev.isaev.exception.ProofGeneratingException;
 import ru.ifmo.ctddev.isaev.helpers.AxiomScheme;
 import ru.ifmo.ctddev.isaev.structure.Expression;
 import ru.ifmo.ctddev.isaev.structure.NumExpr;
@@ -20,13 +21,11 @@ import java.util.regex.Pattern;
 import static ru.ifmo.ctddev.isaev.General.*;
 
 /**
- * Created with IntelliJ IDEA.
  * User: Xottab
- * Date: 10.11.13
- * Time: 17:39
- * To change this template use File | Settings | File Templates.
+ * Date: 09.03.14
  */
-public class Deduct2 extends Homework {
+public class Deduct4 extends Homework {
+
     public PrintWriter stat;
     private int k1;
     private int k2;
@@ -36,7 +35,7 @@ public class Deduct2 extends Homework {
     private Expression alpha;
     private Map<String, Expression> map = new HashMap<>();
 
-    public Deduct2() {
+    public Deduct4() {
         try {
             stat = new PrintWriter("stat.out");
         } catch (FileNotFoundException e) {
@@ -45,7 +44,7 @@ public class Deduct2 extends Homework {
 
     }
 
-    public Deduct2(List<Expression> hypos, Expression alpha) {
+    public Deduct4(List<Expression> hypos, Expression alpha) {
 
         this.hypos = hypos;
         this.hypos.add(alpha);
@@ -54,6 +53,10 @@ public class Deduct2 extends Homework {
     public void setHypos(List<Expression> hypos) {
         this.hypos = new ArrayList<>(hypos);
         this.alpha = this.hypos.remove(hypos.size() - 1);
+    }
+
+    public void setAlpha(Expression alpha) {
+        this.alpha = alpha;
     }
 
     public void setProofed(List<Expression> proofed) {
@@ -65,10 +68,9 @@ public class Deduct2 extends Homework {
         k2 = 0;
         k3 = 0;
         List<Expression> result = new ArrayList<>();
-        for (int l = 0; l < proof.size(); l++) {
-            Expression expr = proof.get(l);
-
+        for (Expression expr : proof) {
             boolean f = false;
+            //todo remove stupid copypaste
             for (Expression e : hypos) {
                 if (e.match(expr)) {
                     f = true;
@@ -89,6 +91,18 @@ public class Deduct2 extends Homework {
                 result.add(new Then(expr, new Then(alpha, expr)));
                 result.add(new Then(alpha, expr));
             }
+           // todo
+            if(!f&&General.matchForAllPredicateAxiom(expr)){
+               f=true;
+
+            }
+
+            if(!f&General.matchForAllPredicateAxiom(expr)){
+                 f=true;
+
+            }
+
+            //todo remove stupid copypaste
             if (!f && expr.match(alpha)) {
                 k2++;
                 result.addAll(proofAThenA(alpha));
@@ -96,7 +110,6 @@ public class Deduct2 extends Homework {
             }
             if (!f) {
                 for (int i = proofed.size() - 1; i >= 0; i--) {
-                    if (f) break;
                     if (proofed.get(i).equals(expr)) {
                         f = true;
                         break;
@@ -150,7 +163,7 @@ public class Deduct2 extends Homework {
                 proofed.add(expr);
             }
         }
-
+        //todo end
         stat.println("Axiom: " + k1);
         stat.println("alpha: " + k2);
         stat.println("MP: " + k3);
@@ -159,7 +172,7 @@ public class Deduct2 extends Homework {
     }
 
     @Override
-    public void doSomething() throws IOException, ParsingException, LexingException, IncorrectProofException {
+    public void doSomething() throws IOException, ParsingException, LexingException, IncorrectProofException, ProofGeneratingException {
         String[] temp = in.readLine().split(Pattern.quote("|-"));
         if (temp.length > 2) {
             throw new IOException("more than one |- in first line");
@@ -175,13 +188,14 @@ public class Deduct2 extends Homework {
             proof.add(parse(s1));
             s1 = in.readLine();
         }
-        List<Expression> newProof = move1HypoToProof(proof);
-        for (Expression e : newProof) {
+        for (Expression e : proof) {
             out.println(e.asString());
         }
-    }
 
-    public boolean haveZeroHypos() {
-        return hypos.size() == 0;
+
+       /* List<Expression> newProof = move1HypoToProof(proof);
+        for (Expression e : newProof) {
+            out.println(e.asString());
+        }*/
     }
 }

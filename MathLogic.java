@@ -4,6 +4,7 @@ import ru.ifmo.ctddev.isaev.exception.LexingException;
 import ru.ifmo.ctddev.isaev.exception.ParsingException;
 import ru.ifmo.ctddev.isaev.exception.ProofGeneratingException;
 import ru.ifmo.ctddev.isaev.parser.LogicParser;
+import ru.ifmo.ctddev.isaev.parser.PredicateParser;
 
 import java.io.*;
 
@@ -39,6 +40,8 @@ public class MathLogic {
                 break;
             }
             case "4": {
+                General.setParser(new PredicateParser());
+                work = new Deduct4();
                 break;
             }
             case "5": {

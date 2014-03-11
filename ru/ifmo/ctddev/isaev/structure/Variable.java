@@ -15,12 +15,21 @@ import java.util.Map;
  * Time: 20:34
  * To change this template use File | Settings | File Templates.
  */
-public class Variable extends AbstractExpression {
-    public String name;
-    public Boolean currentValue;
+public class Variable extends Term {
+    protected Boolean currentValue;
+
+    public void setCurrentValue(Boolean currentValue) {
+        this.currentValue = currentValue;
+    }
+
+    public Boolean getCurrentValue() {
+
+        return currentValue;
+    }
 
     public Variable(String name) {
-        this.name = name;
+        super(name);
+        arguments=new Term[0];
     }
 
     @Override
@@ -43,11 +52,11 @@ public class Variable extends AbstractExpression {
         return substituteAndCopy(variables);
     }
 
-    @Override
+    /*@Override
     public boolean hasSameType(Expression other) {
         return other instanceof Variable;
     }
-
+*/
     @Override
     public boolean evaluate() {
 

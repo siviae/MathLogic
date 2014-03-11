@@ -22,20 +22,8 @@ public class And extends Binary {
     }
 
     @Override
-    public boolean match(Expression other) {
-        return hasSameType(other)
-                && ((And) other).left.match(left)
-                && ((And) other).right.match(right);
-    }
-
-    @Override
     public Expression substituteAndCopy(Map<String, ? extends Expression> variables) {
         return new And(left.substituteAndCopy(variables), right.substituteAndCopy(variables));
-    }
-
-    @Override
-    public boolean hasSameType(Expression other) {
-        return other instanceof And;
     }
 
     @Override
@@ -57,7 +45,7 @@ public class And extends Binary {
             result.add(b);
             result.add(new Then(b, new And(a, b)));
             result.add(new And(a, b));
-        } else if (!l&r) {
+        } else if (!l & r) {
             result.add(new Then(new Then(new And(a, b), a), new Then(new Then(new And(a, b), new Not(a)), new Not(new And(a, b)))));
             result.add(new Then(new And(a, b), a));
             result.add(new Then(new Then(new And(a, b), new Not(a)), new Not(new And(a, b))));
@@ -65,7 +53,7 @@ public class And extends Binary {
             result.add(new Not(a));
             result.add(new Then(new And(a, b), new Not(a)));
             result.add(new Not(new And(a, b)));
-        } else if (l&!r) {
+        } else if (l & !r) {
             result.add(new Then(new Then(new And(a, b), b), new Then(new Then(new And(a, b), new Not(b)), new Not(new And(a, b)))));
             result.add(new Then(new And(a, b), b));
             result.add(new Then(new Then(new And(a, b), new Not(b)), new Not(new And(a, b))));
@@ -73,7 +61,7 @@ public class And extends Binary {
             result.add(new Not(b));
             result.add(new Then(new And(a, b), new Not(b)));
             result.add(new Not(new And(a, b)));
-        } else if (!l&!r) {
+        } else if (!l & !r) {
             result.add(new Then(new Then(new And(a, b), a), new Then(new Then(new And(a, b), new Not(a)), new Not(new And(a, b)))));
             result.add(new Then(new And(a, b), a));
             result.add(new Then(new Then(new And(a, b), new Not(a)), new Not(new And(a, b))));

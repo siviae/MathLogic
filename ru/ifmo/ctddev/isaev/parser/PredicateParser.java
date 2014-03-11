@@ -1,10 +1,11 @@
 package ru.ifmo.ctddev.isaev.parser;
 
 import ru.ifmo.ctddev.isaev.exception.ParsingException;
-import ru.ifmo.ctddev.isaev.structure.*;
-import ru.ifmo.ctddev.isaev.structure.logic.And;
+import ru.ifmo.ctddev.isaev.structure.Expression;
+import ru.ifmo.ctddev.isaev.structure.Predicate;
+import ru.ifmo.ctddev.isaev.structure.Term;
+import ru.ifmo.ctddev.isaev.structure.Variable;
 import ru.ifmo.ctddev.isaev.structure.logic.Not;
-import ru.ifmo.ctddev.isaev.structure.logic.Or;
 import ru.ifmo.ctddev.isaev.structure.logic.Then;
 import ru.ifmo.ctddev.isaev.structure.predicate.Exists;
 import ru.ifmo.ctddev.isaev.structure.predicate.ForAll;
@@ -19,14 +20,16 @@ import static ru.ifmo.ctddev.isaev.General.isUppercaseVariable;
  * User: Xottab
  * Date: 22.01.14
  */
-public class PredicateParser extends Parser {
-
+public class PredicateParser extends LogicParser {
+    /**
+     * Инвариант для каждого метода - после окончания парсинга, поциция следующего токена должна быть перенесена
+     */
     @Override
     protected Expression expr() throws ParsingException {
         Expression result = disj();
         ArrayList<Expression> arr = new ArrayList<>();
         arr.add(result);
-        while (position < tokens.length && tokens[position].equals(Lexeme.THEN.token)) {
+        while (position < tokens.length && tokens[position].equals(Lexeme.THEN.s)) {
             position++;
             arr.add(disj());
         }
@@ -41,94 +44,38 @@ public class PredicateParser extends Parser {
         return result;
     }
 
-    private Expression disj() throws ParsingException {
-        Expression result = conj();
-        while (position < tokens.length && tokens[position].equals(Lexeme.OR.token)) {
-            position++;
-            result = new Or(result, conj());
-        }
-        return result;
+   /* protected Expression disj() throws ParsingException {
+        return  super.disj();
     }
 
-    private Expression conj() throws ParsingException {
-        Expression result = unary();
-        while (position < tokens.length && tokens[position].equals(Lexeme.AND.token)) {
+    protected Expression conj() throws ParsingException {
+        return super.conj();
+    }*/
+
+    @Override
+    protected Expression unary() throws ParsingException {
+        Expression result;
+        if (tokens[position].equals(Lexeme.NOT.s)) {
             position++;
-            result = new And(result, unary());
+            result = new Not(unary());
+            return result;
         }
-        return result;
-    }
-
-    private Term term() throws ParsingException {
-        boolean brackets = false;
-        if (tokens[position].equals(Lexeme.LEFT_P.token)) {
+        if (tokens[position].equals(Lexeme.FOR_ALL.s)) {
             position++;
-            brackets = true;
+            Variable var = var();
+            result = new ForAll(var, unary());
+            return result;
         }
-        Term result;
-        if (isLowercaseVariable(tokens[position])) {
-            result = new Term(var().toString());
-        } else
-            throw new ParsingException("cannot parse term without name");
-
-        if (tokens[position].equals(Lexeme.LEFT_P.token)) {
+        if (tokens[position].equals(Lexeme.EXISTS.s)) {
             position++;
-            List<Term> arguments = new ArrayList<>(3);
-            arguments.add(term());
-            while (tokens[position].equals(Lexeme.COMMA.token)) {
-                position++;
-                arguments.add(term());
-            }
-            position++;
-            result.arguments = arguments.toArray(new Term[arguments.size()]);
+            Variable var = var();
+            result = new Exists(var, unary());
+            return result;
         }
-
-        if (brackets) {
+        if (tokens[position].equals(Lexeme.LEFT_P.s)) {
             position++;
-        }
-        return result;
-    }
-
-    private Predicate predicate() throws ParsingException {
-        Predicate result;
-        if (isUppercaseVariable(tokens[position])) {
-            result = new Predicate(var().toString());
-        } else
-            throw new ParsingException("cannot predicate without name");
-
-        if (tokens[position].equals(Lexeme.LEFT_P.token)) {
-            position++;
-            List<Term> arguments = new ArrayList<>(3);
-            arguments.add(term());
-            while (tokens[position].equals(Lexeme.COMMA.token)) {
-                position++;
-                arguments.add(term());
-            }
-            position++;
-            result.arguments = arguments.toArray(new Term[arguments.size()]);
-        }
-        return result;
-    }
-
-    private Variable var() {
-        Variable result = new Variable(tokens[position]);
-        position++;
-        return result;
-    }
-
-    private Expression unary() throws ParsingException {
-
-        if (isLowercaseVariable(tokens[position])) {
-            return var();
-        }
-        if (isUppercaseVariable(tokens[position])) {
-            return predicate();
-        }
-        if (tokens[position].equals(Lexeme.LEFT_P.token)) {
-            position++;
-
-            Expression result = expr();
-            if (!tokens[position].equals(Lexeme.RIGHT_P.token)) {
+            result = expr();
+            if (!tokens[position].equals(Lexeme.RIGHT_P.s)) {
                 StringBuilder sb = new StringBuilder();
                 for (String s : tokens) {
                     sb.append(s);
@@ -140,20 +87,62 @@ public class PredicateParser extends Parser {
             return result;
         }
 
-        if (tokens[position].equals(Lexeme.NOT.token)) {
-            position++;
-            return new Not(unary());
-        }
-        if (tokens[position].equals(Lexeme.FORALL.token)) {
-            position++;
-            Variable v = var();
-            return new ForAll(v, unary());
-        }
-        if (tokens[position].equals(Lexeme.EXISTS.token)) {
-            position++;
-            Variable v = var();
-            return new Exists(v, unary());
+        if (isUppercaseVariable(tokens[position])) {
+            return predicate();
         }
         throw new ParsingException("unexpected symbol");
     }
+
+    /*protected Variable var() {
+        Variable result = new Variable(tokens[position]);
+        position++;
+        return result;
+    }*/
+
+    protected Predicate predicate() throws ParsingException {
+        Predicate result;
+        result = new Predicate(tokens[position]);
+        position++;
+        if (tokens[position].equals(Lexeme.LEFT_P.s)) {
+            position++;
+            List<Term> arguments = new ArrayList<>(3);
+            arguments.add(term());
+            while (tokens[position].equals(Lexeme.COMMA.s)) {
+                position++;
+                arguments.add(term());
+            }
+            position++;
+            result.setArguments(arguments.toArray(new Term[arguments.size()]));
+        } /*else {
+            position++;
+        }*/
+        return result;
+    }
+
+    protected Term term() throws ParsingException {
+        Term result;
+        if (tokens[position].equals(Lexeme.LEFT_P.s)) {
+            position++;
+            result = term();
+        } else if (isLowercaseVariable(tokens[position])) {
+            result = new Term(tokens[position]);
+            if (tokens[position].equals(Lexeme.LEFT_P.s)) {
+                position++;
+                List<Term> arguments = new ArrayList<>(3);
+                arguments.add(term());
+                while (tokens[position].equals(Lexeme.COMMA.s)) {
+                    position++;
+                    arguments.add(term());
+                }
+                result.setArguments(arguments.toArray(new Term[arguments.size()]));
+            } else {
+                result = new Variable(result.getName());
+            }
+        } else
+            throw new ParsingException("cannot parse term without name, incorrect invocation");
+
+        position++;
+        return result;
+    }
+
 }

@@ -21,17 +21,12 @@ public class Then extends Binary {
         this.token = Lexeme.THEN;
     }
 
-    @Override
-    public boolean match(Expression other) {
-        return other instanceof Then
-                && ((Then) other).left.match(left)
-                && ((Then) other).right.match(right);
-    }
 
-    @Override
+
+    /*@Override
     public boolean hasSameType(Expression other) {
         return other instanceof Then;
-    }
+    }*/
 
     @Override
     public boolean evaluate() {
