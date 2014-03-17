@@ -29,7 +29,6 @@ public class Variable extends Term {
 
     public Variable(String name) {
         super(name);
-        arguments=new Term[0];
     }
 
     @Override

@@ -11,12 +11,13 @@ import java.util.Map;
  * Date: 17.12.13
  */
 public class Term extends AbstractExpression {
-    public void setArguments(Term[] arguments) {
-        this.arguments = arguments;
-    }
-
     protected String name;
     protected Term[] arguments;
+
+    public Term(String token) {
+        this.arguments = new Term[0];
+        this.name = token;
+    }
 
     public String getName() {
         return name;
@@ -26,12 +27,25 @@ public class Term extends AbstractExpression {
         return arguments;
     }
 
-    public Term(String token) {
-        this.name = token;
+    public void setArguments(Term[] arguments) {
+        this.arguments = arguments;
     }
 
     @Override
     public boolean match(Expression other) {
+        if (hasSameType(other)) {
+            Predicate pred = (Predicate) other;
+            if (name.equals(pred.name) && arguments.length == pred.arguments.length) {
+                boolean f = false;
+                for (int i = 0; i < arguments.length; i++) {
+                    if (!arguments[i].match(pred.arguments[i])) {
+                        f = true;
+                        break;
+                    }
+                }
+                if (!f) return true;
+            }
+        }
         return false;
     }
 
@@ -42,18 +56,22 @@ public class Term extends AbstractExpression {
 
     @Override
     public Expression substituteAndCopy(Map<String, ? extends Expression> variables) {
-        return null;
+        Term term = new Term(this.name);
+        Term[] args = new Term[arguments.length];
+        for (int i = 0; i < arguments.length; i++) {
+            args[i] = (Term) arguments[i].substitute(variables);
+        }
+        term.setArguments(args);
+        return term;
     }
 
     @Override
     public Expression substitute(Map<String, ? extends Expression> variables) {
-        return null;
+        for (int i = 0; i < arguments.length; i++) {
+            arguments[i] = (Term) arguments[i].substitute(variables);
+        }
+        return this;
     }
-
-    /*@Override
-    public boolean hasSameType(Expression other) {
-        return other instanceof Term;
-    }*/
 
     @Override
     public boolean evaluate() {

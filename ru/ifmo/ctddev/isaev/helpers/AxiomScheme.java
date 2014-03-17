@@ -115,6 +115,9 @@ public enum AxiomScheme {
 
     private Expression expr;
 
+    public Expression getExpr() {
+        return expr;
+    }
 
     private AxiomScheme(Expression expr) {
         this.expr = expr;

@@ -30,7 +30,9 @@ public class Exists extends Unary {
 
     @Override
     public boolean match(Expression other) {
-        return false;
+        return hasSameType(other)
+                && var.match(other)
+                && operand.match(other);
     }
 
     @Override

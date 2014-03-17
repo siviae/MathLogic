@@ -14,25 +14,38 @@ public class Predicate extends AbstractExpression {
     protected String name;
     protected Term[] arguments;
 
-    public String getName() {
-        return name;
+    public Predicate(String name) {
+        this.arguments = new Term[0];
+        this.name = name;
     }
 
-    public void setArguments(Term[] arguments) {
-        this.arguments = arguments;
+    public String getName() {
+        return name;
     }
 
     public Term[] getArguments() {
         return arguments;
     }
 
-    public Predicate(String name) {
-        super();
-        this.name = name;
+    public void setArguments(Term[] arguments) {
+        this.arguments = arguments;
     }
 
     @Override
     public boolean match(Expression other) {
+        if (hasSameType(other)) {
+            Predicate pred = (Predicate) other;
+            if (name.equals(pred.name) && arguments.length == pred.arguments.length) {
+                boolean f = false;
+                for (int i = 0; i < arguments.length; i++) {
+                    if (!arguments[i].match(pred.arguments[i])) {
+                        f = true;
+                        break;
+                    }
+                }
+                if (!f) return true;
+            }
+        }
         return false;
     }
 
@@ -43,16 +56,22 @@ public class Predicate extends AbstractExpression {
 
     @Override
     public Expression substituteAndCopy(Map<String, ? extends Expression> variables) {
-        return null;
+        Predicate pred = new Predicate(this.name);
+        Term[] args = new Term[arguments.length];
+        for (int i = 0; i < arguments.length; i++) {
+            args[i] = (Term) arguments[i].substitute(variables);
+        }
+        pred.setArguments(args);
+        return pred;
     }
 
     @Override
     public Expression substitute(Map<String, ? extends Expression> variables) {
-        return null;
+        for (int i = 0; i < arguments.length; i++) {
+            arguments[i] = (Term) arguments[i].substitute(variables);
+        }
+        return this;
     }
-
-
-
 
     @Override
     public boolean evaluate() {
@@ -75,7 +94,7 @@ public class Predicate extends AbstractExpression {
 
     @Override
     public StringBuilder asJavaExpr() {
-        return  null;
+        return null;
     }
 
     @Override

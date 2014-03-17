@@ -43,11 +43,11 @@ public class PredicateParser extends LogicParser {
         }
         return result;
     }
-
-   /* protected Expression disj() throws ParsingException {
+    /*@Override
+    protected Expression disj() throws ParsingException {
         return  super.disj();
     }
-
+    @Override
     protected Expression conj() throws ParsingException {
         return super.conj();
     }*/
@@ -103,7 +103,7 @@ public class PredicateParser extends LogicParser {
         Predicate result;
         result = new Predicate(tokens[position]);
         position++;
-        if (tokens[position].equals(Lexeme.LEFT_P.s)) {
+        if (position<tokens.length && tokens[position].equals(Lexeme.LEFT_P.s)) {
             position++;
             List<Term> arguments = new ArrayList<>(3);
             arguments.add(term());

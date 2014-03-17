@@ -40,10 +40,10 @@ public abstract class Binary extends AbstractExpression {
     }
 
     @Override
-    public boolean matchAxiomScheme(Expression expr, HashMap<Integer, Expression> known) {
-        return hasSameType(expr)
-                && left.matchAxiomScheme(((Binary) expr).left, known)
-                && right.matchAxiomScheme(((Binary) expr).right, known);
+    public boolean matchAxiomScheme(Expression axiomScheme, HashMap<Integer, Expression> known) {
+        return hasSameType(axiomScheme)
+                && left.matchAxiomScheme(((Binary) axiomScheme).left, known)
+                && right.matchAxiomScheme(((Binary) axiomScheme).right, known);
     }
 
     @Override

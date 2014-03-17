@@ -85,24 +85,24 @@ public class Deduct4 extends Homework {
                     }
                 }
             }
+            if (!f) {
+                if (General.matchForAllPredicateAxiom(expr)) {
+                    f = true;
+                }
+            }
             if (f) {
                 k1++;
                 result.add(expr);
                 result.add(new Then(expr, new Then(alpha, expr)));
                 result.add(new Then(alpha, expr));
             }
-           // todo
-            if(!f&&General.matchForAllPredicateAxiom(expr)){
-               f=true;
-
-            }
-
+/*
             if(!f&General.matchForAllPredicateAxiom(expr)){
                  f=true;
 
             }
 
-            //todo remove stupid copypaste
+            //todo remove stupid copypaste*/
             if (!f && expr.match(alpha)) {
                 k2++;
                 result.addAll(proofAThenA(alpha));
@@ -145,7 +145,7 @@ public class Deduct4 extends Homework {
                                             new Then(
                                                     new NumExpr(1),
                                                     new NumExpr(3))).substitute(map));
-                            result.add(new Then(alpha, expr).substitute(map));
+                            result.add(new Then(alpha, expr));
                             f = true;
                             break;
                         }
@@ -188,7 +188,8 @@ public class Deduct4 extends Homework {
             proof.add(parse(s1));
             s1 = in.readLine();
         }
-        for (Expression e : proof) {
+        List<Expression> newProof = move1HypoToProof(proof);
+        for (Expression e : newProof) {
             out.println(e.asString());
         }
 

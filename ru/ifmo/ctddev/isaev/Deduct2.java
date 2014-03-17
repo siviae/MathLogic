@@ -139,7 +139,7 @@ public class Deduct2 extends Homework {
                                             new Then(
                                                     new NumExpr(1),
                                                     new NumExpr(3))).substitute(map));
-                            result.add(new Then(alpha, expr).substitute(map));
+                            result.add(new Then(alpha, expr));
                             f = true;
                             break;
                         }

@@ -19,6 +19,7 @@ public class ForAll extends Unary {
     public Lexeme token = Lexeme.FOR_ALL;
     public Variable var;
 
+
     public ForAll(Expression operand) {
         super(operand);
     }
@@ -30,7 +31,9 @@ public class ForAll extends Unary {
 
     @Override
     public boolean match(Expression other) {
-        return false;
+        return hasSameType(other)
+                && var.match(((ForAll) other).var)
+                && operand.match(((ForAll) other).operand);
     }
 
     @Override
