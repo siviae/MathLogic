@@ -27,12 +27,11 @@ public class Exists extends Unary {
         this.var = var;
     }
 
-
     @Override
     public boolean match(Expression other) {
         return hasSameType(other)
-                && var.match(other)
-                && operand.match(other);
+                && var.match(((Exists) other).var)
+                && operand.match(((Exists) other).operand);
     }
 
     @Override
@@ -62,7 +61,7 @@ public class Exists extends Unary {
 
     @Override
     public StringBuilder asJavaExpr() {
-        return null;
+        return new StringBuilder("new Exists(").append(var.asJavaExpr()).append(",").append(operand.asJavaExpr()).append(")");
     }
 
     @Override

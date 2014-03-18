@@ -90,19 +90,18 @@ public class Deduct4 extends Homework {
                     f = true;
                 }
             }
+            if (!f && General.matchExistsPredicateAxiom(expr)) {
+                f = true;
+
+            }
             if (f) {
                 k1++;
                 result.add(expr);
                 result.add(new Then(expr, new Then(alpha, expr)));
                 result.add(new Then(alpha, expr));
             }
-/*
-            if(!f&General.matchForAllPredicateAxiom(expr)){
-                 f=true;
 
-            }
 
-            //todo remove stupid copypaste*/
             if (!f && expr.match(alpha)) {
                 k2++;
                 result.addAll(proofAThenA(alpha));
@@ -148,6 +147,29 @@ public class Deduct4 extends Homework {
                             result.add(new Then(alpha, expr));
                             f = true;
                             break;
+                        }
+                    }
+
+                    String[] strings = null;
+                    if (!f && forAllRule(proofed.get(i), expr)) {
+                        f = true;
+                        strings = GiantStrings.FORALL_DEDUCT
+                                .replace("{A}", alpha.asString())
+                                .replace("{B}", ((Then) proofed.get(i)).getLeft().asString())
+                                .replace("{C}", ((Then) proofed.get(i)).getRight().asString())
+                                .split("\\n");
+                    }
+                    if (!f && existsRule(proofed.get(i), expr)) {
+                        f = true;
+                        strings = GiantStrings.FORALL_DEDUCT
+                                .replace("{A}", alpha.asString())
+                                .replace("{B}", ((Then) proofed.get(i)).getLeft().asString())
+                                .replace("{C}", ((Then) proofed.get(i)).getRight().asString())
+                                .split("\\n");
+                    }
+                    if (f) {
+                        for (String s : strings) {
+                            result.add(parse(s));
                         }
                     }
                 }

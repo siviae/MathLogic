@@ -32,7 +32,7 @@ public class Deduct2 extends Homework {
     private int k2;
     private int k3;
     private List<Expression> hypos = new ArrayList<>();
-    private List<Expression> proofed = new ArrayList<>();
+    private Map<String, Expression> proofed = new HashMap<>();
     private Expression alpha;
     private Map<String, Expression> map = new HashMap<>();
 
@@ -57,7 +57,10 @@ public class Deduct2 extends Homework {
     }
 
     public void setProofed(List<Expression> proofed) {
-        this.proofed = new ArrayList<>(proofed);
+        this.proofed = new HashMap<>();
+        for (Expression e : proofed) {
+            this.proofed.put(e.toString(), e);
+        }
     }
 
     public List<Expression> move1HypoToProof(List<Expression> proof) throws IncorrectProofException {
@@ -65,7 +68,7 @@ public class Deduct2 extends Homework {
         k2 = 0;
         k3 = 0;
         List<Expression> result = new ArrayList<>();
-        for (Expression e : proofed) {
+        for (Expression e : proofed.values()) {
             result.add(e);
             result.add(new Then(e, new Then(alpha, e)));
             result.add(new Then(alpha, e));
@@ -102,70 +105,57 @@ public class Deduct2 extends Homework {
                 f = true;
             }
             if (!f) {
-                for (int i = proofed.size() - 1; i >= 0; i--) {
-                    if (f) break;
-                    if (proofed.get(i).equals(expr)) {
+                for (Expression alreadyProofed : proofed.values()) {
+                    if (alreadyProofed.equals(expr)) {
                         f = true;
                         break;
                     }
-                    for (int j = proofed.size() - 1; j >= 0; j--) {
-                        Expression aProofed = proofed.get(j);
-                        if (modusPonens(proofed.get(i), aProofed, expr)) {
-                            k3++;
-                            map.put("1", alpha);
-                            map.put("2", proofed.get(i));
-                            map.put("3", expr);
-                            result.add(
-                                    new Then(
-                                            new Then(
-                                                    new NumExpr(1),
-                                                    new NumExpr(2)),
-                                            new Then(
-                                                    new Then(
-                                                            new NumExpr(1),
-                                                            new Then(
-                                                                    new NumExpr(2),
-                                                                    new NumExpr(3))),
-                                                    new Then(
-                                                            new NumExpr(1),
-                                                            new NumExpr(3)))).substitute(map));
-                            result.add(
-                                    new Then(
-                                            new Then(
-                                                    new NumExpr(1),
-                                                    new Then(
-                                                            new NumExpr(2),
-                                                            new NumExpr(3))),
-                                            new Then(
-                                                    new NumExpr(1),
-                                                    new NumExpr(3))).substitute(map));
-                            result.add(new Then(alpha, expr));
-                            f = true;
-                            break;
-                        }
+                    Expression temp = proofed.get(new Then(alreadyProofed, expr).toString());
+                    if (temp != null) {
+                        k3++;
+                        map.put("1", alpha);
+                        map.put("2", alreadyProofed);
+                        map.put("3", expr);
+                        result.add(
+                                new Then(
+                                        new Then(
+                                                new NumExpr(1),
+                                                new NumExpr(2)),
+                                        new Then(
+                                                new Then(
+                                                        new NumExpr(1),
+                                                        new Then(
+                                                                new NumExpr(2),
+                                                                new NumExpr(3))),
+                                                new Then(
+                                                        new NumExpr(1),
+                                                        new NumExpr(3)))).substitute(map));
+                        result.add(
+                                new Then(
+                                        new Then(
+                                                new NumExpr(1),
+                                                new Then(
+                                                        new NumExpr(2),
+                                                        new NumExpr(3))),
+                                        new Then(
+                                                new NumExpr(1),
+                                                new NumExpr(3))).substitute(map));
+                        result.add(new Then(alpha, expr));
+                        f = true;
+                        break;
                     }
                 }
             }
 
-/*
             if (!f) {
-                for (Expression e : proofed) {
-                    if (e.match(expr)) {
-                        f = true;
-                        break;
-                    }
-                }
-            }*/
-
-            if (!f) {
-                for (Expression e : proofed) {
+                for (Expression e : proofed.values()) {
                     out.println(e.asString());
                 }
                 out.println("до этого всё было ок");
                 out.println("Не получилось доказать: " + expr.asString());
                 throw new IncorrectProofException(expr.toString());
             } else {
-                proofed.add(expr);
+                proofed.put(expr.toString(), expr);
             }
         }
 

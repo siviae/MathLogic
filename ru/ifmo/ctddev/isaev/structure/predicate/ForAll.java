@@ -63,7 +63,7 @@ public class ForAll extends Unary {
 
     @Override
     public StringBuilder asJavaExpr() {
-        return null;
+        return new StringBuilder("new ForAll(").append(var.asJavaExpr()).append(",").append(operand.asJavaExpr()).append(")");
     }
 
     @Override

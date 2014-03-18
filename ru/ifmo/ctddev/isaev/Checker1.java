@@ -2,10 +2,11 @@ package ru.ifmo.ctddev.isaev;
 
 import ru.ifmo.ctddev.isaev.helpers.AxiomScheme;
 import ru.ifmo.ctddev.isaev.structure.Expression;
+import ru.ifmo.ctddev.isaev.structure.logic.Then;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 import static ru.ifmo.ctddev.isaev.General.*;
 
@@ -21,7 +22,7 @@ public class Checker1 extends Homework {
 
     @Override
     public void doSomething() throws IOException {
-        List<Expression> proofed = new ArrayList<>();
+        Map<String, Expression> proofed = new HashMap<>();
         String temp = in.readLine();
         row = 1;
         boolean ok = true;
@@ -34,12 +35,14 @@ public class Checker1 extends Homework {
                     break;
                 }
             }
+            if (proofed.containsKey(expr.toString())) {
+                f = true;
+            }
             if (!f) {
-                for (int i = proofed.size() - 1; i >= 0; i--) {
-                    f = proofed.get(i).match(expr);
-                    for (int j = proofed.size() - 1; j >= 0; j--) {
-                        Expression aProofed = proofed.get(j);
-                        f = f || modusPonens(proofed.get(i), aProofed, expr);
+                for (Expression alreadyProofed : proofed.values()) {
+                    Expression ex = proofed.get(new Then(alreadyProofed, expr).toString());
+                    if (ex != null) {
+                        f = true;
                     }
                     if (f) break;
                 }
@@ -49,7 +52,7 @@ public class Checker1 extends Homework {
                 ok = false;
                 break;
             }
-            proofed.add(expr);
+            proofed.put(expr.toString(), expr);
             row++;
             temp = in.readLine();
 
