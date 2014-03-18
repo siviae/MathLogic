@@ -1,11 +1,11 @@
 package ru.ifmo.ctddev.isaev;
 
-import ru.ifmo.ctddev.isaev.helpers.AxiomScheme;
+import ru.ifmo.ctddev.isaev.hardcodedRules.AxiomScheme;
 import ru.ifmo.ctddev.isaev.structure.Expression;
-import ru.ifmo.ctddev.isaev.structure.logic.Then;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static ru.ifmo.ctddev.isaev.General.*;
@@ -23,6 +23,7 @@ public class Checker1 extends Homework {
     @Override
     public void doSomething() throws IOException {
         Map<String, Expression> proofed = new HashMap<>();
+        Map<Expression, List<Expression>> mps = new HashMap<>();
         String temp = in.readLine();
         row = 1;
         boolean ok = true;
@@ -39,12 +40,13 @@ public class Checker1 extends Homework {
                 f = true;
             }
             if (!f) {
-                for (Expression alreadyProofed : proofed.values()) {
-                    Expression ex = proofed.get(new Then(alreadyProofed, expr).toString());
-                    if (ex != null) {
-                        f = true;
+                if (mps.get(expr) != null) {
+                    for (Expression e : mps.get(expr)) {
+                        if (proofed.get(e.toString()) != null) {
+                            f = true;
+                            break;
+                        }
                     }
-                    if (f) break;
                 }
             }
             if (!f) {
@@ -53,6 +55,7 @@ public class Checker1 extends Homework {
                 break;
             }
             proofed.put(expr.toString(), expr);
+            addToMps(mps, expr);
             row++;
             temp = in.readLine();
 

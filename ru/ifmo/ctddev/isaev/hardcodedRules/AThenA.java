@@ -1,4 +1,4 @@
-package ru.ifmo.ctddev.isaev.helpers;
+package ru.ifmo.ctddev.isaev.hardcodedRules;
 
 import ru.ifmo.ctddev.isaev.structure.Expression;
 import ru.ifmo.ctddev.isaev.structure.NumExpr;
@@ -14,11 +14,11 @@ import static ru.ifmo.ctddev.isaev.General.parse;
  * Date: 24.01.14
  */
 public enum AThenA {
-    R_1(new Then(new NumExpr(1),new Then(new NumExpr(1),new NumExpr(1)))),
-    R_2(new Then(new NumExpr(1),new Then(new Then(new NumExpr(1),new NumExpr(1)),new NumExpr(1)))),
-    R_3(new Then(new Then(new NumExpr(1),new Then(new NumExpr(1),new NumExpr(1))),new Then(new Then(new NumExpr(1),new Then(new Then(new NumExpr(1),new NumExpr(1)),new NumExpr(1))),new Then(new NumExpr(1),new NumExpr(1))))),
-    R_4(new Then(new Then(new NumExpr(1),new Then(new Then(new NumExpr(1),new NumExpr(1)),new NumExpr(1))),new Then(new NumExpr(1),new NumExpr(1)))),
-    R_5(new Then(new NumExpr(1),new NumExpr(1)));
+    R_1(new Then(new NumExpr(1), new Then(new NumExpr(1), new NumExpr(1)))),
+    R_2(new Then(new NumExpr(1), new Then(new Then(new NumExpr(1), new NumExpr(1)), new NumExpr(1)))),
+    R_3(new Then(new Then(new NumExpr(1), new Then(new NumExpr(1), new NumExpr(1))), new Then(new Then(new NumExpr(1), new Then(new Then(new NumExpr(1), new NumExpr(1)), new NumExpr(1))), new Then(new NumExpr(1), new NumExpr(1))))),
+    R_4(new Then(new Then(new NumExpr(1), new Then(new Then(new NumExpr(1), new NumExpr(1)), new NumExpr(1))), new Then(new NumExpr(1), new NumExpr(1)))),
+    R_5(new Then(new NumExpr(1), new NumExpr(1)));
 
     private Expression expression;
 

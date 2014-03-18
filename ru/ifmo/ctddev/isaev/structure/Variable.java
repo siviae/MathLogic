@@ -114,7 +114,7 @@ public class Variable extends Term {
     @Override
     public int hashCode() {
         int result = name.hashCode();
-        result = 31 * result + (currentValue ? 1 : 0);
+        result = 31 * result + ((currentValue == null || !currentValue) ? 0 : 1);
         return result;
     }
 }

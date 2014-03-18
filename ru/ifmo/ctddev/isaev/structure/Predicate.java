@@ -19,6 +19,11 @@ public class Predicate extends AbstractExpression {
         this.name = name;
     }
 
+    public Predicate(String name, Term... terms) {
+        this.arguments = terms;
+        this.name = name;
+    }
+
     public String getName() {
         return name;
     }
@@ -94,7 +99,12 @@ public class Predicate extends AbstractExpression {
 
     @Override
     public StringBuilder asJavaExpr() {
-        return null;
+        StringBuilder sb = new StringBuilder("new Predicate(").append("\"" + name + "\"");
+        for (int i = 0; i < arguments.length; i++) {
+            sb.append(",").append(arguments[i].asJavaExpr());
+        }
+        sb.append(")");
+        return sb;
     }
 
     @Override

@@ -1,6 +1,6 @@
 package ru.ifmo.ctddev.isaev;
 
-import ru.ifmo.ctddev.isaev.helpers.AThenA;
+import ru.ifmo.ctddev.isaev.hardcodedRules.AThenA;
 import ru.ifmo.ctddev.isaev.parser.Lexer;
 import ru.ifmo.ctddev.isaev.parser.LogicParser;
 import ru.ifmo.ctddev.isaev.parser.Parser;
@@ -13,6 +13,7 @@ import java.io.BufferedReader;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * User: Xottab
@@ -48,6 +49,16 @@ public class General {
             result.add(e.replace(alpha));
         }
         return result;
+    }
+
+
+    public static void addToMps(Map<Expression, List<Expression>> mps, Expression e) {
+        if (e instanceof Then) {
+            if (!mps.containsKey(((Then) e).getRight())) {
+                mps.put(((Then) e).getRight(), new ArrayList<Expression>(3));
+            }
+            mps.get(((Then) e).getRight()).add(((Then) e).getLeft());
+        }
     }
 
     public static boolean isLowercaseVariable(String temp) {

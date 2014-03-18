@@ -4,7 +4,9 @@ import ru.ifmo.ctddev.isaev.exception.IncorrectProofException;
 import ru.ifmo.ctddev.isaev.exception.LexingException;
 import ru.ifmo.ctddev.isaev.exception.ParsingException;
 import ru.ifmo.ctddev.isaev.exception.ProofGeneratingException;
-import ru.ifmo.ctddev.isaev.helpers.AxiomScheme;
+import ru.ifmo.ctddev.isaev.hardcodedRules.AxiomScheme;
+import ru.ifmo.ctddev.isaev.hardcodedRules.ExistsRule;
+import ru.ifmo.ctddev.isaev.hardcodedRules.ForAllRule;
 import ru.ifmo.ctddev.isaev.structure.Expression;
 import ru.ifmo.ctddev.isaev.structure.NumExpr;
 import ru.ifmo.ctddev.isaev.structure.logic.Then;
@@ -150,27 +152,22 @@ public class Deduct4 extends Homework {
                         }
                     }
 
-                    String[] strings = null;
+
                     if (!f && forAllRule(proofed.get(i), expr)) {
                         f = true;
-                        strings = GiantStrings.FORALL_DEDUCT
-                                .replace("{A}", alpha.asString())
-                                .replace("{B}", ((Then) proofed.get(i)).getLeft().asString())
-                                .replace("{C}", ((Then) proofed.get(i)).getRight().asString())
-                                .split("\\n");
+                        for (ForAllRule rule : ForAllRule.values()) {
+                            result.add(rule.replace(alpha,
+                                    ((Then) proofed.get(i)).getLeft(),
+                                    ((Then) proofed.get(i)).getRight()));
+                        }
                     }
                     if (!f && existsRule(proofed.get(i), expr)) {
-                        f = true;
-                        strings = GiantStrings.FORALL_DEDUCT
-                                .replace("{A}", alpha.asString())
-                                .replace("{B}", ((Then) proofed.get(i)).getLeft().asString())
-                                .replace("{C}", ((Then) proofed.get(i)).getRight().asString())
-                                .split("\\n");
-                    }
-                    if (f) {
-                        for (String s : strings) {
-                            result.add(parse(s));
+                        for (ExistsRule rule : ExistsRule.values()) {
+                            result.add(rule.replace(alpha,
+                                    ((Then) proofed.get(i)).getLeft(),
+                                    ((Then) proofed.get(i)).getRight()));
                         }
+                        f = true;
                     }
                 }
             }

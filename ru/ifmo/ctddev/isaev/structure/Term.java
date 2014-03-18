@@ -19,6 +19,11 @@ public class Term extends AbstractExpression {
         this.name = token;
     }
 
+    public Term(String token, Term... terms) {
+        this.arguments = terms;
+        this.name = token;
+    }
+
     public String getName() {
         return name;
     }
@@ -94,7 +99,12 @@ public class Term extends AbstractExpression {
 
     @Override
     public StringBuilder asJavaExpr() {
-        return null;
+        StringBuilder sb = new StringBuilder("new Term(").append("\"" + name + "\"");
+        for (int i = 0; i < arguments.length; i++) {
+            sb.append(",").append(arguments[i].asJavaExpr());
+        }
+        sb.append(")");
+        return sb;
     }
 
     @Override
