@@ -1,11 +1,8 @@
 package ru.ifmo.ctddev.isaev.parser;
 
 import ru.ifmo.ctddev.isaev.exception.ParsingException;
-import ru.ifmo.ctddev.isaev.structure.*;
-import ru.ifmo.ctddev.isaev.structure.logic.And;
-import ru.ifmo.ctddev.isaev.structure.logic.Not;
-import ru.ifmo.ctddev.isaev.structure.logic.Or;
-import ru.ifmo.ctddev.isaev.structure.logic.Then;
+import ru.ifmo.ctddev.isaev.structure.Expression;
+import ru.ifmo.ctddev.isaev.structure.logic.*;
 
 import java.util.ArrayList;
 
@@ -57,57 +54,6 @@ public class LogicParser extends Parser {
         }
         return result;
     }
-
-   /* private Term term() throws ParsingException {
-        boolean brackets = false;
-        if (tokens[position].equals(Lexeme.LEFT_P.s)) {
-            position++;
-            brackets = true;
-        }
-        Term result;
-        if (isLowercaseVariable(tokens[position])) {
-            result = new Term(var().toString());
-        } else
-            throw new ParsingException("cannot parse term without name");
-
-        if (tokens[position].equals(Lexeme.LEFT_P.s)) {
-            position++;
-            List<Term> arguments = new ArrayList<>(3);
-            arguments.add(term());
-            while (tokens[position].equals(Lexeme.COMMA.s)) {
-                position++;
-                arguments.add(term());
-            }
-            position++;
-            result.arguments = arguments.toArray(new Term[arguments.size()]);
-        }
-
-        if (brackets) {
-            position++;
-        }
-        return result;
-    }
-
-    private Predicate predicate() throws ParsingException {
-        Predicate result;
-        if (isUppercaseVariable(tokens[position])) {
-            result = new Predicate(var().toString());
-        } else
-            throw new ParsingException("cannot predicate without name");
-
-        if (tokens[position].equals(Lexeme.LEFT_P.s)) {
-            position++;
-            List<Term> arguments = new ArrayList<>(3);
-            arguments.add(term());
-            while (tokens[position].equals(Lexeme.COMMA.s)) {
-                position++;
-                arguments.add(term());
-            }
-            position++;
-            result.arguments = arguments.toArray(new Term[arguments.size()]);
-        }
-        return result;
-    }*/
 
     protected Variable var() {
         Variable result = new Variable(tokens[position]);

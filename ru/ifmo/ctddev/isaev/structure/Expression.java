@@ -1,6 +1,7 @@
 package ru.ifmo.ctddev.isaev.structure;
 
 import ru.ifmo.ctddev.isaev.exception.ProofGeneratingException;
+import ru.ifmo.ctddev.isaev.structure.logic.Variable;
 
 import java.util.List;
 import java.util.Map;

@@ -1,5 +1,7 @@
 package ru.ifmo.ctddev.isaev.structure;
 
+import ru.ifmo.ctddev.isaev.structure.logic.Variable;
+
 import java.util.Map;
 
 /**

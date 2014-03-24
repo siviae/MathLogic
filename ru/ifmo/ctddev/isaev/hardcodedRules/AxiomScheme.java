@@ -1,11 +1,7 @@
 package ru.ifmo.ctddev.isaev.hardcodedRules;
 
 import ru.ifmo.ctddev.isaev.structure.Expression;
-import ru.ifmo.ctddev.isaev.structure.NumExpr;
-import ru.ifmo.ctddev.isaev.structure.logic.And;
-import ru.ifmo.ctddev.isaev.structure.logic.Not;
-import ru.ifmo.ctddev.isaev.structure.logic.Or;
-import ru.ifmo.ctddev.isaev.structure.logic.Then;
+import ru.ifmo.ctddev.isaev.structure.logic.*;
 
 import java.util.HashMap;
 

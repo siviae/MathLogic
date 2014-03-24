@@ -3,8 +3,8 @@ package ru.ifmo.ctddev.isaev.structure.predicate;
 import ru.ifmo.ctddev.isaev.exception.ProofGeneratingException;
 import ru.ifmo.ctddev.isaev.parser.Lexeme;
 import ru.ifmo.ctddev.isaev.structure.Expression;
-import ru.ifmo.ctddev.isaev.structure.Unary;
-import ru.ifmo.ctddev.isaev.structure.Variable;
+import ru.ifmo.ctddev.isaev.structure.logic.Unary;
+import ru.ifmo.ctddev.isaev.structure.logic.Variable;
 
 import java.util.List;
 import java.util.Map;

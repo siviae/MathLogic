@@ -7,11 +7,7 @@ import ru.ifmo.ctddev.isaev.exception.ProofGeneratingException;
 import ru.ifmo.ctddev.isaev.hardcodedRules.AxiomScheme;
 import ru.ifmo.ctddev.isaev.hardcodedRules.ContrapositionRule;
 import ru.ifmo.ctddev.isaev.structure.Expression;
-import ru.ifmo.ctddev.isaev.structure.NumExpr;
-import ru.ifmo.ctddev.isaev.structure.Variable;
-import ru.ifmo.ctddev.isaev.structure.logic.Not;
-import ru.ifmo.ctddev.isaev.structure.logic.Or;
-import ru.ifmo.ctddev.isaev.structure.logic.Then;
+import ru.ifmo.ctddev.isaev.structure.logic.*;
 
 import java.io.IOException;
 import java.util.ArrayList;

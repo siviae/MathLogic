@@ -1,7 +1,9 @@
-package ru.ifmo.ctddev.isaev.structure;
+package ru.ifmo.ctddev.isaev.structure.logic;
 
 import ru.ifmo.ctddev.isaev.exception.ProofGeneratingException;
 import ru.ifmo.ctddev.isaev.parser.Lexeme;
+import ru.ifmo.ctddev.isaev.structure.AbstractExpression;
+import ru.ifmo.ctddev.isaev.structure.Expression;
 
 import java.util.List;
 import java.util.Map;

@@ -5,7 +5,7 @@ import ru.ifmo.ctddev.isaev.exception.LexingException;
 import ru.ifmo.ctddev.isaev.exception.ParsingException;
 import ru.ifmo.ctddev.isaev.hardcodedRules.AxiomScheme;
 import ru.ifmo.ctddev.isaev.structure.Expression;
-import ru.ifmo.ctddev.isaev.structure.NumExpr;
+import ru.ifmo.ctddev.isaev.structure.logic.NumExpr;
 import ru.ifmo.ctddev.isaev.structure.logic.Then;
 
 import java.io.FileNotFoundException;

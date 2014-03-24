@@ -16,7 +16,11 @@ public enum Lexeme {
     FOR_ALL("@"),
     LEFT_P("("),
     RIGHT_P(")"),
-    COMMA(",");
+    PLUS("+"),
+    MUL("*"),
+    PRIME("'"),
+    EQ("="),
+    COMMA(","), ZERO("0");
     public final String s;
 
     private Lexeme(final String s) {

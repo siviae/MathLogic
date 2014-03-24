@@ -1,7 +1,8 @@
-package ru.ifmo.ctddev.isaev.structure;
+package ru.ifmo.ctddev.isaev.structure.logic;
 
 import ru.ifmo.ctddev.isaev.exception.ProofGeneratingException;
-import ru.ifmo.ctddev.isaev.structure.logic.Not;
+import ru.ifmo.ctddev.isaev.structure.Expression;
+import ru.ifmo.ctddev.isaev.structure.predicate.Term;
 
 import java.util.ArrayList;
 import java.util.HashMap;

@@ -2,13 +2,12 @@ package ru.ifmo.ctddev.isaev.parser;
 
 import ru.ifmo.ctddev.isaev.exception.ParsingException;
 import ru.ifmo.ctddev.isaev.structure.Expression;
-import ru.ifmo.ctddev.isaev.structure.Predicate;
-import ru.ifmo.ctddev.isaev.structure.Term;
-import ru.ifmo.ctddev.isaev.structure.Variable;
 import ru.ifmo.ctddev.isaev.structure.logic.Not;
-import ru.ifmo.ctddev.isaev.structure.logic.Then;
+import ru.ifmo.ctddev.isaev.structure.logic.Variable;
 import ru.ifmo.ctddev.isaev.structure.predicate.Exists;
 import ru.ifmo.ctddev.isaev.structure.predicate.ForAll;
+import ru.ifmo.ctddev.isaev.structure.predicate.Predicate;
+import ru.ifmo.ctddev.isaev.structure.predicate.Term;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,38 +18,9 @@ import static ru.ifmo.ctddev.isaev.General.isUppercaseVariable;
 /**
  * User: Xottab
  * Date: 22.01.14
+ * Инвариант для каждого метода - после окончания парсинга, поциция следующего токена должна быть перенесена
  */
 public class PredicateParser extends LogicParser {
-    /**
-     * Инвариант для каждого метода - после окончания парсинга, поциция следующего токена должна быть перенесена
-     */
-    @Override
-    protected Expression expr() throws ParsingException {
-        Expression result = disj();
-        ArrayList<Expression> arr = new ArrayList<>();
-        arr.add(result);
-        while (position < tokens.length && tokens[position].equals(Lexeme.THEN.s)) {
-            position++;
-            arr.add(disj());
-        }
-        if (arr.size() > 1) {
-            result = arr.get(arr.size() - 1);
-            int i = arr.size() - 2;
-            while (i >= 0) {
-                result = new Then(arr.get(i), result);
-                i--;
-            }
-        }
-        return result;
-    }
-    /*@Override
-    protected Expression disj() throws ParsingException {
-        return  super.disj();
-    }
-    @Override
-    protected Expression conj() throws ParsingException {
-        return super.conj();
-    }*/
 
     @Override
     protected Expression unary() throws ParsingException {
@@ -93,12 +63,6 @@ public class PredicateParser extends LogicParser {
         throw new ParsingException("unexpected symbol");
     }
 
-    /*protected Variable var() {
-        Variable result = new Variable(tokens[position]);
-        position++;
-        return result;
-    }*/
-
     protected Predicate predicate() throws ParsingException {
         Predicate result;
         result = new Predicate(tokens[position]);
@@ -113,9 +77,7 @@ public class PredicateParser extends LogicParser {
             }
             position++;
             result.setArguments(arguments.toArray(new Term[arguments.size()]));
-        } /*else {
-            position++;
-        }*/
+        }
         return result;
     }
 
