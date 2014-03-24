@@ -23,13 +23,13 @@ public class Not extends Unary {
     }
 
     @Override
-    public boolean match(Expression other) {
+    public boolean treeEquals(Expression other) {
         return hasSameType(other)
-                && ((Not) other).operand.match(operand);
+                && ((Not) other).operand.treeEquals(operand);
     }
 
     @Override
-    public boolean canSubstitute(Variable v){
+    public boolean canSubstitute(Variable v) {
         return operand.canSubstitute(v);
     }
 

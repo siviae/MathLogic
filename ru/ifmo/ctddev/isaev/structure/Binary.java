@@ -3,7 +3,6 @@ package ru.ifmo.ctddev.isaev.structure;
 import ru.ifmo.ctddev.isaev.exception.ProofGeneratingException;
 import ru.ifmo.ctddev.isaev.parser.Lexeme;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -33,14 +32,13 @@ public abstract class Binary extends AbstractExpression {
     protected Lexeme token;
 
 
-
     protected Binary(Expression left, Expression right) {
         this.left = left;
         this.right = right;
     }
 
     @Override
-    public boolean matchAxiomScheme(Expression axiomScheme, HashMap<Integer, Expression> known) {
+    public boolean matchAxiomScheme(Expression axiomScheme, Map<Integer, Expression> known) {
         return hasSameType(axiomScheme)
                 && left.matchAxiomScheme(((Binary) axiomScheme).left, known)
                 && right.matchAxiomScheme(((Binary) axiomScheme).right, known);
@@ -62,8 +60,8 @@ public abstract class Binary extends AbstractExpression {
     }
 
     @Override
-    public HashMap<String, Variable> getVars() {
-        HashMap<String, Variable> h = left.getVars();
+    public Map<String, Variable> getVars() {
+        Map<String, Variable> h = left.getVars();
         h.putAll(right.getVars());
         return h;
     }
@@ -74,19 +72,10 @@ public abstract class Binary extends AbstractExpression {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Binary)) return false;
-        Binary that = (Binary) o;
-        return left.equals(that.left) && right.equals(that.right) && token == that.token;
-
-    }
-
-    @Override
-    public boolean match(Expression other) {
+    public boolean treeEquals(Expression other) {
         return hasSameType(other)
-                && ((Binary) other).left.match(left)
-                && ((Binary) other).right.match(right);
+                && ((Binary) other).left.treeEquals(left)
+                && ((Binary) other).right.treeEquals(right);
     }
 
     @Override
@@ -106,13 +95,5 @@ public abstract class Binary extends AbstractExpression {
         left = left.substitute(variables);
         right = right.substitute(variables);
         return this;
-    }
-
-    @Override
-    public int hashCode() {
-        int result = left.hashCode();
-        result = 31 * result + right.hashCode();
-        result = 31 * result + token.hashCode();
-        return result;
     }
 }

@@ -37,13 +37,13 @@ public class Term extends AbstractExpression {
     }
 
     @Override
-    public boolean match(Expression other) {
+    public boolean treeEquals(Expression other) {
         if (hasSameType(other)) {
-            Predicate pred = (Predicate) other;
+            Term pred = (Term) other;
             if (name.equals(pred.name) && arguments.length == pred.arguments.length) {
                 boolean f = false;
                 for (int i = 0; i < arguments.length; i++) {
-                    if (!arguments[i].match(pred.arguments[i])) {
+                    if (!arguments[i].treeEquals(pred.arguments[i])) {
                         f = true;
                         break;
                     }
@@ -55,7 +55,14 @@ public class Term extends AbstractExpression {
     }
 
     @Override
-    public boolean matchAxiomScheme(Expression expr, HashMap<Integer, Expression> known) {
+    public boolean match(Expression other) {
+        return hasSameType(other)
+                && ((Term) other).getName().equals(name)
+                && ((Term) other).arguments.length == arguments.length;
+    }
+
+    @Override
+    public boolean matchAxiomScheme(Expression expr, Map<Integer, Expression> known) {
         return false;
     }
 
@@ -113,8 +120,21 @@ public class Term extends AbstractExpression {
     }
 
     @Override
-    public HashMap<String, Variable> getVars() {
-        return null;
+    public Map<String, Variable> getVars() {
+        Map<String, Variable> h = null;
+        if (arguments.length == 0) {
+            h = new HashMap<>();
+            h.put(name, new Variable(name));
+        } else {
+            for (int i = 0; i < arguments.length; i++) {
+                if (i == 0) {
+                    h = arguments[i].getVars();
+                } else {
+                    h.putAll(arguments[i].getVars());
+                }
+            }
+        }
+        return h;
     }
 
     @Override

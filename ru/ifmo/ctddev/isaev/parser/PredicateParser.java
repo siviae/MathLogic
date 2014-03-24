@@ -103,7 +103,7 @@ public class PredicateParser extends LogicParser {
         Predicate result;
         result = new Predicate(tokens[position]);
         position++;
-        if (position<tokens.length && tokens[position].equals(Lexeme.LEFT_P.s)) {
+        if (position < tokens.length && tokens[position].equals(Lexeme.LEFT_P.s)) {
             position++;
             List<Term> arguments = new ArrayList<>(3);
             arguments.add(term());
@@ -121,11 +121,14 @@ public class PredicateParser extends LogicParser {
 
     protected Term term() throws ParsingException {
         Term result;
+        boolean f = false;
         if (tokens[position].equals(Lexeme.LEFT_P.s)) {
             position++;
             result = term();
         } else if (isLowercaseVariable(tokens[position])) {
             result = new Term(tokens[position]);
+            position++;
+            f = true;
             if (tokens[position].equals(Lexeme.LEFT_P.s)) {
                 position++;
                 List<Term> arguments = new ArrayList<>(3);
@@ -135,13 +138,14 @@ public class PredicateParser extends LogicParser {
                     arguments.add(term());
                 }
                 result.setArguments(arguments.toArray(new Term[arguments.size()]));
+                position++;
             } else {
                 result = new Variable(result.getName());
             }
         } else
             throw new ParsingException("cannot parse term without name, incorrect invocation");
 
-        position++;
+        if (!f) position++;
         return result;
     }
 

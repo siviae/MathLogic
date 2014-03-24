@@ -2,8 +2,6 @@ package ru.ifmo.ctddev.isaev.structure;
 
 import ru.ifmo.ctddev.isaev.exception.ProofGeneratingException;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -16,9 +14,11 @@ import java.util.Map;
  */
 public interface Expression {
 
+    boolean treeEquals(Expression other);
+
     boolean match(Expression other);
 
-    boolean matchAxiomScheme(Expression expr, HashMap<Integer, Expression> known);
+    boolean matchAxiomScheme(Expression expr, Map<Integer, Expression> known);
 
     Expression substituteAndCopy(Map<String, ? extends Expression> variables);
 
@@ -34,7 +34,9 @@ public interface Expression {
 
     List<Expression> getParticularProof(List<? extends Expression> hypos) throws ProofGeneratingException;
 
-    HashMap<String, Variable> getVars();
+    Map<String, Variable> getVars();
+
+    Map<String, Variable> getFreeVars();
 
     boolean canSubstitute(Variable var);
 }

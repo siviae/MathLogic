@@ -6,7 +6,6 @@ import ru.ifmo.ctddev.isaev.structure.Expression;
 import ru.ifmo.ctddev.isaev.structure.Unary;
 import ru.ifmo.ctddev.isaev.structure.Variable;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -28,14 +27,14 @@ public class Exists extends Unary {
     }
 
     @Override
-    public boolean match(Expression other) {
+    public boolean treeEquals(Expression other) {
         return hasSameType(other)
-                && var.match(((Exists) other).var)
-                && operand.match(((Exists) other).operand);
+                && var.treeEquals(((Exists) other).var)
+                && operand.treeEquals(((Exists) other).operand);
     }
 
     @Override
-    public boolean matchAxiomScheme(Expression expr, HashMap<Integer, Expression> known) {
+    public boolean matchAxiomScheme(Expression expr, Map<Integer, Expression> known) {
         return false;
     }
 
@@ -57,6 +56,13 @@ public class Exists extends Unary {
     @Override
     public StringBuilder asString() {
         return new StringBuilder(token.s).append(var.asString()).append("(").append(operand.asString()).append(")");
+    }
+
+    @Override
+    public Map<String, Variable> getFreeVars() {
+        Map<String, Variable> vars = getVars();
+        vars.remove(var.getName());
+        return vars;
     }
 
     @Override

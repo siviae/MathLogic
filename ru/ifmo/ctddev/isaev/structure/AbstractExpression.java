@@ -1,5 +1,7 @@
 package ru.ifmo.ctddev.isaev.structure;
 
+import java.util.Map;
+
 /**
  * User: Xottab
  * Date: 29.11.13
@@ -12,16 +14,25 @@ public abstract class AbstractExpression implements Expression {
 
     @Override
     public int hashCode() {
-        return asString().hashCode();
+        return toString().hashCode();
+    }
+
+    @Override
+    public Map<String, Variable> getFreeVars() {
+        return getVars();
     }
 
     @Override
     public boolean equals(Object o) {
         return o instanceof AbstractExpression
-                && toString().equals(o.toString());
+                && this.toString().equals(o.toString());
     }
 
     public boolean hasSameType(Expression other) {
         return this.getClass().getSimpleName().equals(other.getClass().getSimpleName());
+    }
+
+    public boolean match(Expression other) {
+        return treeEquals(other);
     }
 }

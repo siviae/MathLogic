@@ -3,21 +3,19 @@ package ru.ifmo.ctddev.isaev;
 import ru.ifmo.ctddev.isaev.exception.IncorrectProofException;
 import ru.ifmo.ctddev.isaev.exception.LexingException;
 import ru.ifmo.ctddev.isaev.exception.ParsingException;
-import ru.ifmo.ctddev.isaev.exception.ProofGeneratingException;
 import ru.ifmo.ctddev.isaev.hardcodedRules.AxiomScheme;
 import ru.ifmo.ctddev.isaev.hardcodedRules.ExistsRule;
 import ru.ifmo.ctddev.isaev.hardcodedRules.ForAllRule;
 import ru.ifmo.ctddev.isaev.structure.Expression;
 import ru.ifmo.ctddev.isaev.structure.NumExpr;
 import ru.ifmo.ctddev.isaev.structure.logic.Then;
+import ru.ifmo.ctddev.isaev.structure.predicate.Exists;
+import ru.ifmo.ctddev.isaev.structure.predicate.ForAll;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Pattern;
 
 import static ru.ifmo.ctddev.isaev.General.*;
@@ -27,15 +25,15 @@ import static ru.ifmo.ctddev.isaev.General.*;
  * Date: 09.03.14
  */
 public class Deduct4 extends Homework {
-
     public PrintWriter stat;
-    private int k1;
-    private int k2;
-    private int k3;
+    DenialReason denial;
     private List<Expression> hypos = new ArrayList<>();
-    private List<Expression> proofed = new ArrayList<>();
+    private Map<String, Expression> proofed = new HashMap<>();
     private Expression alpha;
+    private Set<String> assumptVars = new HashSet<>();
     private Map<String, Expression> map = new HashMap<>();
+    private Map<Expression, List<Expression>> mps = new HashMap<>();
+    private boolean success;
 
     public Deduct4() {
         try {
@@ -46,8 +44,8 @@ public class Deduct4 extends Homework {
 
     }
 
-    public Deduct4(List<Expression> hypos, Expression alpha) {
 
+    public Deduct4(List<Expression> hypos, Expression alpha) {
         this.hypos = hypos;
         this.hypos.add(alpha);
     }
@@ -57,34 +55,38 @@ public class Deduct4 extends Homework {
         this.alpha = this.hypos.remove(hypos.size() - 1);
     }
 
-    public void setAlpha(Expression alpha) {
-        this.alpha = alpha;
-    }
-
     public void setProofed(List<Expression> proofed) {
-        this.proofed = new ArrayList<>(proofed);
+        this.proofed = new HashMap<>();
+        for (Expression e : proofed) {
+            this.proofed.put(e.toString(), e);
+        }
     }
 
     public List<Expression> move1HypoToProof(List<Expression> proof) throws IncorrectProofException {
-        k1 = 0;
-        k2 = 0;
-        k3 = 0;
         List<Expression> result = new ArrayList<>();
-        for (Expression expr : proof) {
+        mps.clear();
+        success = false;
+        for (Expression e : proofed.values()) {
+            result.add(e);
+            result.add(new Then(e, new Then(alpha, e)));
+            Expression temp = new Then(alpha, e);
+            result.add(temp);
+            addToMps(mps, e);
+            addToMps(mps, temp);
+        }
+        assumptVars.addAll(alpha.getVars().keySet());
+        for (Expression e : hypos) {
+            assumptVars.addAll(e.getVars().keySet());
+        }
+
+        for (int l = 0; l < proof.size(); l++) {
+            Expression expr = proof.get(l);
+
             boolean f = false;
-            //todo remove stupid copypaste
             for (Expression e : hypos) {
-                if (e.match(expr)) {
+                if (e.treeEquals(expr)) {
                     f = true;
                     break;
-                }
-            }
-            if (!f) {
-                for (AxiomScheme scheme : AxiomScheme.values()) {
-                    if (scheme.match(expr)) {
-                        f = true;
-                        break;
-                    }
                 }
             }
             if (!f) {
@@ -96,31 +98,80 @@ public class Deduct4 extends Homework {
                 f = true;
 
             }
-            if (f) {
-                k1++;
-                result.add(expr);
-                result.add(new Then(expr, new Then(alpha, expr)));
-                result.add(new Then(alpha, expr));
-            }
-
-
-            if (!f && expr.match(alpha)) {
-                k2++;
-                result.addAll(proofAThenA(alpha));
-                f = true;
-            }
             if (!f) {
-                for (int i = proofed.size() - 1; i >= 0; i--) {
-                    if (proofed.get(i).equals(expr)) {
+                for (AxiomScheme scheme : AxiomScheme.values()) {
+                    if (scheme.match(expr)) {
                         f = true;
                         break;
                     }
-                    for (int j = proofed.size() - 1; j >= 0; j--) {
-                        Expression aProofed = proofed.get(j);
-                        if (modusPonens(proofed.get(i), aProofed, expr)) {
-                            k3++;
+                }
+            }
+            if (f) {
+                result.add(expr);
+                result.add(new Then(expr, new Then(alpha, expr)));
+                Expression temp = new Then(alpha, expr);
+                result.add(temp);
+            }
+            if (!f && expr.treeEquals(alpha)) {
+                result.addAll(proofAThenA(alpha));
+                f = true;
+            }
+            if (proofed.containsKey(expr.toString())) {
+                f = true;
+            }
+
+
+            //проверка на новые правила вывода
+            if (!f) {
+                if (expr instanceof Then &&
+                        ((Then) expr).getRight() instanceof ForAll) {
+                    Expression prev = proofed.get(
+                            new Then(
+                                    ((Then) expr).getLeft(),
+                                    ((ForAll) ((Then) expr).getRight()).getOperand()
+                            ).toString());
+                    if (
+                            prev != null
+                                    && !((Then) prev).getLeft().getFreeVars().containsKey(((ForAll) ((Then) expr).getRight()).var.getName())
+                                    && !assumptVars.contains(((ForAll) ((Then) expr).getRight()).var.getName())) {
+                        for (ForAllRule rule : ForAllRule.values()) {
+                            result.add(rule.replace(alpha,
+                                    ((Then) expr).getLeft(),
+                                    ((Then) expr).getRight()));
+                        }
+                        f = true;
+                    }
+                }
+            }
+
+            if (!f) {
+                if (expr instanceof Then &&
+                        ((Then) expr).getLeft() instanceof Exists) {
+                    Expression prev = proofed.get(
+                            new Then(
+                                    ((Exists) ((Then) expr).getLeft()).getOperand(),
+                                    ((Then) expr).getRight()
+                            ).toString());
+                    if (
+                            prev != null
+                                    && !((Then) prev).getRight().getFreeVars().containsKey(((Exists) ((Then) expr).getLeft()).var.getName())
+                                    && !assumptVars.contains(((Exists) ((Then) expr).getLeft()).var.getName())) {
+                        for (ExistsRule rule : ExistsRule.values()) {
+                            result.add(rule.replace(alpha,
+                                    ((Then) expr).getLeft(),
+                                    ((Then) expr).getRight()));
+                        }
+                        f = true;
+                    }
+                }
+            }
+
+            if (!f) {
+                if (mps.get(expr) != null) {
+                    for (Expression e : mps.get(expr)) {
+                        if (proofed.get(e.toString()) != null) {
                             map.put("1", alpha);
-                            map.put("2", proofed.get(i));
+                            map.put("2", e);
                             map.put("3", expr);
                             result.add(
                                     new Then(
@@ -151,47 +202,28 @@ public class Deduct4 extends Homework {
                             break;
                         }
                     }
-
-
-                    if (!f && forAllRule(proofed.get(i), expr)) {
-                        f = true;
-                        for (ForAllRule rule : ForAllRule.values()) {
-                            result.add(rule.replace(alpha,
-                                    ((Then) proofed.get(i)).getLeft(),
-                                    ((Then) proofed.get(i)).getRight()));
-                        }
-                    }
-                    if (!f && existsRule(proofed.get(i), expr)) {
-                        for (ExistsRule rule : ExistsRule.values()) {
-                            result.add(rule.replace(alpha,
-                                    ((Then) proofed.get(i)).getLeft(),
-                                    ((Then) proofed.get(i)).getRight()));
-                        }
-                        f = true;
-                    }
                 }
             }
+
             if (!f) {
-                for (Expression e : proofed) {
+                for (Expression e : proofed.values()) {
                     out.println(e.asString());
                 }
                 out.println("до этого всё было ок");
                 out.println("Не получилось доказать: " + expr.asString());
-                throw new IncorrectProofException(expr.toString());
+                break;
             } else {
-                proofed.add(expr);
+                proofed.put(expr.toString(), expr);
+                addToMps(mps, expr);
+                addToMps(mps, new Then(alpha, expr));
             }
+            success = true;
         }
-        //todo end
-        stat.println("Axiom: " + k1);
-        stat.println("alpha: " + k2);
-        stat.println("MP: " + k3);
-        stat.println();
         return result;
     }
 
     @Override
-    public void doSomething() throws IOException, ParsingException, LexingException, IncorrectProofException, ProofGeneratingException {
+    public void doSomething() throws IOException, ParsingException, LexingException, IncorrectProofException {
         String[] temp = in.readLine().split(Pattern.quote("|-"));
         if (temp.length > 2) {
             throw new IOException("more than one |- in first line");
@@ -208,14 +240,31 @@ public class Deduct4 extends Homework {
             s1 = in.readLine();
         }
         List<Expression> newProof = move1HypoToProof(proof);
-        for (Expression e : newProof) {
+        if (success) for (Expression e : newProof) {
             out.println(e.asString());
         }
+    }
 
+    public boolean haveZeroHypos() {
+        return hypos.size() == 0;
+    }
 
-       /* List<Expression> newProof = move1HypoToProof(proof);
-        for (Expression e : newProof) {
-            out.println(e.asString());
-        }*/
+    private enum DenialReason {
+        ERROR_1("терм %s не свободен для подстановки в формулу %s вместо переменной %s."),
+        ERROR_2("переменная %s входит свободно в формулу %s."),
+        ERROR_3("используется %s с квантором по переменной %s, " +
+                "входящей свободно в допущение %s.");
+        int row;
+        String reason;
+
+        DenialReason(String reason) {
+            this.reason = reason;
+        }
+
+        void create(int row, String... params) {
+            this.row = row;
+            reason = String.format(reason, params);
+        }
+
     }
 }

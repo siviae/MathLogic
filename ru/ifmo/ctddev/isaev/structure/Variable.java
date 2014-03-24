@@ -18,8 +18,8 @@ import java.util.Map;
 public class Variable extends Term {
     protected Boolean currentValue;
 
-    public void setCurrentValue(Boolean currentValue) {
-        this.currentValue = currentValue;
+    public Variable(String name) {
+        super(name);
     }
 
     public Boolean getCurrentValue() {
@@ -27,17 +27,22 @@ public class Variable extends Term {
         return currentValue;
     }
 
-    public Variable(String name) {
-        super(name);
+    public void setCurrentValue(Boolean currentValue) {
+        this.currentValue = currentValue;
     }
 
     @Override
-    public boolean match(Expression other) {
+    public boolean treeEquals(Expression other) {
         return hasSameType(other) && (name != null && ((Variable) other).name.equals(name));
     }
 
     @Override
-    public boolean matchAxiomScheme(Expression expr, HashMap<Integer, Expression> known) {
+    public boolean match(Expression other) {
+        return true;
+    }
+
+    @Override
+    public boolean matchAxiomScheme(Expression expr, Map<Integer, Expression> known) {
         return false;
     }
 
@@ -96,25 +101,9 @@ public class Variable extends Term {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Variable)) return false;
-        Variable variable = (Variable) o;
-        return name.equals(variable.name);
-
-    }
-
-    @Override
     public HashMap<String, Variable> getVars() {
         HashMap<String, Variable> vars = new HashMap<>();
         vars.put(name, this);
         return vars;
-    }
-
-    @Override
-    public int hashCode() {
-        int result = name.hashCode();
-        result = 31 * result + ((currentValue == null || !currentValue) ? 0 : 1);
-        return result;
     }
 }

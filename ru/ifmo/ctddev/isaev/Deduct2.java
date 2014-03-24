@@ -28,9 +28,6 @@ import static ru.ifmo.ctddev.isaev.General.*;
  */
 public class Deduct2 extends Homework {
     public PrintWriter stat;
-    private int k1;
-    private int k2;
-    private int k3;
     private List<Expression> hypos = new ArrayList<>();
     private Map<String, Expression> proofed = new HashMap<>();
     private Expression alpha;
@@ -65,9 +62,6 @@ public class Deduct2 extends Homework {
     }
 
     public List<Expression> move1HypoToProof(List<Expression> proof) throws IncorrectProofException {
-        k1 = 0;
-        k2 = 0;
-        k3 = 0;
         List<Expression> result = new ArrayList<>();
         mps.clear();
         for (Expression e : proofed.values()) {
@@ -79,12 +73,10 @@ public class Deduct2 extends Homework {
             addToMps(mps, temp);
         }
 
-        for (int l = 0; l < proof.size(); l++) {
-            Expression expr = proof.get(l);
-
+        for (Expression expr : proof) {
             boolean f = false;
             for (Expression e : hypos) {
-                if (e.match(expr)) {
+                if (e.treeEquals(expr)) {
                     f = true;
                     break;
                 }
@@ -99,14 +91,12 @@ public class Deduct2 extends Homework {
                 }
             }
             if (f) {
-                k1++;
                 result.add(expr);
                 result.add(new Then(expr, new Then(alpha, expr)));
                 Expression temp = new Then(alpha, expr);
                 result.add(temp);
             }
-            if (!f && expr.match(alpha)) {
-                k2++;
+            if (!f && expr.treeEquals(alpha)) {
                 result.addAll(proofAThenA(alpha));
                 f = true;
             }
@@ -117,7 +107,6 @@ public class Deduct2 extends Homework {
                 if (mps.get(expr) != null) {
                     for (Expression e : mps.get(expr)) {
                         if (proofed.get(e.toString()) != null) {
-                            k3++;
                             map.put("1", alpha);
                             map.put("2", e);
                             map.put("3", expr);
@@ -167,9 +156,6 @@ public class Deduct2 extends Homework {
             }
         }
 
-        stat.println("Axiom: " + k1);
-        stat.println("alpha: " + k2);
-        stat.println("MP: " + k3);
         stat.println();
         return result;
     }

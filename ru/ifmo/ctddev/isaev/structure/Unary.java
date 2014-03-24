@@ -3,7 +3,6 @@ package ru.ifmo.ctddev.isaev.structure;
 import ru.ifmo.ctddev.isaev.exception.ProofGeneratingException;
 import ru.ifmo.ctddev.isaev.parser.Lexeme;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -31,7 +30,7 @@ public abstract class Unary extends AbstractExpression {
     }
 
     @Override
-    public boolean matchAxiomScheme(Expression expr, HashMap<Integer, Expression> known) {
+    public boolean matchAxiomScheme(Expression expr, Map<Integer, Expression> known) {
         return hasSameType(expr)
                 && operand.matchAxiomScheme(((Unary) expr).operand, known);
     }
@@ -39,7 +38,7 @@ public abstract class Unary extends AbstractExpression {
     @Override
     public StringBuilder asString() {
         StringBuilder s = operand.asString();
-       if (operand instanceof Binary) {
+        if (operand instanceof Binary) {
             s.insert(0, Lexeme.LEFT_P.s);
             s.append(Lexeme.RIGHT_P.s);
         }
@@ -52,7 +51,7 @@ public abstract class Unary extends AbstractExpression {
     }
 
     @Override
-    public HashMap<String, Variable> getVars() {
+    public Map<String, Variable> getVars() {
         return operand.getVars();
     }
 
@@ -60,25 +59,10 @@ public abstract class Unary extends AbstractExpression {
     public List<Expression> getParticularProof(List<? extends Expression> hypos) throws ProofGeneratingException {
         return operand.getParticularProof(hypos);
     }
+
     @Override
     public Expression substitute(Map<String, ? extends Expression> variables) {
-        operand=operand.substitute(variables);
+        operand = operand.substitute(variables);
         return this;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Unary)) return false;
-        Unary that = (Unary) o;
-        return operand.equals(that.operand) && token == that.token;
-
-    }
-
-    @Override
-    public int hashCode() {
-        int result = operand.hashCode();
-        result = 31 * result + token.hashCode();
-        return result;
     }
 }

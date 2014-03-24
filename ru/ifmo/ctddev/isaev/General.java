@@ -51,13 +51,21 @@ public class General {
         return result;
     }
 
-
     public static void addToMps(Map<Expression, List<Expression>> mps, Expression e) {
         if (e instanceof Then) {
             if (!mps.containsKey(((Then) e).getRight())) {
-                mps.put(((Then) e).getRight(), new ArrayList<Expression>(3));
+                mps.put(((Then) e).getRight(), new ArrayList<>(3));
             }
-            mps.get(((Then) e).getRight()).add(((Then) e).getLeft());
+           /* int l = ((Then) e).getRight().hashCode();
+            String s = ((Then) e).getRight().toString();
+            for (Map.Entry<Expression, List<Expression>> pair : mps.entrySet()) {
+                int l2 = pair.getKey().hashCode();
+                String s2 = pair.getKey().toString();
+                boolean f = pair.getKey().equals(((Then) e).getRight());
+                boolean ss = f;
+            }*/
+            List<Expression> exprs = mps.get(((Then) e).getRight());
+            exprs.add(((Then) e).getLeft());
         }
     }
 
@@ -90,7 +98,7 @@ public class General {
         Then expr = (Then) e;
         if (!(expr.getLeft() instanceof ForAll)) return false;
         ForAll left = (ForAll) expr.getLeft();
-        return expr.getRight().canSubstitute(left.var);
+        return left.getOperand().match(expr.getRight()) && expr.getRight().canSubstitute(left.var);
     }
 
     public static boolean matchExistsPredicateAxiom(Expression e) {
@@ -98,6 +106,6 @@ public class General {
         Then expr = (Then) e;
         if (!(expr.getRight() instanceof Exists)) return false;
         Exists right = (Exists) expr.getRight();
-        return expr.getLeft().canSubstitute(right.var);
+        return expr.getLeft().match(right.getOperand()) && expr.getLeft().canSubstitute(right.var);
     }
 }

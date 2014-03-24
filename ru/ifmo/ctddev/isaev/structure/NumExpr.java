@@ -21,14 +21,14 @@ public class NumExpr extends AbstractExpression {
     }
 
     @Override
-    public boolean match(Expression other) {
+    public boolean treeEquals(Expression other) {
         return true;
     }
 
     @Override
-    public boolean matchAxiomScheme(Expression expr, HashMap<Integer, Expression> known) {
+    public boolean matchAxiomScheme(Expression expr, Map<Integer, Expression> known) {
         if (known.containsKey(number)) {
-            return known.get(number).match(expr);
+            return known.get(number).treeEquals(expr);
         } else {
             known.put(number, expr);
             return true;
