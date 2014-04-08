@@ -1,6 +1,8 @@
 package ru.ifmo.ctddev.isaev.structure;
 
+import javafx.util.Pair;
 import ru.ifmo.ctddev.isaev.exception.ProofGeneratingException;
+import ru.ifmo.ctddev.isaev.exception.SubstitutionException;
 import ru.ifmo.ctddev.isaev.structure.logic.Variable;
 
 import java.util.List;
@@ -39,5 +41,18 @@ public interface Expression {
 
     Map<String, Variable> getFreeVars();
 
-    boolean canSubstitute(Variable var);
+    boolean hasQuantifier(Variable var);
+
+    /**
+     * @param original search the variable, substituted instead of original, checks if it is equal to alreadyKnown value
+     *                 returns pair
+     *                 first parameter is true if substitution is correct
+     *                 second parameter is not null if we finded some variable substituted
+     *                 default - false,null
+     *                 finded some correct - true, not null
+     *                 finded some crap - false, not null
+     */
+    Pair<Boolean, Variable> findSubstitutionAndCheck(Expression other, Variable original, Variable alreadyKnown) throws SubstitutionException;
+
+
 }

@@ -1,6 +1,8 @@
 package ru.ifmo.ctddev.isaev.structure.logic;
 
+import javafx.util.Pair;
 import ru.ifmo.ctddev.isaev.exception.ProofGeneratingException;
+import ru.ifmo.ctddev.isaev.exception.SubstitutionException;
 import ru.ifmo.ctddev.isaev.parser.Lexeme;
 import ru.ifmo.ctddev.isaev.structure.AbstractExpression;
 import ru.ifmo.ctddev.isaev.structure.Expression;
@@ -18,6 +20,12 @@ import java.util.Map;
 public abstract class Binary extends AbstractExpression {
     protected Expression left;
     protected Expression right;
+    protected Lexeme token;
+
+    protected Binary(Expression left, Expression right) {
+        this.left = left;
+        this.right = right;
+    }
 
     public Lexeme getToken() {
         return token;
@@ -29,14 +37,6 @@ public abstract class Binary extends AbstractExpression {
 
     public Expression getLeft() {
         return left;
-    }
-
-    protected Lexeme token;
-
-
-    protected Binary(Expression left, Expression right) {
-        this.left = left;
-        this.right = right;
     }
 
     @Override
@@ -81,8 +81,19 @@ public abstract class Binary extends AbstractExpression {
     }
 
     @Override
-    public boolean canSubstitute(Variable v) {
-        return left.canSubstitute(v) && right.canSubstitute(v);
+    public boolean hasQuantifier(Variable v) {
+        return left.hasQuantifier(v) && right.hasQuantifier(v);
+    }
+
+    @Override
+    public Pair<Boolean, Variable> findSubstitutionAndCheck(Expression other, Variable original, Variable alreadyKnown) throws SubstitutionException {
+        if (!hasSameType(other)) throw new SubstitutionException();
+        Pair<Boolean, Variable> ans = left.findSubstitutionAndCheck(other, original, null);
+        if (!ans.getKey() && ans.getValue() != null) return ans;//нашли ошибку
+        Pair<Boolean, Variable> ans2 = left.findSubstitutionAndCheck(other, original, ans.getValue());
+        if (!ans.getKey() && ans.getValue() != null) return ans;//нашли ошибку
+        if (ans2.getKey()) return ans2;
+        return new Pair<>(false, null);
     }
 
     @Override

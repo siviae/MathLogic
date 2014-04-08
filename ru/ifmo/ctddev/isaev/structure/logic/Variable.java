@@ -1,6 +1,8 @@
 package ru.ifmo.ctddev.isaev.structure.logic;
 
+import javafx.util.Pair;
 import ru.ifmo.ctddev.isaev.exception.ProofGeneratingException;
+import ru.ifmo.ctddev.isaev.exception.SubstitutionException;
 import ru.ifmo.ctddev.isaev.structure.Expression;
 import ru.ifmo.ctddev.isaev.structure.predicate.Term;
 
@@ -106,5 +108,17 @@ public class Variable extends Term {
         HashMap<String, Variable> vars = new HashMap<>();
         vars.put(name, this);
         return vars;
+    }
+
+    @Override
+    public Pair<Boolean, Variable> findSubstitutionAndCheck(Expression other, Variable original, Variable alreadyKnown) throws SubstitutionException {
+        if (!hasSameType(other)) throw new SubstitutionException();
+        if (((Variable) other).name.equals(original.name)) {
+            if ((alreadyKnown == null || this.name.equals(alreadyKnown.name))) {
+                return new Pair<>(true, alreadyKnown);
+            }
+            return new Pair<>(false, alreadyKnown);
+        }
+        return new Pair<>(false, null);
     }
 }

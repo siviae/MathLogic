@@ -1,6 +1,8 @@
 package ru.ifmo.ctddev.isaev.structure.predicate;
 
+import javafx.util.Pair;
 import ru.ifmo.ctddev.isaev.exception.ProofGeneratingException;
+import ru.ifmo.ctddev.isaev.exception.SubstitutionException;
 import ru.ifmo.ctddev.isaev.parser.Lexeme;
 import ru.ifmo.ctddev.isaev.structure.Expression;
 import ru.ifmo.ctddev.isaev.structure.logic.Unary;
@@ -73,7 +75,16 @@ public class ForAll extends Unary {
     }
 
     @Override
-    public boolean canSubstitute(Variable var) {
-        return !(var.getName().equals(this.var.getName())) && !operand.canSubstitute(var);
+    public boolean hasQuantifier(Variable var) {
+        return !(var.getName().equals(this.var.getName())) && !operand.hasQuantifier(var);
+    }
+
+    @Override
+    public Pair<Boolean, Variable> findSubstitutionAndCheck(Expression other, Variable original, Variable alreadyKnown) throws SubstitutionException {
+        if (!hasSameType(other)) throw new SubstitutionException();
+        Pair<Boolean, Variable> result = operand.findSubstitutionAndCheck(other, original, alreadyKnown);
+        if (var.name.equals(original.name)) {
+            return new Pair<>(false, var);
+        } else return result;
     }
 }

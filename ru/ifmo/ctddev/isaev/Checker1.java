@@ -4,8 +4,8 @@ import ru.ifmo.ctddev.isaev.hardcodedRules.AxiomScheme;
 import ru.ifmo.ctddev.isaev.structure.Expression;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import static ru.ifmo.ctddev.isaev.General.*;
@@ -23,7 +23,7 @@ public class Checker1 extends Homework {
     @Override
     public void doSomething() throws IOException {
         Map<String, Expression> proofed = new HashMap<>();
-        Map<Expression, List<Expression>> mps = new HashMap<>();
+        Map<Expression, ArrayList<Expression>> mps = new HashMap<>();
         String temp = in.readLine();
         row = 1;
         boolean ok = true;

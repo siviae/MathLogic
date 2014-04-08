@@ -32,7 +32,7 @@ public class Deduct2 extends Homework {
     private Map<String, Expression> proofed = new HashMap<>();
     private Expression alpha;
     private Map<String, Expression> map = new HashMap<>();
-    private Map<Expression, List<Expression>> mps = new HashMap<>();
+    private Map<Expression, ArrayList<Expression>> mps = new HashMap<>();
 
     public Deduct2() {
         try {

@@ -1,6 +1,8 @@
 package ru.ifmo.ctddev.isaev.structure.logic;
 
+import javafx.util.Pair;
 import ru.ifmo.ctddev.isaev.exception.ProofGeneratingException;
+import ru.ifmo.ctddev.isaev.exception.SubstitutionException;
 import ru.ifmo.ctddev.isaev.parser.Lexeme;
 import ru.ifmo.ctddev.isaev.structure.AbstractExpression;
 import ru.ifmo.ctddev.isaev.structure.Expression;
@@ -55,6 +57,12 @@ public abstract class Unary extends AbstractExpression {
     @Override
     public Map<String, Variable> getVars() {
         return operand.getVars();
+    }
+
+    @Override
+    public Pair<Boolean, Variable> findSubstitutionAndCheck(Expression other, Variable original, Variable alreadyKnown) throws SubstitutionException {
+        if (!hasSameType(other)) throw new SubstitutionException();
+        return operand.findSubstitutionAndCheck(other, original, alreadyKnown);
     }
 
     @Override

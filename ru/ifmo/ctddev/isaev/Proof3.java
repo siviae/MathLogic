@@ -91,9 +91,9 @@ public class Proof3 extends Homework {
             theorem = theorem.substituteAndCopy(vars);
             boolean f = theorem.evaluate();
             if (!f) {
-                StringBuilder sb = new StringBuilder("Высказывание ложно при ");
+                StringBuilder sb = new StringBuilder("Expression is false when ");
                 for (int j = 0; j < variables.size(); j++) {
-                    sb.append(variables.get(j).getName()).append("=").append(variables.get(j).getCurrentValue() ? "И" : "Л");
+                    sb.append(variables.get(j).getName()).append("=").append(variables.get(j).getCurrentValue() ? "True" : "False");
                     if (j != variables.size() - 1) {
                         sb.append(", ");
                     }

@@ -18,7 +18,6 @@ import static ru.ifmo.ctddev.isaev.General.isUppercaseVariable;
 /**
  * User: Xottab
  * Date: 22.01.14
- * Инвариант для каждого метода - после окончания парсинга, поциция следующего токена должна быть перенесена
  */
 public class PredicateParser extends LogicParser {
 
@@ -57,28 +56,28 @@ public class PredicateParser extends LogicParser {
             return result;
         }
 
-        if (isUppercaseVariable(tokens[position])) {
-            return predicate();
-        }
-        throw new ParsingException("unexpected symbol");
+        return predicate();
+        // throw new ParsingException("unexpected symbol");
     }
 
     protected Predicate predicate() throws ParsingException {
-        Predicate result;
-        result = new Predicate(tokens[position]);
-        position++;
-        if (position < tokens.length && tokens[position].equals(Lexeme.LEFT_P.s)) {
+        if (isUppercaseVariable(tokens[position])) {
+            Predicate result;
+            result = new Predicate(tokens[position]);
             position++;
-            List<Term> arguments = new ArrayList<>(3);
-            arguments.add(term());
-            while (tokens[position].equals(Lexeme.COMMA.s)) {
+            if (position < tokens.length && tokens[position].equals(Lexeme.LEFT_P.s)) {
                 position++;
+                List<Term> arguments = new ArrayList<>(3);
                 arguments.add(term());
+                while (tokens[position].equals(Lexeme.COMMA.s)) {
+                    position++;
+                    arguments.add(term());
+                }
+                position++;
+                result.setArguments(arguments.toArray(new Term[arguments.size()]));
             }
-            position++;
-            result.setArguments(arguments.toArray(new Term[arguments.size()]));
-        }
-        return result;
+            return result;
+        } else throw new ParsingException("unexpected symbol");
     }
 
     protected Term term() throws ParsingException {

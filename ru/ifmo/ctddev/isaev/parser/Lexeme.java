@@ -21,6 +21,7 @@ public enum Lexeme {
     PRIME("'"),
     EQ("="),
     COMMA(","), ZERO("0");
+
     public final String s;
 
     private Lexeme(final String s) {
