@@ -60,6 +60,11 @@ public abstract class Unary extends AbstractExpression {
     }
 
     @Override
+    public Map<String, Variable> getFreeVars() {
+        return operand.getFreeVars();
+    }
+
+    @Override
     public Pair<Boolean, Variable> findSubstitutionAndCheck(Expression other, Variable original, Variable alreadyKnown) throws SubstitutionException {
         if (!hasSameType(other)) throw new SubstitutionException();
         return operand.findSubstitutionAndCheck(other, original, alreadyKnown);

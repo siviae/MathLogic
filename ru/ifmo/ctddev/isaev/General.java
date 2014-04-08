@@ -1,6 +1,8 @@
 package ru.ifmo.ctddev.isaev;
 
+import ru.ifmo.ctddev.isaev.exception.ParsingException;
 import ru.ifmo.ctddev.isaev.hardcodedRules.AThenA;
+import ru.ifmo.ctddev.isaev.parser.ArithmeticParser;
 import ru.ifmo.ctddev.isaev.parser.Lexer;
 import ru.ifmo.ctddev.isaev.parser.LogicParser;
 import ru.ifmo.ctddev.isaev.parser.Parser;
@@ -33,6 +35,9 @@ public class General {
     public static Expression parse(String s) {
         Expression expression = null;
         try {
+            if (parser instanceof ArithmeticParser) {
+                s = prefixPrimes(s);
+            }
             String[] lexems = lexer.lex(s);
             expression = parser.parse(lexems);
         } catch (Exception e) {
@@ -41,6 +46,35 @@ public class General {
             System.exit(1);
         }
         return expression;
+    }
+
+    private static String prefixPrimes(String s) throws ParsingException {
+        StringBuilder sb = new StringBuilder(s);
+        int i = sb.length() - 1;
+        while (i >= 0) {
+            if (sb.charAt(i) == '\'') {
+                int pos = searchBackFindParentnessesPosition(sb, i - 1);
+                String temp = prefixPrimes(s.substring(pos, i));
+                i = pos - 1;
+                s = s.substring(0, pos) + "'" + temp + s.substring(pos + temp.length() + 1);
+            } else i--;
+        }
+        return s;
+    }
+
+    private static int searchBackFindParentnessesPosition(StringBuilder sb, int i) throws ParsingException {
+        int j = 0;
+        int result = i;
+        if (sb.charAt(result) == ')') {
+            result--;
+            if (result < 0) throw new ParsingException("Wrong parentnesses");
+            while (!(j == 0 && sb.charAt(result) == '(')) {
+                if (sb.charAt(result) == ')') j++;
+                if (sb.charAt(result) == '(') j--;
+                result--;
+            }
+        }
+        return result;
     }
 
     public static List<Expression> proofAThenA(Expression alpha) {

@@ -13,7 +13,14 @@ public class Prime extends Term {
 
     public Prime(Term operand) {
         super(Lexeme.PRIME.s, operand);
-        operand = arguments[0];
+        this.operand = arguments[0];
+    }
+
+    @Override
+    public StringBuilder asString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(Lexeme.LEFT_P).append(operand.asString()).append(Lexeme.RIGHT_P).append(name);
+        return sb;
     }
 
 }

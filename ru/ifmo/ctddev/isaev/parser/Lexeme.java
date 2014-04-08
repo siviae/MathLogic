@@ -24,6 +24,11 @@ public enum Lexeme {
 
     public final String s;
 
+    @Override
+    public String toString() {
+        return s;
+    }
+
     private Lexeme(final String s) {
         this.s = s;
     }

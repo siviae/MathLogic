@@ -69,6 +69,13 @@ public abstract class Binary extends AbstractExpression {
     }
 
     @Override
+    public Map<String, Variable> getFreeVars() {
+        Map<String, Variable> h = left.getFreeVars();
+        h.putAll(right.getFreeVars());
+        return h;
+    }
+
+    @Override
     public StringBuilder asJavaExpr() {
         return new StringBuilder("new ").append(getClass().getSimpleName()).append("(").append(left.asJavaExpr()).append(",").append(right.asJavaExpr()).append(")");
     }

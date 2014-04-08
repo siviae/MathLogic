@@ -48,10 +48,12 @@ public class Exists extends Unary {
     @Override
     public Pair<Boolean, Variable> findSubstitutionAndCheck(Expression other, Variable original, Variable alreadyKnown) throws SubstitutionException {
         if (!hasSameType(other)) throw new SubstitutionException();
-        Pair<Boolean, Variable> result = operand.findSubstitutionAndCheck(other, original, alreadyKnown);
+        Pair<Boolean, Variable> result = operand.findSubstitutionAndCheck(((Exists) other).operand, original, alreadyKnown);
         if (var.name.equals(original.name)) {
-            return new Pair<>(false, var);
-        } else return result;
+            return new Pair<>(false, result.getValue());
+        } else {
+            return result;
+        }
     }
 
     @Override

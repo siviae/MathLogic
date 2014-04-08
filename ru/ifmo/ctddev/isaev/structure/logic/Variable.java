@@ -113,9 +113,9 @@ public class Variable extends Term {
     @Override
     public Pair<Boolean, Variable> findSubstitutionAndCheck(Expression other, Variable original, Variable alreadyKnown) throws SubstitutionException {
         if (!hasSameType(other)) throw new SubstitutionException();
-        if (((Variable) other).name.equals(original.name)) {
-            if ((alreadyKnown == null || this.name.equals(alreadyKnown.name))) {
-                return new Pair<>(true, alreadyKnown);
+        if (/*((Variable) other)*/this.name.equals(original.name)) {
+            if ((alreadyKnown == null || ((Variable) other).name.equals(alreadyKnown.name))) {
+                return new Pair<>(true, ((Variable) other));
             }
             return new Pair<>(false, alreadyKnown);
         }

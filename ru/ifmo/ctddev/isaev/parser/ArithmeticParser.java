@@ -1,10 +1,7 @@
 package ru.ifmo.ctddev.isaev.parser;
 
 import ru.ifmo.ctddev.isaev.exception.ParsingException;
-import ru.ifmo.ctddev.isaev.structure.arithmetics.Equals;
-import ru.ifmo.ctddev.isaev.structure.arithmetics.Plus;
-import ru.ifmo.ctddev.isaev.structure.arithmetics.Prime;
-import ru.ifmo.ctddev.isaev.structure.arithmetics.Zero;
+import ru.ifmo.ctddev.isaev.structure.arithmetics.*;
 import ru.ifmo.ctddev.isaev.structure.logic.Variable;
 import ru.ifmo.ctddev.isaev.structure.predicate.Predicate;
 import ru.ifmo.ctddev.isaev.structure.predicate.Term;
@@ -53,7 +50,8 @@ public class ArithmeticParser extends PredicateParser {
     @Override
     protected Term term() throws ParsingException {
         Term term = sum();
-        if (tokens[position].equals(Lexeme.PLUS.s)) {
+        if (position < tokens.length && tokens[position].equals(Lexeme.PLUS.s)) {
+            position++;
             return new Plus(term, term());
         }
         return term;
@@ -61,15 +59,22 @@ public class ArithmeticParser extends PredicateParser {
 
     protected Term sum() throws ParsingException {
         Term term = mul();
-        if (tokens[position].equals(Lexeme.PLUS.s)) {
-            return new Plus(term, sum());
+        if (position < tokens.length && tokens[position].equals(Lexeme.MUL.s)) {
+            position++;
+            return new Mul(term, sum());
         }
         return term;
     }
 
     protected Term mul() throws ParsingException {
-        Term result;
+        Term result = null;
         boolean f = false;
+        if (tokens[position].equals(Lexeme.PRIME.s)) {
+            position++;
+            //f=true;
+            return new Prime(mul());
+
+        }
         if (tokens[position].equals(Lexeme.LEFT_P.s)) {
             position++;
             result = term();
@@ -77,7 +82,7 @@ public class ArithmeticParser extends PredicateParser {
             result = new Term(tokens[position]);
             position++;
             f = true;
-            if (tokens[position].equals(Lexeme.LEFT_P.s)) {
+            if (position < tokens.length && tokens[position].equals(Lexeme.LEFT_P.s)) {
                 position++;
                 List<Term> arguments = new ArrayList<>(3);
                 arguments.add(term());
@@ -91,16 +96,25 @@ public class ArithmeticParser extends PredicateParser {
                 result = new Variable(result.getName());
             }
         } else if (tokens[position].equals(Lexeme.ZERO.s)) {
-            return new Zero();
-        } else {
+            // position++;
+            //f=true;
+            result = new Zero();
+        } /*else {
             result = mul();
             if (tokens[position].equals(Lexeme.PRIME.s)) {
+                position++;
                 return new Prime(result);
             } else
                 throw new ParsingException("cannot parse term without name, incorrect invocation");
-        }
+        }*/
 
         if (!f) position++;
+       /* while(position<tokens.length&&tokens[position].equals(Lexeme.PRIME.s)){
+            result = new Prime(result);
+            position++;
+        }*/
         return result;
+
+
     }
 }

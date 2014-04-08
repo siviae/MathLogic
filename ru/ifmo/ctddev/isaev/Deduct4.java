@@ -83,9 +83,9 @@ public class Deduct4 extends Homework {
             addToMps(mps, e);
             addToMps(mps, temp);
         }
-        hyposVars.addAll(alpha.getVars().keySet());
+        hyposVars.addAll(alpha.getFreeVars().keySet());
         for (Expression e : hypos) {
-            hyposVars.addAll(e.getVars().keySet());
+            hyposVars.addAll(e.getFreeVars().keySet());
         }
 
         for (int l = 0; l < proof.size(); l++) {
@@ -98,51 +98,48 @@ public class Deduct4 extends Homework {
                     break;
                 }
             }
-            //todo заинлайнить
+            //something complex is happening here ->
             if (!f) {
                 if (expr instanceof Then
                         && ((Then) expr).getLeft() instanceof ForAll
-                        && ((ForAll) ((Then) expr).getLeft()).getOperand().match(((Then) expr).getRight())) {
+                        /*&& ((ForAll) ((Then) expr).getLeft()).getOperand().match(((Then) expr).getRight())*/) {
                     Variable var = ((ForAll) ((Then) expr).getLeft()).var;
                     try {
                         Pair<Boolean, Variable> pair = ((ForAll) ((Then) expr).getLeft()).getOperand().findSubstitutionAndCheck(((Then) expr).getRight(), var, null);
                         if (pair.getKey()) {
                             f = true;
-                            break;
                         } else {
                             if (pair.getValue() != null) {
-                                DenialReason.ERROR_1.create(l + 1, pair.getValue().toString(), ((Then) expr).getRight().toString(), var.getName());
-                            } else {
-                                break;
+                                DenialReason.ERROR_1.create(l + 1, pair.getValue().toString(), ((ForAll) ((Then) expr).getLeft()).getOperand().toString(), var.getName());
                             }
                         }
                     } catch (SubstitutionException e) {
-                        finish(e.getMessage());
+                        //  break;
                     }
                 }
             }
             if (!f) {
                 if (expr instanceof Then
                         && ((Then) expr).getRight() instanceof Exists
-                        && ((Exists) ((Then) expr).getRight()).getOperand().match(((Then) expr).getLeft())) {
+                        /*&& ((Exists) ((Then) expr).getRight()).getOperand().match(((Then) expr).getLeft())*/) {
                     Variable var = ((Exists) ((Then) expr).getRight()).var;
                     try {
                         Pair<Boolean, Variable> pair = ((Exists) ((Then) expr).getRight()).getOperand().findSubstitutionAndCheck(((Then) expr).getLeft(), var, null);
                         if (pair.getKey()) {
                             f = true;
-                            break;
+                            // break;
                         } else {
                             if (pair.getValue() != null) {
                                 DenialReason.ERROR_1.create(l + 1, pair.getValue().toString(), ((Then) expr).getLeft().toString(), var.getName());
-                            } else {
+                            }/* else {
                                 break;
-                            }
+                            }*/
                         }
                     } catch (SubstitutionException e) {
-                        finish(e.getMessage());
+                        //break;
                     }
                 }
-            }
+            }               //<-
             if (!f) {
                 for (AxiomScheme scheme : AxiomScheme.values()) {
                     if (scheme.match(expr)) {
@@ -235,6 +232,9 @@ public class Deduct4 extends Homework {
                 }
             }
 
+            if (l == 73) {
+                boolean k = true;
+            }
             if (!f) {
                 if (expr instanceof Then &&
                         ((Then) expr).getLeft() instanceof Exists) {
@@ -271,7 +271,7 @@ public class Deduct4 extends Homework {
                     out.println(e.asString());
                 }
                 out.println("до этого всё было ок");
-                out.println("Не получилось доказать: " + expr.asString());
+                finish("Не получилось доказать: " + expr.asString());
                 break;
             } else {
                 proofed.put(expr.toString(), expr);

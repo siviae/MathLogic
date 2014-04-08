@@ -152,6 +152,20 @@ public class Term extends AbstractExpression {
 
     @Override
     public Pair<Boolean, Variable> findSubstitutionAndCheck(Expression other, Variable original, Variable alreadyKnown) throws SubstitutionException {
-        return null;
+        if (!hasSameType(other) || this.arguments.length != ((Term) other).arguments.length)
+            throw new SubstitutionException();
+        if (arguments.length > 0) {
+            Variable alreadyKn = alreadyKnown;
+            /*Pair<Boolean,Variable> result = findSubstitutionAndCheck(arguments[0],original,alreadyKnown);
+            if(!result.getKey()) return result;
+            alreadyKn = result.getValue();*/
+            for (int i = 0; i < this.arguments.length; i++) {
+                Pair<Boolean, Variable> result = arguments[i].findSubstitutionAndCheck(((Term) other).arguments[i], original, alreadyKn);
+                alreadyKn = result.getValue();
+                if (!result.getKey()) return result;
+            }
+            return new Pair<>(true, alreadyKn);
+        }
+        return new Pair<>(false, alreadyKnown);
     }
 }

@@ -18,4 +18,11 @@ public class Equals extends Predicate {
         left = arguments[0];
         right = arguments[1];
     }
+
+    @Override
+    public StringBuilder asString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(Lexeme.LEFT_P).append(left.asString()).append(name).append(right.asString()).append(Lexeme.RIGHT_P);
+        return sb;
+    }
 }

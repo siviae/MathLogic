@@ -15,7 +15,14 @@ public class Plus extends Term {
 
     public Plus(Term left, Term right) {
         super(Lexeme.PLUS.s, left, right);
-        left = arguments[0];
-        right = arguments[1];
+        this.left = arguments[0];
+        this.right = arguments[1];
+    }
+
+    @Override
+    public StringBuilder asString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(Lexeme.LEFT_P).append(left.asString()).append(name).append(right.asString()).append(Lexeme.RIGHT_P);
+        return sb;
     }
 }
