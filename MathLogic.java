@@ -76,7 +76,7 @@ public class MathLogic {
         }
         long endTime = System.currentTimeMillis();
         out.println();
-        out.println("... Программа завершила свою работу за " + (endTime - startTime) + " мс");
+        //  out.println("... Программа завершила свою работу за " + (endTime - startTime) + " мс");
         out.close();
     }
 }
