@@ -1,8 +1,12 @@
 package ru.ifmo.ctddev.isaev.parser;
 
 import ru.ifmo.ctddev.isaev.exception.ParsingException;
+import ru.ifmo.ctddev.isaev.structure.Expression;
 import ru.ifmo.ctddev.isaev.structure.arithmetics.*;
+import ru.ifmo.ctddev.isaev.structure.logic.Not;
 import ru.ifmo.ctddev.isaev.structure.logic.Variable;
+import ru.ifmo.ctddev.isaev.structure.predicate.Exists;
+import ru.ifmo.ctddev.isaev.structure.predicate.ForAll;
 import ru.ifmo.ctddev.isaev.structure.predicate.Predicate;
 import ru.ifmo.ctddev.isaev.structure.predicate.Term;
 
@@ -45,6 +49,43 @@ public class ArithmeticParser extends PredicateParser {
             }
         }
         throw new ParsingException("unexpected symbol");
+    }
+
+    @Override
+    protected Expression unary() throws ParsingException {
+        Expression result;
+        if (tokens[position].equals(Lexeme.NOT.s)) {
+            position++;
+            result = new Not(unary());
+            return result;
+        }
+        if (tokens[position].equals(Lexeme.FOR_ALL.s)) {
+            position++;
+            Variable var = var();
+            result = new ForAll(var, unary());
+            return result;
+        }
+        if (tokens[position].equals(Lexeme.EXISTS.s)) {
+            position++;
+            Variable var = var();
+            result = new Exists(var, unary());
+            return result;
+        }
+        if (tokens[position].equals(Lexeme.LEFT_P.s)) {
+            position++;
+            result = expr();
+            if (!tokens[position].equals(Lexeme.RIGHT_P.s)) {
+                StringBuilder sb = new StringBuilder();
+                for (String s : tokens) {
+                    sb.append(s);
+                }
+                throw new ParsingException("you have unclosed brackets in expression " + sb.toString());
+            } else {
+                position++;
+            }
+            return result;
+        }
+        return predicate();
     }
 
     @Override

@@ -8,8 +8,6 @@ import ru.ifmo.ctddev.isaev.parser.LogicParser;
 import ru.ifmo.ctddev.isaev.parser.Parser;
 import ru.ifmo.ctddev.isaev.structure.Expression;
 import ru.ifmo.ctddev.isaev.structure.logic.Then;
-import ru.ifmo.ctddev.isaev.structure.predicate.Exists;
-import ru.ifmo.ctddev.isaev.structure.predicate.ForAll;
 
 import java.io.BufferedReader;
 import java.io.PrintWriter;
@@ -35,16 +33,23 @@ public class General {
     public static Expression parse(String s) {
         Expression expression = null;
         try {
-            if (parser instanceof ArithmeticParser) {
-                s = prefixPrimes(s);
-            }
-            String[] lexems = lexer.lex(s);
-            expression = parser.parse(lexems);
+            expression = parseExcept(s);
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println("string " + s + " looks kinda crappy, cant parse this");
             System.exit(1);
         }
+        return expression;
+    }
+
+    public static Expression parseExcept(String s) throws Exception {
+        Expression expression;
+        if (parser instanceof ArithmeticParser) {
+            s = prefixPrimes(s);
+        }
+        String[] lexems = lexer.lex(s);
+        expression = parser.parse(lexems);
+
         return expression;
     }
 
@@ -119,19 +124,10 @@ public class General {
         return Character.isLetter(temp.charAt(0)) && looksLikeSomething(temp);
     }
 
-    public static boolean matchForAllPredicateAxiom(Expression e) {
-        if (!(e instanceof Then)) return false;
-        Then expr = (Then) e;
-        if (!(expr.getLeft() instanceof ForAll)) return false;
-        ForAll left = (ForAll) expr.getLeft();
-        return left.getOperand().match(expr.getRight()) && expr.getRight().hasQuantifier(left.var);
-    }
 
-    public static boolean matchExistsPredicateAxiom(Expression e) {
-        if (!(e instanceof Then)) return false;
-        Then expr = (Then) e;
-        if (!(expr.getRight() instanceof Exists)) return false;
-        Exists right = (Exists) expr.getRight();
-        return expr.getLeft().match(right.getOperand()) && expr.getLeft().hasQuantifier(right.var);
+    public static void exitWithMessage(String s) {
+        out.println(s);
+        out.close();
+        System.exit(1);
     }
 }

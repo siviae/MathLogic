@@ -55,29 +55,33 @@ public class PredicateParser extends LogicParser {
             }
             return result;
         }
-
-        return predicate();
-        // throw new ParsingException("unexpected symbol");
+        if (isUppercaseVariable(tokens[position])) {
+            return predicate();
+        }
+      /*  if (isLowercaseVariable(tokens[position])) {
+            return term();
+        }*/
+        throw new ParsingException("unexpected symbol");
     }
 
     protected Predicate predicate() throws ParsingException {
-        if (isUppercaseVariable(tokens[position])) {
-            Predicate result;
-            result = new Predicate(tokens[position]);
+        // if (isUppercaseVariable(tokens[position])) {
+        Predicate result;
+        result = new Predicate(tokens[position]);
+        position++;
+        if (position < tokens.length && tokens[position].equals(Lexeme.LEFT_P.s)) {
             position++;
-            if (position < tokens.length && tokens[position].equals(Lexeme.LEFT_P.s)) {
+            List<Term> arguments = new ArrayList<>(3);
+            arguments.add(term());
+            while (tokens[position].equals(Lexeme.COMMA.s)) {
                 position++;
-                List<Term> arguments = new ArrayList<>(3);
                 arguments.add(term());
-                while (tokens[position].equals(Lexeme.COMMA.s)) {
-                    position++;
-                    arguments.add(term());
-                }
-                position++;
-                result.setArguments(arguments.toArray(new Term[arguments.size()]));
             }
-            return result;
-        } else throw new ParsingException("unexpected symbol");
+            position++;
+            result.setArguments(arguments.toArray(new Term[arguments.size()]));
+        }
+        return result;
+        //  } else throw new ParsingException("unexpected symbol");
     }
 
     protected Term term() throws ParsingException {
@@ -90,7 +94,7 @@ public class PredicateParser extends LogicParser {
             result = new Term(tokens[position]);
             position++;
             f = true;
-            if (tokens[position].equals(Lexeme.LEFT_P.s)) {
+            if (position < tokens.length && tokens[position].equals(Lexeme.LEFT_P.s)) {
                 position++;
                 List<Term> arguments = new ArrayList<>(3);
                 arguments.add(term());

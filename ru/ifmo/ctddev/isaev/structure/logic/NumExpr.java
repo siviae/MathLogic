@@ -5,6 +5,7 @@ import ru.ifmo.ctddev.isaev.exception.ProofGeneratingException;
 import ru.ifmo.ctddev.isaev.exception.SubstitutionException;
 import ru.ifmo.ctddev.isaev.structure.AbstractExpression;
 import ru.ifmo.ctddev.isaev.structure.Expression;
+import ru.ifmo.ctddev.isaev.structure.predicate.Term;
 
 import java.util.HashMap;
 import java.util.List;
@@ -86,6 +87,11 @@ public class NumExpr extends AbstractExpression {
 
     @Override
     public Pair<Boolean, Variable> findSubstitutionAndCheck(Expression other, Variable original, Variable alreadyKnown) throws SubstitutionException {
+        return null;
+    }
+
+    @Override
+    public Pair<Boolean, Term> findSubstitutionAndCheck2(Expression other, Variable original, Term alreadyKnown) throws SubstitutionException {
         return null;
     }
 

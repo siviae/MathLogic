@@ -84,7 +84,7 @@ public enum ForAllRule {
     R_73("((A->(B->C))->(((A&B)->(B->C))->((A&B)->C)))->((A->(B->C))->((A&B)->C))"),
     R_74("(A->(B->C))->((A&B)->C)"),
     R_75("((A&B)->C)"),
-    R_76("((A&B)->C)->(A&B->@xC)"),
+    // R_76("((A&B)->C)->(A&B->@xC)"),
     R_77("(A&B->@xC)"),
     R_78("A->(A->A)"),
     R_79("(A->(A->A))->(((A&B)->@x(C))->(A->(A->A)))"),
@@ -320,8 +320,6 @@ public enum ForAllRule {
     R_309("(((A&B)->@x(C))->((A->((B->((A&B)->@x(C)))->(B->@x(C))))->(A->(B->@x(C)))))->(((A&B)->@x(C))->(A->(B->@x(C))))"),
     R_310("((A&B)->@x(C))->(A->(B->@x(C)))"),
     R_311("A->(B->@x(C))");
-
-
     private String expression;
 
     ForAllRule(String expression) {
@@ -333,13 +331,13 @@ public enum ForAllRule {
     }
 
     public Expression replace(Expression alpha, Expression e, Expression e1) {
-        return parse(expression
-                .replace("A", alpha.asString())
-                .replace("B", e.asString())
-                .replace("C", e1.asString()));
+
+        String s1 = expression.replace("A", alpha.asString().insert(0, "(").append(")"));
+        String s2 = s1.replace("B", e.asString().insert(0, "(").append(")"));
+        String s3 = s2.replace("C", e1.asString().insert(0, "(").append(")"));
+        Expression result = parse(s3);
+        return result;
     }
 
-    public String replace(String e, String e1) {
-        return expression.replace(e, e1);
-    }
+
 }

@@ -110,4 +110,8 @@ public enum ArithmeticAxiom {
     ArithmeticAxiom(Expression expr) {
         this.expr = expr;
     }
+
+    public boolean match(Expression expr) {
+        return this.expr.match(expr);
+    }
 }

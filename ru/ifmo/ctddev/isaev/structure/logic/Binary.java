@@ -6,6 +6,7 @@ import ru.ifmo.ctddev.isaev.exception.SubstitutionException;
 import ru.ifmo.ctddev.isaev.parser.Lexeme;
 import ru.ifmo.ctddev.isaev.structure.AbstractExpression;
 import ru.ifmo.ctddev.isaev.structure.Expression;
+import ru.ifmo.ctddev.isaev.structure.predicate.Term;
 
 import java.util.List;
 import java.util.Map;
@@ -95,9 +96,20 @@ public abstract class Binary extends AbstractExpression {
     @Override
     public Pair<Boolean, Variable> findSubstitutionAndCheck(Expression other, Variable original, Variable alreadyKnown) throws SubstitutionException {
         if (!hasSameType(other)) throw new SubstitutionException();
-        Pair<Boolean, Variable> ans = left.findSubstitutionAndCheck(other, original, null);
+        Pair<Boolean, Variable> ans = left.findSubstitutionAndCheck(((Binary) other).left, original, alreadyKnown);
         if (!ans.getKey() && ans.getValue() != null) return ans;//нашли ошибку
-        Pair<Boolean, Variable> ans2 = left.findSubstitutionAndCheck(other, original, ans.getValue());
+        Pair<Boolean, Variable> ans2 = right.findSubstitutionAndCheck(((Binary) other).right, original, ans.getValue());
+        if (!ans.getKey() && ans.getValue() != null) return ans;//нашли ошибку
+        if (ans2.getKey()) return ans2;
+        return new Pair<>(false, null);
+    }
+
+    @Override
+    public Pair<Boolean, Term> findSubstitutionAndCheck2(Expression other, Variable original, Term alreadyKnown) throws SubstitutionException {
+        if (!hasSameType(other)) throw new SubstitutionException();
+        Pair<Boolean, Term> ans = left.findSubstitutionAndCheck2(((Binary) other).left, original, alreadyKnown);
+        if (!ans.getKey() && ans.getValue() != null) return ans;//нашли ошибку
+        Pair<Boolean, Term> ans2 = right.findSubstitutionAndCheck2(((Binary) other).right, original, ans.getValue());
         if (!ans.getKey() && ans.getValue() != null) return ans;//нашли ошибку
         if (ans2.getKey()) return ans2;
         return new Pair<>(false, null);

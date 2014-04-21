@@ -112,13 +112,25 @@ public class Variable extends Term {
 
     @Override
     public Pair<Boolean, Variable> findSubstitutionAndCheck(Expression other, Variable original, Variable alreadyKnown) throws SubstitutionException {
-        if (!hasSameType(other)) throw new SubstitutionException();
+        if (!(hasSameType(other))) throw new SubstitutionException();
         if (/*((Variable) other)*/this.name.equals(original.name)) {
             if ((alreadyKnown == null || ((Variable) other).name.equals(alreadyKnown.name))) {
                 return new Pair<>(true, ((Variable) other));
             }
             return new Pair<>(false, alreadyKnown);
         }
-        return new Pair<>(false, null);
+        return new Pair<>(alreadyKnown != null, alreadyKnown);
+    }
+
+    @Override
+    public Pair<Boolean, Term> findSubstitutionAndCheck2(Expression other, Variable original, Term alreadyKnown) throws SubstitutionException {
+        if (!(other instanceof Term)) throw new SubstitutionException();
+        if (this.name.equals(original.name)) {
+            if ((alreadyKnown == null || other.match(alreadyKnown))) {
+                return new Pair<>(true, ((Term) other));
+            }
+            return new Pair<>(false, alreadyKnown);
+        }
+        return new Pair<>(alreadyKnown != null, alreadyKnown);
     }
 }

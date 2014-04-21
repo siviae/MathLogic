@@ -91,6 +91,11 @@ public class Deduct4 extends Homework {
         for (int l = 0; l < proof.size(); l++) {
             Expression expr = proof.get(l);
 
+
+            if (row == 5) {
+                boolean c = true;
+            }
+
             boolean f = false;
             for (Expression e : hypos) {
                 if (e.treeEquals(expr)) {
@@ -225,16 +230,13 @@ public class Deduct4 extends Homework {
                         for (ForAllRule rule : ForAllRule.values()) {
                             result.add(rule.replace(alpha,
                                     ((Then) expr).getLeft(),
-                                    ((Then) expr).getRight()));
+                                    ((ForAll) ((Then) expr).getRight()).getOperand()));
                         }
                         f = true;
                     }
                 }
             }
 
-            if (l == 73) {
-                boolean k = true;
-            }
             if (!f) {
                 if (expr instanceof Then &&
                         ((Then) expr).getLeft() instanceof Exists) {
@@ -257,7 +259,7 @@ public class Deduct4 extends Homework {
                     if (cond) {
                         for (ExistsRule rule : ExistsRule.values()) {
                             result.add(rule.replace(alpha,
-                                    ((Then) expr).getLeft(),
+                                    ((Exists) ((Then) expr).getLeft()).getOperand(),
                                     ((Then) expr).getRight()));
                         }
                         f = true;
@@ -297,10 +299,28 @@ public class Deduct4 extends Homework {
         if (temp.length > 2) {
             throw new IOException("more than one |- in first line");
         }
-        String[] s = temp[0].split(",");
-        for (String value : s) {
-            hypos.add(parse(value));
+        String s = temp[0];
+        int l = 0;
+        int r = 0;
+        while (l < s.length()) {
+            r++;
+            Expression tempExpr;
+            try {
+                String ss = s.substring(l, r);
+                tempExpr = parseExcept(ss);
+            } catch (Exception e) {
+                continue;
+            }
+            if (r == s.length() || s.charAt(r) == ',') {
+                l = r + 1;
+                r = l;
+                hypos.add(tempExpr);
+            }
         }
+
+        /*for (String value : s) {
+            hypos.add(parse(value));
+        } -*/
         alpha = hypos.remove(hypos.size() - 1);
         List<Expression> proof = new ArrayList<>();
         String s1 = in.readLine();

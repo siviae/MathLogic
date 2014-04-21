@@ -156,16 +156,48 @@ public class Term extends AbstractExpression {
             throw new SubstitutionException();
         if (arguments.length > 0) {
             Variable alreadyKn = alreadyKnown;
-            /*Pair<Boolean,Variable> result = findSubstitutionAndCheck(arguments[0],original,alreadyKnown);
-            if(!result.getKey()) return result;
-            alreadyKn = result.getValue();*/
             for (int i = 0; i < this.arguments.length; i++) {
                 Pair<Boolean, Variable> result = arguments[i].findSubstitutionAndCheck(((Term) other).arguments[i], original, alreadyKn);
-                alreadyKn = result.getValue();
-                if (!result.getKey()) return result;
+                if (result.getKey()) {
+                    if (alreadyKn != null) {
+                        if (!result.getValue().match(alreadyKn)) {
+                            return new Pair<>(false, alreadyKn);
+                        }
+                    } else alreadyKn = result.getValue();
+                } else {
+                    if (result.getValue() != null) {
+                        return result;
+                    }
+                }
             }
-            return new Pair<>(true, alreadyKn);
         }
-        return new Pair<>(false, alreadyKnown);
+        return new Pair<>(alreadyKnown != null, alreadyKnown);
+    }
+
+    @Override
+    public Pair<Boolean, Term> findSubstitutionAndCheck2(Expression other, Variable original, Term alreadyKnown) throws SubstitutionException {
+        if (!hasSameType(other) || this.arguments.length != ((Term) other).arguments.length)
+            throw new SubstitutionException();
+        if (arguments.length > 0) {
+            Term alreadyKn = alreadyKnown;
+            for (int i = 0; i < this.arguments.length; i++) {
+                Pair<Boolean, Term> result = arguments[i].findSubstitutionAndCheck2(((Term) other).arguments[i], original, alreadyKn);
+                if (result.getKey()) {
+                    if (alreadyKn != null) {
+                        if (!result.getValue().match(alreadyKn)) {
+                            return new Pair<>(false, alreadyKn);
+                        }
+                    } else alreadyKn = result.getValue();
+                } else {
+                    if (result.getValue() != null) {
+                        return result;
+                    }
+                }
+            }
+            if (alreadyKn != null) {
+                return new Pair<>(true, alreadyKn);
+            }
+        }
+        return new Pair<>(alreadyKnown != null, alreadyKnown);
     }
 }

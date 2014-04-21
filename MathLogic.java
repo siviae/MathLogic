@@ -40,11 +40,6 @@ public class MathLogic {
                 work = new Proof3();
                 break;
             }
-            case "3.5": {
-                General.setParser(new LogicParser());
-                work = new Kripke3_5();
-                break;
-            }
             case "4": {
                 General.setParser(new PredicateParser());
                 work = new Deduct4();
