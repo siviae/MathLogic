@@ -45,7 +45,8 @@ public class General {
     public static Expression parseExcept(String s) throws Exception {
         Expression expression;
         if (parser instanceof ArithmeticParser) {
-            s = prefixPrimes(s);
+            String s1 = prefixPrimes(s).toString();
+            s = s1;
         }
         String[] lexems = lexer.lex(s);
         expression = parser.parse(lexems);
@@ -53,18 +54,31 @@ public class General {
         return expression;
     }
 
-    private static String prefixPrimes(String s) throws ParsingException {
+    private static StringBuilder prefixPrimes(String s) throws ParsingException {
         StringBuilder sb = new StringBuilder(s);
         int i = sb.length() - 1;
         while (i >= 0) {
             if (sb.charAt(i) == '\'') {
-                int pos = searchBackFindParentnessesPosition(sb, i - 1);
-                String temp = prefixPrimes(s.substring(pos, i));
+                int primesCount = 0;
+                while (sb.charAt(i) == '\'') {
+                    primesCount++;
+                    i--;
+                }
+                int pos = searchBackFindParentnessesPosition(sb, i);
+                StringBuilder temp = prefixPrimes(sb.substring(pos, i + 1));
                 i = pos - 1;
-                s = s.substring(0, pos) + "'" + temp + s.substring(pos + temp.length() + 1);
-            } else i--;
+                StringBuilder temp2 = new StringBuilder(sb.substring(0, pos));
+                for (int j = 0; j < primesCount; j++) {
+                    temp2.append("'");
+                }
+                temp2.append(temp);
+                temp2.append(sb.substring(pos + temp.length() + primesCount));
+                sb = temp2;
+            } else {
+                i--;
+            }
         }
-        return s;
+        return sb;
     }
 
     private static int searchBackFindParentnessesPosition(StringBuilder sb, int i) throws ParsingException {
@@ -123,7 +137,6 @@ public class General {
     public static boolean isVariable(String temp) {
         return Character.isLetter(temp.charAt(0)) && looksLikeSomething(temp);
     }
-
 
     public static void exitWithMessage(String s) {
         out.println(s);

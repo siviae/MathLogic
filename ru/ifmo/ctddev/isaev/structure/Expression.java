@@ -1,10 +1,7 @@
 package ru.ifmo.ctddev.isaev.structure;
 
-import javafx.util.Pair;
 import ru.ifmo.ctddev.isaev.exception.ProofGeneratingException;
-import ru.ifmo.ctddev.isaev.exception.SubstitutionException;
 import ru.ifmo.ctddev.isaev.structure.logic.Variable;
-import ru.ifmo.ctddev.isaev.structure.predicate.Term;
 
 import java.util.List;
 import java.util.Map;
@@ -52,8 +49,8 @@ public interface Expression {
      *                 default - false,null
      *                 finded some correct - true, not null
      *                 finded some crap - false, not null
+     * @param alreadyKnown
      */
-    Pair<Boolean, Variable> findSubstitutionAndCheck(Expression other, Variable original, Variable alreadyKnown) throws SubstitutionException;
+    // Pair<Boolean, Term> findSubstitutionAndCheck(Expression other, Variable original, Term alreadyKnown) throws SubstitutionException;
 
-    Pair<Boolean, Term> findSubstitutionAndCheck2(Expression other, Variable original, Term alreadyKnown) throws SubstitutionException;
 }

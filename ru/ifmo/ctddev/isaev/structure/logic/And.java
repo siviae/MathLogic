@@ -21,6 +21,12 @@ public class And extends Binary {
     }
 
     @Override
+    public boolean treeEquals(Expression other) {
+        return other instanceof Binary &&
+                left.treeEquals(((Binary) other).left) && right.treeEquals(((Binary) other).right);
+    }
+
+    @Override
     public Expression substituteAndCopy(Map<String, ? extends Expression> variables) {
         return new And(left.substituteAndCopy(variables), right.substituteAndCopy(variables));
     }

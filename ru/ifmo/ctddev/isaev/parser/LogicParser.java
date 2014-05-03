@@ -24,7 +24,8 @@ public class LogicParser extends Parser {
         arr.add(result);
         while (position < tokens.length && tokens[position].equals(Lexeme.THEN.s)) {
             position++;
-            arr.add(disj());
+            Expression expr = disj();
+            arr.add(expr);
         }
         if (arr.size() > 1) {
             result = arr.get(arr.size() - 1);

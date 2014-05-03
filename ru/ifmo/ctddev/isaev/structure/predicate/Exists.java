@@ -1,8 +1,6 @@
 package ru.ifmo.ctddev.isaev.structure.predicate;
 
-import javafx.util.Pair;
 import ru.ifmo.ctddev.isaev.exception.ProofGeneratingException;
-import ru.ifmo.ctddev.isaev.exception.SubstitutionException;
 import ru.ifmo.ctddev.isaev.parser.Lexeme;
 import ru.ifmo.ctddev.isaev.structure.Expression;
 import ru.ifmo.ctddev.isaev.structure.logic.Unary;
@@ -17,13 +15,13 @@ import java.util.Map;
  */
 public class Exists extends Unary {
     public Lexeme token = Lexeme.EXISTS;
-    public Variable var;
+    public Term var;
 
     public Exists(Expression operand) {
         super(operand);
     }
 
-    public Exists(Variable var, Expression operand) {
+    public Exists(Term var, Expression operand) {
         super(operand);
         this.var = var;
     }
@@ -43,17 +41,6 @@ public class Exists extends Unary {
     @Override
     public Expression substituteAndCopy(Map<String, ? extends Expression> variables) {
         return null;
-    }
-
-    @Override
-    public Pair<Boolean, Variable> findSubstitutionAndCheck(Expression other, Variable original, Variable alreadyKnown) throws SubstitutionException {
-        if (!hasSameType(other)) throw new SubstitutionException();
-        Pair<Boolean, Variable> result = operand.findSubstitutionAndCheck(((Exists) other).operand, original, alreadyKnown);
-        if (var.name.equals(original.name)) {
-            return new Pair<>(false, result.getValue());
-        } else {
-            return result;
-        }
     }
 
     @Override

@@ -31,13 +31,13 @@ public class PredicateParser extends LogicParser {
         }
         if (tokens[position].equals(Lexeme.FOR_ALL.s)) {
             position++;
-            Variable var = var();
+            Term var = term();
             result = new ForAll(var, unary());
             return result;
         }
         if (tokens[position].equals(Lexeme.EXISTS.s)) {
             position++;
-            Variable var = var();
+            Term var = term();
             result = new Exists(var, unary());
             return result;
         }
@@ -58,30 +58,29 @@ public class PredicateParser extends LogicParser {
         if (isUppercaseVariable(tokens[position])) {
             return predicate();
         }
-      /*  if (isLowercaseVariable(tokens[position])) {
-            return term();
-        }*/
         throw new ParsingException("unexpected symbol");
     }
 
     protected Predicate predicate() throws ParsingException {
-        // if (isUppercaseVariable(tokens[position])) {
-        Predicate result;
-        result = new Predicate(tokens[position]);
-        position++;
-        if (position < tokens.length && tokens[position].equals(Lexeme.LEFT_P.s)) {
+        if (isUppercaseVariable(tokens[position])) {
+            Predicate result;
+            result = new Predicate(tokens[position]);
             position++;
-            List<Term> arguments = new ArrayList<>(3);
-            arguments.add(term());
-            while (tokens[position].equals(Lexeme.COMMA.s)) {
+            if (position < tokens.length && tokens[position].equals(Lexeme.LEFT_P.s)) {
                 position++;
+                List<Term> arguments = new ArrayList<>(3);
                 arguments.add(term());
+                while (tokens[position].equals(Lexeme.COMMA.s)) {
+                    position++;
+                    arguments.add(term());
+                }
+                position++;
+                result.setArguments(arguments.toArray(new Term[arguments.size()]));
+            } else {
+                result = new Variable(tokens[position - 1]);
             }
-            position++;
-            result.setArguments(arguments.toArray(new Term[arguments.size()]));
-        }
-        return result;
-        //  } else throw new ParsingException("unexpected symbol");
+            return result;
+        } else throw new ParsingException("you tried to parse predicate but first symbol is not uppercase latin");
     }
 
     protected Term term() throws ParsingException {
@@ -104,8 +103,6 @@ public class PredicateParser extends LogicParser {
                 }
                 result.setArguments(arguments.toArray(new Term[arguments.size()]));
                 position++;
-            } else {
-                result = new Variable(result.getName());
             }
         } else
             throw new ParsingException("cannot parse term without name, incorrect invocation");

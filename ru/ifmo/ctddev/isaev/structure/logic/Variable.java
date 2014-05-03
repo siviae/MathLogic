@@ -1,10 +1,8 @@
 package ru.ifmo.ctddev.isaev.structure.logic;
 
-import javafx.util.Pair;
 import ru.ifmo.ctddev.isaev.exception.ProofGeneratingException;
-import ru.ifmo.ctddev.isaev.exception.SubstitutionException;
 import ru.ifmo.ctddev.isaev.structure.Expression;
-import ru.ifmo.ctddev.isaev.structure.predicate.Term;
+import ru.ifmo.ctddev.isaev.structure.predicate.Predicate;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -18,7 +16,7 @@ import java.util.Map;
  * Time: 20:34
  * To change this template use File | Settings | File Templates.
  */
-public class Variable extends Term {
+public class Variable extends Predicate {
     protected Boolean currentValue;
 
     public Variable(String name) {
@@ -111,26 +109,8 @@ public class Variable extends Term {
     }
 
     @Override
-    public Pair<Boolean, Variable> findSubstitutionAndCheck(Expression other, Variable original, Variable alreadyKnown) throws SubstitutionException {
-        if (!(hasSameType(other))) throw new SubstitutionException();
-        if (/*((Variable) other)*/this.name.equals(original.name)) {
-            if ((alreadyKnown == null || ((Variable) other).name.equals(alreadyKnown.name))) {
-                return new Pair<>(true, ((Variable) other));
-            }
-            return new Pair<>(false, alreadyKnown);
-        }
-        return new Pair<>(alreadyKnown != null, alreadyKnown);
+    public boolean hasQuantifier(Variable var) {
+        return false;
     }
 
-    @Override
-    public Pair<Boolean, Term> findSubstitutionAndCheck2(Expression other, Variable original, Term alreadyKnown) throws SubstitutionException {
-        if (!(other instanceof Term)) throw new SubstitutionException();
-        if (this.name.equals(original.name)) {
-            if ((alreadyKnown == null || other.match(alreadyKnown))) {
-                return new Pair<>(true, ((Term) other));
-            }
-            return new Pair<>(false, alreadyKnown);
-        }
-        return new Pair<>(alreadyKnown != null, alreadyKnown);
-    }
 }

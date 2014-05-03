@@ -1,8 +1,6 @@
 package ru.ifmo.ctddev.isaev.structure.predicate;
 
-import javafx.util.Pair;
 import ru.ifmo.ctddev.isaev.exception.ProofGeneratingException;
-import ru.ifmo.ctddev.isaev.exception.SubstitutionException;
 import ru.ifmo.ctddev.isaev.structure.AbstractExpression;
 import ru.ifmo.ctddev.isaev.structure.Expression;
 import ru.ifmo.ctddev.isaev.structure.logic.Variable;
@@ -148,65 +146,5 @@ public class Predicate extends AbstractExpression {
             if (!t.hasQuantifier(var)) return false;
         }
         return true;
-    }
-
-    @Override
-    public Pair<Boolean, Variable> findSubstitutionAndCheck(Expression other, Variable original, Variable alreadyKnown) throws SubstitutionException {
-        if (!hasSameType(other) || this.arguments.length != ((Predicate) other).arguments.length)
-            throw new SubstitutionException();
-        if (arguments.length > 0) {
-            Variable alreadyKn = alreadyKnown;
-            for (int i = 0; i < this.arguments.length; i++) {
-                Pair<Boolean, Variable> result = arguments[i].findSubstitutionAndCheck(((Predicate) other).arguments[i], original, alreadyKn);
-                if (result.getKey()) {
-                    if (alreadyKn != null) {
-                        if (!result.getValue().match(alreadyKn)) {
-                            return new Pair<>(false, alreadyKn);
-                        }
-                    } else alreadyKn = result.getValue();
-                } else {
-                    if (result.getValue() != null) {
-                        return result;
-                    }
-                }
-            }
-            if (alreadyKn != null) {
-                return new Pair<>(true, alreadyKn);
-            }
-        }
-        return new Pair<>(alreadyKnown != null, alreadyKnown);
-    }
-
-    /**
-     * true->notnull = ответ найден
-     * false->notnull = ошибка найдена
-     * false->null = ничего не найдено
-     */
-
-    @Override
-    public Pair<Boolean, Term> findSubstitutionAndCheck2(Expression other, Variable original, Term alreadyKnown) throws SubstitutionException {
-        if (!hasSameType(other) || this.arguments.length != ((Predicate) other).arguments.length)
-            throw new SubstitutionException();
-        if (arguments.length > 0) {
-            Term alreadyKn = alreadyKnown;
-            for (int i = 0; i < this.arguments.length; i++) {
-                Pair<Boolean, Term> result = arguments[i].findSubstitutionAndCheck2(((Predicate) other).arguments[i], original, alreadyKn);
-                if (result.getKey()) {
-                    if (alreadyKn != null) {
-                        if (!result.getValue().match(alreadyKn)) {
-                            return new Pair<>(false, alreadyKn);
-                        }
-                    } else alreadyKn = result.getValue();
-                } else {
-                    if (result.getValue() != null) {
-                        return result;
-                    }
-                }
-            }
-            if (alreadyKn != null) {
-                return new Pair<>(true, alreadyKn);
-            }
-        }
-        return new Pair<>(alreadyKnown != null, alreadyKnown);
     }
 }

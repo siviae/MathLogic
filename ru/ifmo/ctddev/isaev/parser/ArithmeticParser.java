@@ -4,7 +4,6 @@ import ru.ifmo.ctddev.isaev.exception.ParsingException;
 import ru.ifmo.ctddev.isaev.structure.Expression;
 import ru.ifmo.ctddev.isaev.structure.arithmetics.*;
 import ru.ifmo.ctddev.isaev.structure.logic.Not;
-import ru.ifmo.ctddev.isaev.structure.logic.Variable;
 import ru.ifmo.ctddev.isaev.structure.predicate.Exists;
 import ru.ifmo.ctddev.isaev.structure.predicate.ForAll;
 import ru.ifmo.ctddev.isaev.structure.predicate.Predicate;
@@ -22,9 +21,12 @@ import static ru.ifmo.ctddev.isaev.General.isUppercaseVariable;
  */
 public class ArithmeticParser extends PredicateParser {
 
+    int lookBack;
+
     @Override
     protected Predicate predicate() throws ParsingException {
         Predicate result;
+        // lookBack = position;
         if (isUppercaseVariable(tokens[position])) {
             result = new Predicate(tokens[position]);
             position++;
@@ -48,6 +50,7 @@ public class ArithmeticParser extends PredicateParser {
                 return new Equals(term, term2);
             }
         }
+        //   lookBack = position-lookBack;
         throw new ParsingException("unexpected symbol");
     }
 
@@ -61,29 +64,46 @@ public class ArithmeticParser extends PredicateParser {
         }
         if (tokens[position].equals(Lexeme.FOR_ALL.s)) {
             position++;
-            Variable var = var();
+            Term var = null;
+            if (isLowercaseVariable(tokens[position])) {
+                var = term();
+            } else {
+                throw new ParsingException("something wrong, you tried to parse " + tokens[position] + " as variable");
+            }
             result = new ForAll(var, unary());
             return result;
         }
         if (tokens[position].equals(Lexeme.EXISTS.s)) {
             position++;
-            Variable var = var();
+            Term var;
+            if (isLowercaseVariable(tokens[position])) {
+                var = term();
+            } else {
+                throw new ParsingException("something wrong, you tried to parse " + tokens[position] + " as variable");
+            }
             result = new Exists(var, unary());
             return result;
         }
         if (tokens[position].equals(Lexeme.LEFT_P.s)) {
-            position++;
-            result = expr();
-            if (!tokens[position].equals(Lexeme.RIGHT_P.s)) {
-                StringBuilder sb = new StringBuilder();
-                for (String s : tokens) {
-                    sb.append(s);
-                }
-                throw new ParsingException("you have unclosed brackets in expression " + sb.toString());
-            } else {
+            try {
+                lookBack = position;
+                Predicate p = predicate();
+                return p;
+            } catch (ParsingException e) {
+                position = lookBack;
                 position++;
+                result = expr();
+                if (!tokens[position].equals(Lexeme.RIGHT_P.s)) {
+                    StringBuilder sb = new StringBuilder();
+                    for (String s : tokens) {
+                        sb.append(s);
+                    }
+                    throw new ParsingException("you have unclosed brackets in expression " + sb.toString());
+                } else {
+                    position++;
+                }
+                return result;
             }
-            return result;
         }
         return predicate();
     }
@@ -93,7 +113,8 @@ public class ArithmeticParser extends PredicateParser {
         Term term = sum();
         if (position < tokens.length && tokens[position].equals(Lexeme.PLUS.s)) {
             position++;
-            return new Plus(term, term());
+            Term result = new Plus(term, term());
+            return result;
         }
         return term;
     }
@@ -133,27 +154,18 @@ public class ArithmeticParser extends PredicateParser {
                 }
                 result.setArguments(arguments.toArray(new Term[arguments.size()]));
                 position++;
-            } else {
-                result = new Variable(result.getName());
             }
         } else if (tokens[position].equals(Lexeme.ZERO.s)) {
-            // position++;
-            //f=true;
+
+            f = false;
             result = new Zero();
-        } /*else {
-            result = mul();
-            if (tokens[position].equals(Lexeme.PRIME.s)) {
-                position++;
-                return new Prime(result);
-            } else
-                throw new ParsingException("cannot parse term without name, incorrect invocation");
-        }*/
+        }
 
         if (!f) position++;
-       /* while(position<tokens.length&&tokens[position].equals(Lexeme.PRIME.s)){
-            result = new Prime(result);
-            position++;
-        }*/
+
+        if (result == null) {
+            throw new ParsingException("cannot parse dat crap");
+        }
         return result;
 
 

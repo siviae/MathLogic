@@ -1,8 +1,6 @@
 package ru.ifmo.ctddev.isaev.structure.predicate;
 
-import javafx.util.Pair;
 import ru.ifmo.ctddev.isaev.exception.ProofGeneratingException;
-import ru.ifmo.ctddev.isaev.exception.SubstitutionException;
 import ru.ifmo.ctddev.isaev.structure.AbstractExpression;
 import ru.ifmo.ctddev.isaev.structure.Expression;
 import ru.ifmo.ctddev.isaev.structure.logic.Variable;
@@ -91,6 +89,11 @@ public class Term extends AbstractExpression {
     }
 
     @Override
+    public boolean hasSameType(Expression other) {
+        return false;
+    }
+
+    @Override
     public boolean evaluate() {
         return false;
     }
@@ -124,6 +127,10 @@ public class Term extends AbstractExpression {
         return null;
     }
 
+    public boolean matchAnotherTerm(Term t) {
+        return (t.name.equals(name) && t.arguments.length == arguments.length);
+    }
+
     @Override
     public Map<String, Variable> getVars() {
         Map<String, Variable> h = null;
@@ -143,6 +150,11 @@ public class Term extends AbstractExpression {
     }
 
     @Override
+    public Map<String, Variable> getFreeVars() {
+        return null;
+    }
+
+    @Override
     public boolean hasQuantifier(Variable var) {
         for (Term t : arguments) {
             if (!t.hasQuantifier(var)) return false;
@@ -150,54 +162,5 @@ public class Term extends AbstractExpression {
         return true;
     }
 
-    @Override
-    public Pair<Boolean, Variable> findSubstitutionAndCheck(Expression other, Variable original, Variable alreadyKnown) throws SubstitutionException {
-        if (!hasSameType(other) || this.arguments.length != ((Term) other).arguments.length)
-            throw new SubstitutionException();
-        if (arguments.length > 0) {
-            Variable alreadyKn = alreadyKnown;
-            for (int i = 0; i < this.arguments.length; i++) {
-                Pair<Boolean, Variable> result = arguments[i].findSubstitutionAndCheck(((Term) other).arguments[i], original, alreadyKn);
-                if (result.getKey()) {
-                    if (alreadyKn != null) {
-                        if (!result.getValue().match(alreadyKn)) {
-                            return new Pair<>(false, alreadyKn);
-                        }
-                    } else alreadyKn = result.getValue();
-                } else {
-                    if (result.getValue() != null) {
-                        return result;
-                    }
-                }
-            }
-        }
-        return new Pair<>(alreadyKnown != null, alreadyKnown);
-    }
 
-    @Override
-    public Pair<Boolean, Term> findSubstitutionAndCheck2(Expression other, Variable original, Term alreadyKnown) throws SubstitutionException {
-        if (!hasSameType(other) || this.arguments.length != ((Term) other).arguments.length)
-            throw new SubstitutionException();
-        if (arguments.length > 0) {
-            Term alreadyKn = alreadyKnown;
-            for (int i = 0; i < this.arguments.length; i++) {
-                Pair<Boolean, Term> result = arguments[i].findSubstitutionAndCheck2(((Term) other).arguments[i], original, alreadyKn);
-                if (result.getKey()) {
-                    if (alreadyKn != null) {
-                        if (!result.getValue().match(alreadyKn)) {
-                            return new Pair<>(false, alreadyKn);
-                        }
-                    } else alreadyKn = result.getValue();
-                } else {
-                    if (result.getValue() != null) {
-                        return result;
-                    }
-                }
-            }
-            if (alreadyKn != null) {
-                return new Pair<>(true, alreadyKn);
-            }
-        }
-        return new Pair<>(alreadyKnown != null, alreadyKnown);
-    }
 }

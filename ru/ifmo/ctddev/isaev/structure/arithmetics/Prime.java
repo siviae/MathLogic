@@ -16,6 +16,10 @@ public class Prime extends Term {
         this.operand = arguments[0];
     }
 
+    public Term getOperand() {
+        return operand;
+    }
+
     @Override
     public StringBuilder asString() {
         StringBuilder sb = new StringBuilder();

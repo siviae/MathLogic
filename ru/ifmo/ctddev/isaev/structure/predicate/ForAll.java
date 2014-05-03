@@ -1,8 +1,6 @@
 package ru.ifmo.ctddev.isaev.structure.predicate;
 
-import javafx.util.Pair;
 import ru.ifmo.ctddev.isaev.exception.ProofGeneratingException;
-import ru.ifmo.ctddev.isaev.exception.SubstitutionException;
 import ru.ifmo.ctddev.isaev.parser.Lexeme;
 import ru.ifmo.ctddev.isaev.structure.Expression;
 import ru.ifmo.ctddev.isaev.structure.logic.Unary;
@@ -18,14 +16,14 @@ import java.util.Map;
 public class ForAll extends Unary {
 
     public Lexeme token = Lexeme.FOR_ALL;
-    public Variable var;
+    public Term var;
 
 
     public ForAll(Expression operand) {
         super(operand);
     }
 
-    public ForAll(Variable var, Expression operand) {
+    public ForAll(Term var, Expression operand) {
         super(operand);
         this.var = var;
     }
@@ -79,12 +77,16 @@ public class ForAll extends Unary {
         return !(var.getName().equals(this.var.getName())) && !operand.hasQuantifier(var);
     }
 
-    @Override
-    public Pair<Boolean, Variable> findSubstitutionAndCheck(Expression other, Variable original, Variable alreadyKnown) throws SubstitutionException {
+
+
+    /*@Override
+    public Pair<Boolean, Term> findSubstitutionAndCheck2(Expression other, Variable original, Term alreadyKnown) throws SubstitutionException {
         if (!hasSameType(other)) throw new SubstitutionException();
-        Pair<Boolean, Variable> result = operand.findSubstitutionAndCheck(other, original, alreadyKnown);
-        if (var.name.equals(original.name)) {
+        Pair<Boolean, Term> result = operand.findSubstitutionAndCheck(((ForAll)other).operand, original, alreadyKnown);
+        Term t = result.getValue();
+        if (t!=null && t instanceof Variable && var.name.equals(t.name)) {
             return new Pair<>(false, var);
         } else return result;
-    }
+    }*/
+
 }

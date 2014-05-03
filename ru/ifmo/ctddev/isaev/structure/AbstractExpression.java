@@ -35,6 +35,6 @@ public abstract class AbstractExpression implements Expression {
     }
 
     public boolean match(Expression other) {
-        return treeEquals(other);
+        return this.toString().equals(other.toString());
     }
 }
