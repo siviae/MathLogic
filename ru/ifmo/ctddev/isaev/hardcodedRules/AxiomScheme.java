@@ -121,7 +121,7 @@ public enum AxiomScheme {
     }
 
     public boolean match(Expression expr) {
-        return this.expr.matchAxiomScheme(expr, new HashMap<Integer, Expression>());
+        return this.expr.matchAxiomScheme(expr, new HashMap<>());
     }
 
     public Expression substitute(HashMap<String, Expression> map) {

@@ -6,7 +6,6 @@ import ru.ifmo.ctddev.isaev.exception.TreeMismatchException;
 import ru.ifmo.ctddev.isaev.parser.Lexeme;
 import ru.ifmo.ctddev.isaev.structure.AbstractExpression;
 import ru.ifmo.ctddev.isaev.structure.Expression;
-import ru.ifmo.ctddev.isaev.structure.predicate.Quantifier;
 import ru.ifmo.ctddev.isaev.structure.predicate.Term;
 
 import java.util.List;
@@ -67,7 +66,7 @@ public abstract class Unary extends AbstractExpression {
     }
 
     @Override
-    public void setQuantifiers(Map<String, Quantifier> quantifiers) {
+    public void setQuantifiers(Set<String> quantifiers) {
         operand.setQuantifiers(quantifiers);
     }
 

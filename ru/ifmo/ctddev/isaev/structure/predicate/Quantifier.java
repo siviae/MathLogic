@@ -80,15 +80,11 @@ public class Quantifier extends AbstractExpression {
     }
 
     @Override
-    public boolean hasQuantifier(Variable var) {
-        return !(var.getName().equals(this.var.getName())) && !operand.hasQuantifier(var);
-    }
-
-    @Override
-    public void setQuantifiers(Map<String, Quantifier> quantifiers) {
-        Quantifier q = quantifiers.put(var.toString(), this);
+    public void setQuantifiers(Set<String> quantifiers) {
+        boolean f = quantifiers.contains(var.name);
+        quantifiers.add(var.name);
         operand.setQuantifiers(quantifiers);
-        quantifiers.put(var.toString(), q);
+        if (!f) quantifiers.remove(var.name);
     }
 
     @Override

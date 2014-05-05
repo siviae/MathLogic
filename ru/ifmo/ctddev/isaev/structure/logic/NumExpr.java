@@ -1,13 +1,16 @@
 package ru.ifmo.ctddev.isaev.structure.logic;
 
+import javafx.util.Pair;
 import ru.ifmo.ctddev.isaev.exception.ProofGeneratingException;
+import ru.ifmo.ctddev.isaev.exception.TreeMismatchException;
 import ru.ifmo.ctddev.isaev.structure.AbstractExpression;
 import ru.ifmo.ctddev.isaev.structure.Expression;
-import ru.ifmo.ctddev.isaev.structure.predicate.Quantifier;
+import ru.ifmo.ctddev.isaev.structure.predicate.Term;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Created with IntelliJ IDEA.
@@ -79,13 +82,23 @@ public class NumExpr extends AbstractExpression {
     }
 
     @Override
-    public boolean hasQuantifier(Variable var) {
-        return true;
+    public Set<String> getFreeVars() {
+        return null;
     }
 
     @Override
-    public void setQuantifiers(Map<String, Quantifier> quantifiers) {
+    public void setQuantifiers(Set<String> quantifiers) {
 
+    }
+
+    @Override
+    public int markFreeVariableOccurences(String variableName) {
+        return 0;
+    }
+
+    @Override
+    public Set<Pair<Term, Term>> getReplacedVariableOccurences(Expression originalExpr) throws TreeMismatchException {
+        return null;
     }
 
 

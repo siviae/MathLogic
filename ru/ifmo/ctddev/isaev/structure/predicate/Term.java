@@ -44,7 +44,7 @@ public class Term extends AbstractExpression {
 
     @Override
     public boolean treeEquals(Expression other) {
-        /*if (hasSameType(other)) {
+        if (hasSameType(other)) {
             Term pred = (Term) other;
             if (name.equals(pred.name) && arguments.length == pred.arguments.length) {
                 boolean f = false;
@@ -57,8 +57,7 @@ public class Term extends AbstractExpression {
                 if (!f) return true;
             }
         }
-        return false;*/
-        return hasSameType(other);
+        return false;
     }
 
     @Override
@@ -90,11 +89,6 @@ public class Term extends AbstractExpression {
             arguments[i] = (Term) arguments[i].substitute(variables);
         }
         return this;
-    }
-
-    @Override
-    public boolean hasSameType(Expression other) {
-        return false;
     }
 
     @Override
@@ -132,25 +126,16 @@ public class Term extends AbstractExpression {
     }
 
     public boolean matchAnotherTerm(Term t) {
-        return (t.name.equals(name) && t.arguments.length == arguments.length);
+        return (t.name.equals(name) && hasSameArgumentLength(t));
+    }
+
+    public boolean hasSameArgumentLength(Term t) {
+        return t.arguments.length == arguments.length;
     }
 
     @Override
     public Map<String, Variable> getVars() {
-        Map<String, Variable> h = null;
-        if (arguments.length == 0) {
-            h = new HashMap<>();
-            h.put(name, new Variable(name));
-        } else {
-            for (int i = 0; i < arguments.length; i++) {
-                if (i == 0) {
-                    h = arguments[i].getVars();
-                } else {
-                    h.putAll(arguments[i].getVars());
-                }
-            }
-        }
-        return h;
+        return null;
     }
 
     @Override
@@ -165,17 +150,11 @@ public class Term extends AbstractExpression {
     }
 
     @Override
-    public boolean hasQuantifier(Variable var) {
-        for (Term t : arguments) {
-            if (!t.hasQuantifier(var)) return false;
-        }
-        return true;
-    }
-
-    @Override
-    public void setQuantifiers(Map<String, Quantifier> quantifiers) {
+    public void setQuantifiers(Set<String> quantifiers) {
         Set<String> set = new HashSet<>();
-        set.addAll(quantifiers.keySet());
+        for (String s : quantifiers) {
+            set.add(s);
+        }
         this.quantifiers = set;
     }
 
@@ -227,7 +206,7 @@ public class Term extends AbstractExpression {
     @Override
     public Set<Pair<Term, Term>> getReplacedVariableOccurences(Expression originalExpr) throws TreeMismatchException {
         Set<Pair<Term, Term>> set = new HashSet<>();
-        if (!(originalExpr instanceof Term) || !matchAnotherTerm((Term) originalExpr))
+        if (!(originalExpr instanceof Term) || !hasSameArgumentLength((Term) originalExpr))
             throw new TreeMismatchException(originalExpr, this);
         if (((Term) originalExpr).isFree) {
             set.add(new Pair<>((Term) originalExpr, this));

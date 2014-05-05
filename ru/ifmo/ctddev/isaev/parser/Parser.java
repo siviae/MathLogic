@@ -10,6 +10,7 @@ import ru.ifmo.ctddev.isaev.structure.Expression;
 public abstract class Parser {
 
     protected String[] tokens;
+    public String s;
     protected int position = 0;
 
     public Expression parse(String[] tokens) throws ParsingException {

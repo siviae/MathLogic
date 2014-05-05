@@ -3,7 +3,6 @@ package ru.ifmo.ctddev.isaev.structure.predicate;
 import ru.ifmo.ctddev.isaev.exception.ProofGeneratingException;
 import ru.ifmo.ctddev.isaev.parser.Lexeme;
 import ru.ifmo.ctddev.isaev.structure.Expression;
-import ru.ifmo.ctddev.isaev.structure.logic.Variable;
 
 import java.util.List;
 import java.util.Map;
@@ -59,20 +58,5 @@ public class Exists extends Quantifier {
     @Override
     public List<Expression> getParticularProof(List<? extends Expression> hypos) throws ProofGeneratingException {
         return null;
-    }
-
-    @Override
-    public Map<String, Variable> getVars() {
-        return null;
-    }
-
-    @Override
-    public boolean hasQuantifier(Variable var) {
-        return !(var.getName().equals(this.var.getName())) && !operand.hasQuantifier(var);
-    }
-
-    @Override
-    public void setQuantifiers(Map<String, Quantifier> quantifiers) {
-
     }
 }

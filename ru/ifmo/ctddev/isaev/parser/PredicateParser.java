@@ -35,7 +35,8 @@ public class PredicateParser extends LogicParser {
             position++;
             Term var = null;
             if (isLowercaseVariable(tokens[position])) {
-                var = term();
+                var = new Term(tokens[position]);
+                position++;
             } else {
                 throw new ParsingException("something wrong, you tried to parse " + tokens[position] + " as variable");
             }
@@ -54,12 +55,6 @@ public class PredicateParser extends LogicParser {
             return result;
         }
         if (tokens[position].equals(Lexeme.LEFT_P.s)) {
-            try {
-                lookBack = position;
-                Predicate p = predicate();
-                return p;
-            } catch (ParsingException e) {
-                position = lookBack;
                 position++;
                 result = expr();
                 if (!tokens[position].equals(Lexeme.RIGHT_P.s)) {
@@ -72,7 +67,6 @@ public class PredicateParser extends LogicParser {
                     position++;
                 }
                 return result;
-            }
         }
         return predicate();
     }
@@ -110,15 +104,24 @@ public class PredicateParser extends LogicParser {
             position++;
             f = true;
             if (position < tokens.length && tokens[position].equals(Lexeme.LEFT_P.s)) {
+                lookBack = position;
                 position++;
                 List<Term> arguments = new ArrayList<>(3);
-                arguments.add(term());
-                while (tokens[position].equals(Lexeme.COMMA.s)) {
+                boolean success = true;
+                try {
+                    arguments.add(term());
+                } catch (ParsingException e) {
+                    position = lookBack;
+                    success = false;
+                }
+                if (success) {
+                    while (tokens[position].equals(Lexeme.COMMA.s)) {
                     position++;
                     arguments.add(term());
                 }
                 result.setArguments(arguments.toArray(new Term[arguments.size()]));
-                position++;
+                    position++;
+                }
             }
         } else
             throw new ParsingException("cannot parse term without name, incorrect invocation");

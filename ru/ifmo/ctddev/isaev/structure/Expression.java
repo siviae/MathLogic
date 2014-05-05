@@ -4,7 +4,6 @@ import javafx.util.Pair;
 import ru.ifmo.ctddev.isaev.exception.ProofGeneratingException;
 import ru.ifmo.ctddev.isaev.exception.TreeMismatchException;
 import ru.ifmo.ctddev.isaev.structure.logic.Variable;
-import ru.ifmo.ctddev.isaev.structure.predicate.Quantifier;
 import ru.ifmo.ctddev.isaev.structure.predicate.Term;
 
 import java.util.List;
@@ -45,9 +44,12 @@ public interface Expression {
 
     Set<String> getFreeVars();
 
-    boolean hasQuantifier(Variable var);
-
-    void setQuantifiers(Map<String, Quantifier> quantifiers);
+    /**
+     * traverse through expression tree and adds sets of quantifiers to terms
+     *
+     * @param quantifiers
+     */
+    void setQuantifiers(Set<String> quantifiers);
 
     int markFreeVariableOccurences(String variableName);
 

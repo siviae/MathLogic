@@ -27,11 +27,6 @@ public class Not extends Unary {
     }
 
     @Override
-    public boolean hasQuantifier(Variable v) {
-        return operand.hasQuantifier(v);
-    }
-
-    @Override
     public boolean evaluate() {
         return !operand.evaluate();
     }

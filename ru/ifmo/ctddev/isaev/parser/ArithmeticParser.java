@@ -2,6 +2,7 @@ package ru.ifmo.ctddev.isaev.parser;
 
 import ru.ifmo.ctddev.isaev.exception.ParsingException;
 import ru.ifmo.ctddev.isaev.structure.arithmetics.*;
+import ru.ifmo.ctddev.isaev.structure.logic.Variable;
 import ru.ifmo.ctddev.isaev.structure.predicate.Predicate;
 import ru.ifmo.ctddev.isaev.structure.predicate.Term;
 
@@ -34,6 +35,8 @@ public class ArithmeticParser extends PredicateParser {
                 }
                 position++;
                 result.setArguments(arguments.toArray(new Term[arguments.size()]));
+            } else {
+                result = new Variable(tokens[position - 1]);
             }
             return result;
         } else {
@@ -54,7 +57,7 @@ public class ArithmeticParser extends PredicateParser {
             position++;
             term = new Plus(term, term());
         }
-        while (tokens[position].equals(Lexeme.COMMA.s)) {
+        while (position < tokens.length && tokens[position].equals(Lexeme.COMMA.s)) {
             term = new Prime(term);
             position++;
         }

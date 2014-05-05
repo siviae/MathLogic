@@ -106,10 +106,15 @@ public class Deduct4 extends Homework {
                         && ((Then) expr).getLeft() instanceof ForAll) {
                     Term var = ((ForAll) ((Then) expr).getLeft()).var;
                     try {
+                        ((ForAll) ((Then) expr).getLeft()).getOperand().setQuantifiers(new HashSet<String>());
                         int freeCount = ((ForAll) ((Then) expr).getLeft()).getOperand().markFreeVariableOccurences(var.getName());
                         Set<Pair<Term, Term>> replaced = ((Then) expr).getRight().getReplacedVariableOccurences(((ForAll) ((Then) expr).getLeft()).getOperand());
+                        //trees are matching
                         boolean cond = true;
-                        if (freeCount == 0) cond = false;
+                        if (freeCount == 0) {
+                            cond = false;
+                            f = true;//todo вот это весьма сомнительно
+                        }
                         Term temp = null;
                         if (cond) {
                             for (Pair<Term, Term> pair : replaced) {
@@ -148,15 +153,20 @@ public class Deduct4 extends Homework {
                     }
                 }
             }
+            /*todo подумать насчёт проверки свободных переменных из допущений*/
             if (!f) {
                 if (expr instanceof Then
                         && ((Then) expr).getRight() instanceof Exists) {
                     Term var = ((Exists) ((Then) expr).getRight()).var;
                     try {
+                        ((Exists) ((Then) expr).getRight()).getOperand().setQuantifiers(new HashSet<String>());
                         int freeCount = ((Exists) ((Then) expr).getRight()).getOperand().markFreeVariableOccurences(var.getName());
                         Set<Pair<Term, Term>> replaced = ((Then) expr).getLeft().getReplacedVariableOccurences(((Exists) ((Then) expr).getRight()).getOperand());
                         boolean cond = true;
-                        if (freeCount == 0) cond = false;
+                        if (freeCount == 0) {
+                            cond = false;
+                            f = true;//мы ничего не подставляем, но деревья одинаковые
+                        }
                         Term temp = null;
                         if (cond) {
                             for (Pair<Term, Term> pair : replaced) {
@@ -267,17 +277,19 @@ public class Deduct4 extends Homework {
                             ).toString());
                     Term var = ((ForAll) ((Then) expr).getRight()).var;
                     boolean cond = (prev != null);
-                    if (!cond) break;
-                    cond = !((Then) prev).getRight().getFreeVars().contains(var.getName());
+                    cond = cond && !((Then) prev).getLeft().getFreeVars().contains(var.getName());
                     if (!cond) {
                         DenialReason.ERROR_2.create(l + 1, var.getName(), ((Then) expr).getLeft().toString());
                     }
                     cond = cond && !hyposVars.contains(var.getName());
                     if (!cond) {
-                        DenialReason.ERROR_3.create(l + 1, "правило", var.getName(), searchHypoByVar(var).toString());
+                        DenialReason.ERROR_3.create(l + 1, "правило", var.getName(), searchHypoByVar(var).toString(), prev.toString(), expr.toString());
                     }
                     if (cond) {
                         for (ForAllRule rule : ForAllRule.values()) {
+                            if (rule == ForAllRule.R_80) {
+                                boolean k = true;
+                            }
                             result.add(rule.replace(alpha,
                                     ((Then) expr).getLeft(),
                                     ((ForAll) ((Then) expr).getRight()).getOperand()));
@@ -297,14 +309,13 @@ public class Deduct4 extends Homework {
                             ).toString());
                     Term var = ((Exists) ((Then) expr).getLeft()).var;
                     boolean cond = (prev != null);
-                    if (!cond) break;
-                    cond = !((Then) prev).getRight().getFreeVars().contains(var.getName());
+                    cond = cond && !((Then) prev).getRight().getFreeVars().contains(var.getName());
                     if (!cond) {
                         DenialReason.ERROR_2.create(l + 1, var.getName(), ((Then) expr).getRight().toString());
                     }
                     cond = cond && !hyposVars.contains(var.getName());
                     if (!cond) {
-                        DenialReason.ERROR_3.create(l + 1, "правило", var.getName(), searchHypoByVar(var).toString());
+                        DenialReason.ERROR_3.create(l + 1, "правило", var.getName(), searchHypoByVar(var).toString(), prev.toString(), expr.toString());
                     }
                     if (cond) {
                         for (ExistsRule rule : ExistsRule.values()) {
@@ -375,7 +386,8 @@ public class Deduct4 extends Homework {
         List<Expression> proof = new ArrayList<>();
         String s1 = in.readLine();
         while (s1 != null && !s1.replace("\\s+", "").isEmpty()) {
-            proof.add(parse(s1));
+            Expression e = parse(s1);
+            proof.add(e);
             s1 = in.readLine();
         }
         List<Expression> newProof = move1HypoToProof(proof);

@@ -7,7 +7,10 @@ import ru.ifmo.ctddev.isaev.structure.AbstractExpression;
 import ru.ifmo.ctddev.isaev.structure.Expression;
 import ru.ifmo.ctddev.isaev.structure.logic.Variable;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * User: Xottab
@@ -124,32 +127,20 @@ public class Predicate extends AbstractExpression {
 
     @Override
     public Map<String, Variable> getVars() {
-        Map<String, Variable> h = null;
-        if (arguments.length == 0) {
-            h = new HashMap<>();
-            h.put(name, new Variable(name));
-        } else {
-            for (int i = 0; i < arguments.length; i++) {
-                if (i == 0) {
-                    h = arguments[i].getVars();
-                } else {
-                    h.putAll(arguments[i].getVars());
-                }
-            }
-        }
-        return h;
+        return null;
     }
 
     @Override
-    public boolean hasQuantifier(Variable var) {
+    public Set<String> getFreeVars() {
+        Set<String> set = new HashSet<>();
         for (Term t : arguments) {
-            if (!t.hasQuantifier(var)) return false;
+            set.addAll(t.getFreeVars());
         }
-        return true;
+        return set;
     }
 
     @Override
-    public void setQuantifiers(Map<String, Quantifier> quantifiers) {
+    public void setQuantifiers(Set<String> quantifiers) {
         for (Term t : arguments) {
             t.setQuantifiers(quantifiers);
         }

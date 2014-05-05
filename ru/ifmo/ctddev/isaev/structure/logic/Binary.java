@@ -6,7 +6,6 @@ import ru.ifmo.ctddev.isaev.exception.TreeMismatchException;
 import ru.ifmo.ctddev.isaev.parser.Lexeme;
 import ru.ifmo.ctddev.isaev.structure.AbstractExpression;
 import ru.ifmo.ctddev.isaev.structure.Expression;
-import ru.ifmo.ctddev.isaev.structure.predicate.Quantifier;
 import ru.ifmo.ctddev.isaev.structure.predicate.Term;
 
 import java.util.List;
@@ -90,11 +89,6 @@ public abstract class Binary extends AbstractExpression {
     }
 
     @Override
-    public boolean hasQuantifier(Variable v) {
-        return left.hasQuantifier(v) && right.hasQuantifier(v);
-    }
-
-    @Override
     public List<Expression> getParticularProof(List<? extends Expression> hypos) throws ProofGeneratingException {
         List<Expression> result = left.getParticularProof(hypos);
         result.addAll(right.getParticularProof(hypos));
@@ -102,7 +96,7 @@ public abstract class Binary extends AbstractExpression {
     }
 
     @Override
-    public void setQuantifiers(Map<String, Quantifier> quantifiers) {
+    public void setQuantifiers(Set<String> quantifiers) {
         left.setQuantifiers(quantifiers);
         right.setQuantifiers(quantifiers);
     }
