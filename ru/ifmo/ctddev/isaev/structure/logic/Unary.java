@@ -1,12 +1,17 @@
 package ru.ifmo.ctddev.isaev.structure.logic;
 
+import javafx.util.Pair;
 import ru.ifmo.ctddev.isaev.exception.ProofGeneratingException;
+import ru.ifmo.ctddev.isaev.exception.TreeMismatchException;
 import ru.ifmo.ctddev.isaev.parser.Lexeme;
 import ru.ifmo.ctddev.isaev.structure.AbstractExpression;
 import ru.ifmo.ctddev.isaev.structure.Expression;
+import ru.ifmo.ctddev.isaev.structure.predicate.Quantifier;
+import ru.ifmo.ctddev.isaev.structure.predicate.Term;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Created with IntelliJ IDEA.
@@ -17,7 +22,6 @@ import java.util.Map;
  */
 public abstract class Unary extends AbstractExpression {
     protected Expression operand;
-    protected Lexeme token;
 
     public Unary(Expression operand) {
         this.operand = operand;
@@ -58,10 +62,26 @@ public abstract class Unary extends AbstractExpression {
     }
 
     @Override
-    public Map<String, Variable> getFreeVars() {
+    public Set<String> getFreeVars() {
         return operand.getFreeVars();
     }
 
+    @Override
+    public void setQuantifiers(Map<String, Quantifier> quantifiers) {
+        operand.setQuantifiers(quantifiers);
+    }
+
+    @Override
+    public int markFreeVariableOccurences(String variableName) {
+        return operand.markFreeVariableOccurences(variableName);
+    }
+
+    @Override
+    public Set<Pair<Term, Term>> getReplacedVariableOccurences(Expression originalExpr) throws TreeMismatchException {
+        if (!hasSameType(originalExpr))
+            throw new TreeMismatchException(originalExpr, this);
+        return operand.getReplacedVariableOccurences(((Unary) originalExpr).operand);
+    }
 
     @Override
     public List<Expression> getParticularProof(List<? extends Expression> hypos) throws ProofGeneratingException {

@@ -8,4 +8,8 @@ public class SubstitutionException extends Exception {
     public SubstitutionException() {
         super("Substitution error");
     }
+
+    public SubstitutionException(String message) {
+        super(message);
+    }
 }

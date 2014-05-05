@@ -57,11 +57,6 @@ public class Variable extends Predicate {
         return substituteAndCopy(variables);
     }
 
-    /*@Override
-    public boolean hasSameType(Expression other) {
-        return other instanceof Variable;
-    }
-*/
     @Override
     public boolean evaluate() {
 
@@ -108,9 +103,5 @@ public class Variable extends Predicate {
         return vars;
     }
 
-    @Override
-    public boolean hasQuantifier(Variable var) {
-        return false;
-    }
 
 }

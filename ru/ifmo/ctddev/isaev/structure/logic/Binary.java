@@ -1,12 +1,17 @@
 package ru.ifmo.ctddev.isaev.structure.logic;
 
+import javafx.util.Pair;
 import ru.ifmo.ctddev.isaev.exception.ProofGeneratingException;
+import ru.ifmo.ctddev.isaev.exception.TreeMismatchException;
 import ru.ifmo.ctddev.isaev.parser.Lexeme;
 import ru.ifmo.ctddev.isaev.structure.AbstractExpression;
 import ru.ifmo.ctddev.isaev.structure.Expression;
+import ru.ifmo.ctddev.isaev.structure.predicate.Quantifier;
+import ru.ifmo.ctddev.isaev.structure.predicate.Term;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Created with IntelliJ IDEA.
@@ -18,7 +23,6 @@ import java.util.Map;
 public abstract class Binary extends AbstractExpression {
     protected Expression left;
     protected Expression right;
-    protected Lexeme token;
 
     protected Binary(Expression left, Expression right) {
         this.left = left;
@@ -67,9 +71,9 @@ public abstract class Binary extends AbstractExpression {
     }
 
     @Override
-    public Map<String, Variable> getFreeVars() {
-        Map<String, Variable> h = left.getFreeVars();
-        h.putAll(right.getFreeVars());
+    public Set<String> getFreeVars() {
+        Set<String> h = left.getFreeVars();
+        h.addAll(right.getFreeVars());
         return h;
     }
 
@@ -78,12 +82,12 @@ public abstract class Binary extends AbstractExpression {
         return new StringBuilder("new ").append(getClass().getSimpleName()).append("(").append(left.asJavaExpr()).append(",").append(right.asJavaExpr()).append(")");
     }
 
-   /* @Override
+    @Override
     public boolean treeEquals(Expression other) {
         return hasSameType(other)
                 && ((Binary) other).left.treeEquals(left)
                 && ((Binary) other).right.treeEquals(right);
-    }*/
+    }
 
     @Override
     public boolean hasQuantifier(Variable v) {
@@ -95,6 +99,27 @@ public abstract class Binary extends AbstractExpression {
         List<Expression> result = left.getParticularProof(hypos);
         result.addAll(right.getParticularProof(hypos));
         return result;
+    }
+
+    @Override
+    public void setQuantifiers(Map<String, Quantifier> quantifiers) {
+        left.setQuantifiers(quantifiers);
+        right.setQuantifiers(quantifiers);
+    }
+
+    @Override
+    public int markFreeVariableOccurences(String variableName) {
+        int result = left.markFreeVariableOccurences(variableName);
+        result += right.markFreeVariableOccurences(variableName);
+        return result;
+    }
+
+    @Override
+    public Set<Pair<Term, Term>> getReplacedVariableOccurences(Expression originalExpr) throws TreeMismatchException {
+        if (!hasSameType(originalExpr)) throw new TreeMismatchException(originalExpr, this);
+        Set<Pair<Term, Term>> set = left.getReplacedVariableOccurences(((Binary) originalExpr).left);
+        set.addAll(right.getReplacedVariableOccurences(((Binary) originalExpr).right));
+        return set;
     }
 
     @Override

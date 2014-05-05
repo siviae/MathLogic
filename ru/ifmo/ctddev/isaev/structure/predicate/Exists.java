@@ -3,7 +3,6 @@ package ru.ifmo.ctddev.isaev.structure.predicate;
 import ru.ifmo.ctddev.isaev.exception.ProofGeneratingException;
 import ru.ifmo.ctddev.isaev.parser.Lexeme;
 import ru.ifmo.ctddev.isaev.structure.Expression;
-import ru.ifmo.ctddev.isaev.structure.logic.Unary;
 import ru.ifmo.ctddev.isaev.structure.logic.Variable;
 
 import java.util.List;
@@ -13,17 +12,11 @@ import java.util.Map;
  * User: Xottab
  * Date: 17.12.13
  */
-public class Exists extends Unary {
-    public Lexeme token = Lexeme.EXISTS;
-    public Term var;
-
-    public Exists(Expression operand) {
-        super(operand);
-    }
+public class Exists extends Quantifier {
 
     public Exists(Term var, Expression operand) {
-        super(operand);
-        this.var = var;
+        super(var, operand);
+        token = Lexeme.EXISTS;
     }
 
     @Override
@@ -44,6 +37,11 @@ public class Exists extends Unary {
     }
 
     @Override
+    public Expression substitute(Map<String, ? extends Expression> variables) {
+        return null;
+    }
+
+    @Override
     public boolean evaluate() {
         return false;
     }
@@ -51,13 +49,6 @@ public class Exists extends Unary {
     @Override
     public StringBuilder asString() {
         return new StringBuilder(token.s).append(var.asString()).append("(").append(operand.asString()).append(")");
-    }
-
-    @Override
-    public Map<String, Variable> getFreeVars() {
-        Map<String, Variable> vars = getVars();
-        vars.remove(var.getName());
-        return vars;
     }
 
     @Override
@@ -71,7 +62,17 @@ public class Exists extends Unary {
     }
 
     @Override
+    public Map<String, Variable> getVars() {
+        return null;
+    }
+
+    @Override
     public boolean hasQuantifier(Variable var) {
         return !(var.getName().equals(this.var.getName())) && !operand.hasQuantifier(var);
+    }
+
+    @Override
+    public void setQuantifiers(Map<String, Quantifier> quantifiers) {
+
     }
 }

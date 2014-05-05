@@ -21,6 +21,8 @@ import static ru.ifmo.ctddev.isaev.General.isUppercaseVariable;
  */
 public class PredicateParser extends LogicParser {
 
+    protected int lookBack;
+
     @Override
     protected Expression unary() throws ParsingException {
         Expression result;
@@ -31,34 +33,48 @@ public class PredicateParser extends LogicParser {
         }
         if (tokens[position].equals(Lexeme.FOR_ALL.s)) {
             position++;
-            Term var = term();
+            Term var = null;
+            if (isLowercaseVariable(tokens[position])) {
+                var = term();
+            } else {
+                throw new ParsingException("something wrong, you tried to parse " + tokens[position] + " as variable");
+            }
             result = new ForAll(var, unary());
             return result;
         }
         if (tokens[position].equals(Lexeme.EXISTS.s)) {
             position++;
-            Term var = term();
+            Term var;
+            if (isLowercaseVariable(tokens[position])) {
+                var = term();
+            } else {
+                throw new ParsingException("something wrong, you tried to parse " + tokens[position] + " as variable");
+            }
             result = new Exists(var, unary());
             return result;
         }
         if (tokens[position].equals(Lexeme.LEFT_P.s)) {
-            position++;
-            result = expr();
-            if (!tokens[position].equals(Lexeme.RIGHT_P.s)) {
-                StringBuilder sb = new StringBuilder();
-                for (String s : tokens) {
-                    sb.append(s);
-                }
-                throw new ParsingException("you have unclosed brackets in expression " + sb.toString());
-            } else {
+            try {
+                lookBack = position;
+                Predicate p = predicate();
+                return p;
+            } catch (ParsingException e) {
+                position = lookBack;
                 position++;
+                result = expr();
+                if (!tokens[position].equals(Lexeme.RIGHT_P.s)) {
+                    StringBuilder sb = new StringBuilder();
+                    for (String s : tokens) {
+                        sb.append(s);
+                    }
+                    throw new ParsingException("you have unclosed brackets in expression " + sb.toString());
+                } else {
+                    position++;
+                }
+                return result;
             }
-            return result;
         }
-        if (isUppercaseVariable(tokens[position])) {
-            return predicate();
-        }
-        throw new ParsingException("unexpected symbol");
+        return predicate();
     }
 
     protected Predicate predicate() throws ParsingException {

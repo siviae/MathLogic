@@ -1,19 +1,16 @@
 package ru.ifmo.ctddev.isaev;
 
 import javafx.util.Pair;
-import ru.ifmo.ctddev.isaev.exception.IncorrectProofException;
-import ru.ifmo.ctddev.isaev.exception.LexingException;
-import ru.ifmo.ctddev.isaev.exception.ParsingException;
-import ru.ifmo.ctddev.isaev.exception.SubstitutionException;
+import ru.ifmo.ctddev.isaev.exception.*;
 import ru.ifmo.ctddev.isaev.hardcodedRules.AxiomScheme;
 import ru.ifmo.ctddev.isaev.hardcodedRules.ExistsRule;
 import ru.ifmo.ctddev.isaev.hardcodedRules.ForAllRule;
 import ru.ifmo.ctddev.isaev.structure.Expression;
 import ru.ifmo.ctddev.isaev.structure.logic.NumExpr;
 import ru.ifmo.ctddev.isaev.structure.logic.Then;
-import ru.ifmo.ctddev.isaev.structure.logic.Variable;
 import ru.ifmo.ctddev.isaev.structure.predicate.Exists;
 import ru.ifmo.ctddev.isaev.structure.predicate.ForAll;
+import ru.ifmo.ctddev.isaev.structure.predicate.Term;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -83,9 +80,9 @@ public class Deduct4 extends Homework {
             addToMps(mps, e);
             addToMps(mps, temp);
         }
-        hyposVars.addAll(alpha.getFreeVars().keySet());
+        hyposVars.addAll(alpha.getFreeVars());
         for (Expression e : hypos) {
-            hyposVars.addAll(e.getFreeVars().keySet());
+            hyposVars.addAll(e.getFreeVars());
         }
 
         for (int l = 0; l < proof.size(); l++) {
@@ -98,7 +95,7 @@ public class Deduct4 extends Homework {
 
             boolean f = false;
             for (Expression e : hypos) {
-                if (e.treeEquals(expr)) {
+                if (e.match(expr)) {
                     f = true;
                     break;
                 }
@@ -106,42 +103,95 @@ public class Deduct4 extends Homework {
             //something complex is happening here ->
             if (!f) {
                 if (expr instanceof Then
-                        && ((Then) expr).getLeft() instanceof ForAll
-                        /*&& ((ForAll) ((Then) expr).getLeft()).getOperand().match(((Then) expr).getRight())*/) {
-                    Variable var = ((ForAll) ((Then) expr).getLeft()).var;
+                        && ((Then) expr).getLeft() instanceof ForAll) {
+                    Term var = ((ForAll) ((Then) expr).getLeft()).var;
                     try {
-                        Pair<Boolean, Variable> pair = ((ForAll) ((Then) expr).getLeft()).getOperand().findSubstitutionAndCheck(((Then) expr).getRight(), var, null);
-                        if (pair.getKey()) {
-                            f = true;
-                        } else {
-                            if (pair.getValue() != null) {
-                                DenialReason.ERROR_1.create(l + 1, pair.getValue().toString(), ((ForAll) ((Then) expr).getLeft()).getOperand().toString(), var.getName());
+                        int freeCount = ((ForAll) ((Then) expr).getLeft()).getOperand().markFreeVariableOccurences(var.getName());
+                        Set<Pair<Term, Term>> replaced = ((Then) expr).getRight().getReplacedVariableOccurences(((ForAll) ((Then) expr).getLeft()).getOperand());
+                        boolean cond = true;
+                        if (freeCount == 0) cond = false;
+                        Term temp = null;
+                        if (cond) {
+                            for (Pair<Term, Term> pair : replaced) {
+                                if (temp == null) {
+                                    temp = pair.getValue();
+                                } else {
+                                    if (!(temp.matchAnotherTerm(pair.getValue()))) {
+                                        cond = false;
+                                        break;
+                                    }
+                                }
                             }
                         }
-                    } catch (SubstitutionException e) {
-                        //  break;
+                        /*todo проверить все вхождения, а не только последнее*/
+                        /*на данный момент мы нашли все замены и проверили, что все они одинаковые
+                        * осталось проверить, что ни одна из них не испортила свободное вхождение*/
+                        if (temp == null) cond = false;
+                        if (cond) {
+                            for (Pair<Term, Term> pair : replaced) {
+                                Term t = pair.getValue();
+                                List<String> names = t.getTermNames();
+                                for (String s : names) {
+                                    if (t.quantifiers.contains(s)) {
+                                        cond = false;
+                                        DenialReason.ERROR_1.create(l + 1, String.valueOf(temp), ((ForAll) ((Then) expr).getLeft()).getOperand().toString(), var.getName());
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                        if (cond) {
+                            f = true;
+                        }
+                    } catch (TreeMismatchException e) {
+                        //trees are not equal
                     }
                 }
             }
             if (!f) {
                 if (expr instanceof Then
-                        && ((Then) expr).getRight() instanceof Exists
-                        /*&& ((Exists) ((Then) expr).getRight()).getOperand().match(((Then) expr).getLeft())*/) {
-                    Variable var = ((Exists) ((Then) expr).getRight()).var;
+                        && ((Then) expr).getRight() instanceof Exists) {
+                    Term var = ((Exists) ((Then) expr).getRight()).var;
                     try {
-                        Pair<Boolean, Variable> pair = ((Exists) ((Then) expr).getRight()).getOperand().findSubstitutionAndCheck(((Then) expr).getLeft(), var, null);
-                        if (pair.getKey()) {
-                            f = true;
-                            // break;
-                        } else {
-                            if (pair.getValue() != null) {
-                                DenialReason.ERROR_1.create(l + 1, pair.getValue().toString(), ((Then) expr).getLeft().toString(), var.getName());
-                            }/* else {
-                                break;
-                            }*/
+                        int freeCount = ((Exists) ((Then) expr).getRight()).getOperand().markFreeVariableOccurences(var.getName());
+                        Set<Pair<Term, Term>> replaced = ((Then) expr).getLeft().getReplacedVariableOccurences(((Exists) ((Then) expr).getRight()).getOperand());
+                        boolean cond = true;
+                        if (freeCount == 0) cond = false;
+                        Term temp = null;
+                        if (cond) {
+                            for (Pair<Term, Term> pair : replaced) {
+                                if (temp == null) {
+                                    temp = pair.getValue();
+                                } else {
+                                    if (!(temp.matchAnotherTerm(pair.getValue()))) {
+                                        cond = false;
+                                        break;
+                                    }
+                                }
+                            }
                         }
-                    } catch (SubstitutionException e) {
-                        //break;
+                        /*todo проверить все вхождения, а не только последнее*/
+                        /*на данный момент мы нашли все замены и проверили, что все они одинаковые
+                        * осталось проверить, что ни одна из них не испортила свободное вхождение*/
+                        if (temp == null) cond = false;
+                        if (cond) {
+                            for (Pair<Term, Term> pair : replaced) {
+                                Term t = pair.getValue();
+                                List<String> names = t.getTermNames();
+                                for (String s : names) {
+                                    if (t.quantifiers.contains(s)) {
+                                        cond = false;
+                                        DenialReason.ERROR_1.create(l + 1, String.valueOf(temp), ((Exists) ((Then) expr).getRight()).getOperand().toString(), var.getName());
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                        if (cond) {
+                            f = true;
+                        }
+                    } catch (TreeMismatchException e) {
+                        //trees are not equal
                     }
                 }
             }               //<-
@@ -215,10 +265,10 @@ public class Deduct4 extends Homework {
                                     ((Then) expr).getLeft(),
                                     ((ForAll) ((Then) expr).getRight()).getOperand()
                             ).toString());
-                    Variable var = ((ForAll) ((Then) expr).getRight()).var;
+                    Term var = ((ForAll) ((Then) expr).getRight()).var;
                     boolean cond = (prev != null);
                     if (!cond) break;
-                    cond = !((Then) prev).getLeft().getFreeVars().containsKey(var.getName());
+                    cond = !((Then) prev).getRight().getFreeVars().contains(var.getName());
                     if (!cond) {
                         DenialReason.ERROR_2.create(l + 1, var.getName(), ((Then) expr).getLeft().toString());
                     }
@@ -245,10 +295,10 @@ public class Deduct4 extends Homework {
                                     ((Exists) ((Then) expr).getLeft()).getOperand(),
                                     ((Then) expr).getRight()
                             ).toString());
-                    Variable var = ((Exists) ((Then) expr).getLeft()).var;
+                    Term var = ((Exists) ((Then) expr).getLeft()).var;
                     boolean cond = (prev != null);
                     if (!cond) break;
-                    cond = !((Then) prev).getRight().getFreeVars().containsKey(var.getName());
+                    cond = !((Then) prev).getRight().getFreeVars().contains(var.getName());
                     if (!cond) {
                         DenialReason.ERROR_2.create(l + 1, var.getName(), ((Then) expr).getRight().toString());
                     }
@@ -285,10 +335,10 @@ public class Deduct4 extends Homework {
         return result;
     }
 
-    private Expression searchHypoByVar(Variable v) {
-        if (alpha.getFreeVars().containsKey(v.toString())) return alpha;
+    private Expression searchHypoByVar(Term v) {
+        if (alpha.getFreeVars().contains(v.getName())) return alpha;
         for (Expression e : hypos) {
-            if (e.getFreeVars().containsKey(v.toString())) return e;
+            if (e.getFreeVars().contains(v.getName())) return e;
         }
         return null;
     }
@@ -338,24 +388,4 @@ public class Deduct4 extends Homework {
         return hypos.size() == 0;
     }
 
-    private enum DenialReason {
-        ERROR_1("терм %s не свободен для подстановки в формулу %s вместо переменной %s."),
-        ERROR_2("переменная %s входит свободно в формулу %s."),
-        ERROR_3("используется %s с квантором по переменной %s, " +
-                "входящей свободно в допущение %s.");
-        String reason;
-
-        DenialReason(String reason) {
-            this.reason = reason;
-        }
-
-        void create(int row, String... params) {
-            out.println("Вывод некорректен, начиная с формулы № " + row + "\n");
-            reason = String.format(reason, params);
-            out.println(reason);
-            out.close();
-            System.exit(0);
-        }
-
-    }
 }

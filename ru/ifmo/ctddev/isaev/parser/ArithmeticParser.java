@@ -1,11 +1,7 @@
 package ru.ifmo.ctddev.isaev.parser;
 
 import ru.ifmo.ctddev.isaev.exception.ParsingException;
-import ru.ifmo.ctddev.isaev.structure.Expression;
 import ru.ifmo.ctddev.isaev.structure.arithmetics.*;
-import ru.ifmo.ctddev.isaev.structure.logic.Not;
-import ru.ifmo.ctddev.isaev.structure.predicate.Exists;
-import ru.ifmo.ctddev.isaev.structure.predicate.ForAll;
 import ru.ifmo.ctddev.isaev.structure.predicate.Predicate;
 import ru.ifmo.ctddev.isaev.structure.predicate.Term;
 
@@ -21,12 +17,10 @@ import static ru.ifmo.ctddev.isaev.General.isUppercaseVariable;
  */
 public class ArithmeticParser extends PredicateParser {
 
-    int lookBack;
 
     @Override
     protected Predicate predicate() throws ParsingException {
         Predicate result;
-        // lookBack = position;
         if (isUppercaseVariable(tokens[position])) {
             result = new Predicate(tokens[position]);
             position++;
@@ -50,62 +44,7 @@ public class ArithmeticParser extends PredicateParser {
                 return new Equals(term, term2);
             }
         }
-        //   lookBack = position-lookBack;
         throw new ParsingException("unexpected symbol");
-    }
-
-    @Override
-    protected Expression unary() throws ParsingException {
-        Expression result;
-        if (tokens[position].equals(Lexeme.NOT.s)) {
-            position++;
-            result = new Not(unary());
-            return result;
-        }
-        if (tokens[position].equals(Lexeme.FOR_ALL.s)) {
-            position++;
-            Term var = null;
-            if (isLowercaseVariable(tokens[position])) {
-                var = term();
-            } else {
-                throw new ParsingException("something wrong, you tried to parse " + tokens[position] + " as variable");
-            }
-            result = new ForAll(var, unary());
-            return result;
-        }
-        if (tokens[position].equals(Lexeme.EXISTS.s)) {
-            position++;
-            Term var;
-            if (isLowercaseVariable(tokens[position])) {
-                var = term();
-            } else {
-                throw new ParsingException("something wrong, you tried to parse " + tokens[position] + " as variable");
-            }
-            result = new Exists(var, unary());
-            return result;
-        }
-        if (tokens[position].equals(Lexeme.LEFT_P.s)) {
-            try {
-                lookBack = position;
-                Predicate p = predicate();
-                return p;
-            } catch (ParsingException e) {
-                position = lookBack;
-                position++;
-                result = expr();
-                if (!tokens[position].equals(Lexeme.RIGHT_P.s)) {
-                    StringBuilder sb = new StringBuilder();
-                    for (String s : tokens) {
-                        sb.append(s);
-                    }
-                    throw new ParsingException("you have unclosed brackets in expression " + sb.toString());
-                } else {
-                    position++;
-                }
-                return result;
-            }
-        }
-        return predicate();
     }
 
     @Override
@@ -113,8 +52,11 @@ public class ArithmeticParser extends PredicateParser {
         Term term = sum();
         if (position < tokens.length && tokens[position].equals(Lexeme.PLUS.s)) {
             position++;
-            Term result = new Plus(term, term());
-            return result;
+            term = new Plus(term, term());
+        }
+        while (tokens[position].equals(Lexeme.COMMA.s)) {
+            term = new Prime(term);
+            position++;
         }
         return term;
     }
@@ -131,12 +73,6 @@ public class ArithmeticParser extends PredicateParser {
     protected Term mul() throws ParsingException {
         Term result = null;
         boolean f = false;
-        if (tokens[position].equals(Lexeme.PRIME.s)) {
-            position++;
-            //f=true;
-            return new Prime(mul());
-
-        }
         if (tokens[position].equals(Lexeme.LEFT_P.s)) {
             position++;
             result = term();

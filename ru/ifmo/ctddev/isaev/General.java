@@ -1,17 +1,17 @@
 package ru.ifmo.ctddev.isaev;
 
-import ru.ifmo.ctddev.isaev.exception.ParsingException;
 import ru.ifmo.ctddev.isaev.hardcodedRules.AThenA;
-import ru.ifmo.ctddev.isaev.parser.ArithmeticParser;
 import ru.ifmo.ctddev.isaev.parser.Lexer;
 import ru.ifmo.ctddev.isaev.parser.LogicParser;
 import ru.ifmo.ctddev.isaev.parser.Parser;
+import ru.ifmo.ctddev.isaev.parser.PredicateParser;
 import ru.ifmo.ctddev.isaev.structure.Expression;
 import ru.ifmo.ctddev.isaev.structure.logic.Then;
 
 import java.io.BufferedReader;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -44,16 +44,19 @@ public class General {
 
     public static Expression parseExcept(String s) throws Exception {
         Expression expression;
-        if (parser instanceof ArithmeticParser) {
+        /*if (parser instanceof ArithmeticParser) {
             String s1 = prefixPrimes(s).toString();
             s = s1;
-        }
+        }*/
         String[] lexems = lexer.lex(s);
         expression = parser.parse(lexems);
+        if (parser instanceof PredicateParser) {
+            expression.setQuantifiers(new HashMap<>());
+        }
 
         return expression;
     }
-
+/*
     private static StringBuilder prefixPrimes(String s) throws ParsingException {
         StringBuilder sb = new StringBuilder(s);
         int i = sb.length() - 1;
@@ -94,7 +97,7 @@ public class General {
             }
         }
         return result;
-    }
+    }*/
 
     public static List<Expression> proofAThenA(Expression alpha) {
         List<Expression> result = new ArrayList<>();

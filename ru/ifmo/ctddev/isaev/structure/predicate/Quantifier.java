@@ -1,21 +1,28 @@
 package ru.ifmo.ctddev.isaev.structure.predicate;
 
+import javafx.util.Pair;
 import ru.ifmo.ctddev.isaev.exception.ProofGeneratingException;
-import ru.ifmo.ctddev.isaev.parser.Lexeme;
+import ru.ifmo.ctddev.isaev.exception.TreeMismatchException;
+import ru.ifmo.ctddev.isaev.structure.AbstractExpression;
 import ru.ifmo.ctddev.isaev.structure.Expression;
 import ru.ifmo.ctddev.isaev.structure.logic.Variable;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * User: Xottab
- * Date: 17.12.13
+ * Date: 03.05.14
  */
-public class ForAll extends Quantifier {
-    public ForAll(Term var, Expression operand) {
-        super(var, operand);
-        token = Lexeme.FOR_ALL;
+public class Quantifier extends AbstractExpression {
+
+    public Term var;
+    public Expression operand;
+
+    public Quantifier(Term var, Expression predicate) {
+        this.var = var;
+        this.operand = predicate;
     }
 
     @Override
@@ -38,6 +45,13 @@ public class ForAll extends Quantifier {
     @Override
     public Expression substitute(Map<String, ? extends Expression> variables) {
         return null;
+    }
+
+    @Override
+    public Set<String> getFreeVars() {
+        Set<String> vars = operand.getFreeVars();
+        vars.remove(var.getName());
+        return vars;
     }
 
     @Override
@@ -72,7 +86,24 @@ public class ForAll extends Quantifier {
 
     @Override
     public void setQuantifiers(Map<String, Quantifier> quantifiers) {
-
+        Quantifier q = quantifiers.put(var.toString(), this);
+        operand.setQuantifiers(quantifiers);
+        quantifiers.put(var.toString(), q);
     }
 
+    @Override
+    public int markFreeVariableOccurences(String variableName) {
+        return operand.markFreeVariableOccurences(variableName);
+    }
+
+    @Override
+    public Set<Pair<Term, Term>> getReplacedVariableOccurences(Expression originalExpr) throws TreeMismatchException {
+        if (!hasSameType(originalExpr) || !this.var.name.equals(((Quantifier) originalExpr).var.name))
+            throw new TreeMismatchException(originalExpr, this);
+        return operand.getReplacedVariableOccurences(((Quantifier) originalExpr).operand);
+    }
+
+    public Expression getOperand() {
+        return operand;
+    }
 }

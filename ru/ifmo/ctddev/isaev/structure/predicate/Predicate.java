@@ -1,13 +1,13 @@
 package ru.ifmo.ctddev.isaev.structure.predicate;
 
+import javafx.util.Pair;
 import ru.ifmo.ctddev.isaev.exception.ProofGeneratingException;
+import ru.ifmo.ctddev.isaev.exception.TreeMismatchException;
 import ru.ifmo.ctddev.isaev.structure.AbstractExpression;
 import ru.ifmo.ctddev.isaev.structure.Expression;
 import ru.ifmo.ctddev.isaev.structure.logic.Variable;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * User: Xottab
@@ -146,5 +146,33 @@ public class Predicate extends AbstractExpression {
             if (!t.hasQuantifier(var)) return false;
         }
         return true;
+    }
+
+    @Override
+    public void setQuantifiers(Map<String, Quantifier> quantifiers) {
+        for (Term t : arguments) {
+            t.setQuantifiers(quantifiers);
+        }
+    }
+
+    @Override
+    public int markFreeVariableOccurences(String variableName) {
+        int result = 0;
+        for (Term t : arguments) {
+            result += t.markFreeVariableOccurences(variableName);
+        }
+        return result;
+    }
+
+    @Override
+    public Set<Pair<Term, Term>> getReplacedVariableOccurences(Expression originalExpr) throws TreeMismatchException {
+        Set<Pair<Term, Term>> set = new HashSet<>();
+        if (!match(originalExpr))
+            throw new TreeMismatchException(originalExpr, this);
+        for (int i = 0; i < arguments.length; i++) {
+            Term t = arguments[i];
+            set.addAll(t.getReplacedVariableOccurences(((Predicate) originalExpr).arguments[i]));
+        }
+        return set;
     }
 }

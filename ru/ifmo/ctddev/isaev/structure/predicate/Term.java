@@ -1,24 +1,27 @@
 package ru.ifmo.ctddev.isaev.structure.predicate;
 
+import javafx.util.Pair;
 import ru.ifmo.ctddev.isaev.exception.ProofGeneratingException;
+import ru.ifmo.ctddev.isaev.exception.TreeMismatchException;
 import ru.ifmo.ctddev.isaev.structure.AbstractExpression;
 import ru.ifmo.ctddev.isaev.structure.Expression;
 import ru.ifmo.ctddev.isaev.structure.logic.Variable;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * User: Xottab
  * Date: 17.12.13
  */
 public class Term extends AbstractExpression {
+    public Set<String> quantifiers;
+    public boolean isFree = false;
     protected String name;
     protected Term[] arguments;
 
     public Term(String token) {
         this.arguments = new Term[0];
+        quantifiers = new HashSet<>(3);
         this.name = token;
     }
 
@@ -41,7 +44,7 @@ public class Term extends AbstractExpression {
 
     @Override
     public boolean treeEquals(Expression other) {
-        if (hasSameType(other)) {
+        /*if (hasSameType(other)) {
             Term pred = (Term) other;
             if (name.equals(pred.name) && arguments.length == pred.arguments.length) {
                 boolean f = false;
@@ -54,7 +57,8 @@ public class Term extends AbstractExpression {
                 if (!f) return true;
             }
         }
-        return false;
+        return false;*/
+        return hasSameType(other);
     }
 
     @Override
@@ -150,8 +154,14 @@ public class Term extends AbstractExpression {
     }
 
     @Override
-    public Map<String, Variable> getFreeVars() {
-        return null;
+    public Set<String> getFreeVars() {
+        HashSet<String> vars = new HashSet<>();
+        for (Term t : arguments) {
+            vars.addAll(t.getFreeVars());
+        }
+        if (!this.quantifiers.contains(this.name))
+            vars.add(name);
+        return vars;
     }
 
     @Override
@@ -162,5 +172,70 @@ public class Term extends AbstractExpression {
         return true;
     }
 
+    @Override
+    public void setQuantifiers(Map<String, Quantifier> quantifiers) {
+        Set<String> set = new HashSet<>();
+        set.addAll(quantifiers.keySet());
+        this.quantifiers = set;
+    }
 
+    @Override
+    public int markFreeVariableOccurences(String variableName) {
+        int result = 0;
+        for (Term t : arguments) {
+            result += t.markFreeVariableOccurences(variableName);
+        }
+        if (this.name.equals(variableName)) {
+            boolean f = true;
+            for (String s : quantifiers) {
+                if (s.equals(variableName)) {
+                    f = false;
+                    break;
+                }
+            }
+            if (f) {
+                isFree = true;
+                result++;
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        return this == o;
+    }
+
+    @Override
+    public int hashCode() {
+        return System.identityHashCode(this);
+    }
+
+    public List<String> getTermNames() {
+        List<String> result;
+        if (arguments.length == 0) {
+            result = new ArrayList<>(10);
+        } else {
+            result = arguments[0].getTermNames();
+            for (int i = 1; i < arguments.length; i++) {
+                result.addAll(arguments[i].getTermNames());
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public Set<Pair<Term, Term>> getReplacedVariableOccurences(Expression originalExpr) throws TreeMismatchException {
+        Set<Pair<Term, Term>> set = new HashSet<>();
+        if (!(originalExpr instanceof Term) || !matchAnotherTerm((Term) originalExpr))
+            throw new TreeMismatchException(originalExpr, this);
+        if (((Term) originalExpr).isFree) {
+            set.add(new Pair<>((Term) originalExpr, this));
+        }
+        for (int i = 0; i < arguments.length; i++) {
+            Term t = arguments[i];
+            set.addAll(t.getReplacedVariableOccurences(((Term) originalExpr).arguments[i]));
+        }
+        return set;
+    }
 }

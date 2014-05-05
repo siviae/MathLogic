@@ -3,6 +3,7 @@ package ru.ifmo.ctddev.isaev.structure.logic;
 import ru.ifmo.ctddev.isaev.exception.ProofGeneratingException;
 import ru.ifmo.ctddev.isaev.structure.AbstractExpression;
 import ru.ifmo.ctddev.isaev.structure.Expression;
+import ru.ifmo.ctddev.isaev.structure.predicate.Quantifier;
 
 import java.util.HashMap;
 import java.util.List;
@@ -80,6 +81,11 @@ public class NumExpr extends AbstractExpression {
     @Override
     public boolean hasQuantifier(Variable var) {
         return true;
+    }
+
+    @Override
+    public void setQuantifiers(Map<String, Quantifier> quantifiers) {
+
     }
 
 
