@@ -40,6 +40,19 @@ public class ArithmeticParser extends PredicateParser {
             }
             return result;
         } else {
+            int backupPos = position;
+            try {
+
+                if (tokens[position].equals(Lexeme.LEFT_P.s)) {
+                    position++;
+                    result = predicate();
+                    if (!tokens[position].equals(Lexeme.RIGHT_P.s))
+                        throw new ParsingException("regression!!((");
+                    return result;
+                }
+            } catch (ParsingException e) {
+                position = backupPos;
+            }
             Term term = term();
             if (tokens[position].equals(Lexeme.EQ.s)) {
                 position++;
@@ -57,7 +70,7 @@ public class ArithmeticParser extends PredicateParser {
             position++;
             term = new Plus(term, term());
         }
-        while (position < tokens.length && tokens[position].equals(Lexeme.COMMA.s)) {
+        while (position < tokens.length && tokens[position].equals(Lexeme.PRIME.s)) {
             term = new Prime(term);
             position++;
         }
@@ -82,6 +95,10 @@ public class ArithmeticParser extends PredicateParser {
         } else if (isLowercaseVariable(tokens[position])) {
             result = new Term(tokens[position]);
             position++;
+            while (tokens[position].equals(Lexeme.PRIME.s)) {
+                result = new Prime(result);
+                position++;
+            }
             f = true;
             if (position < tokens.length && tokens[position].equals(Lexeme.LEFT_P.s)) {
                 position++;

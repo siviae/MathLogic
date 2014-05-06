@@ -32,7 +32,7 @@ public class Checker5 extends Homework {
         boolean ok = true;
         while (temp != null) {
             boolean f = false;
-            if (row == /*7497*/7) {
+            if (row == /*7497*/24) {
                 boolean c = true;
             }
             Expression expr = parse(temp);
@@ -184,11 +184,12 @@ public class Checker5 extends Homework {
                     Expression expr1 = ((Then) expr).getRight();
                     And and = (And) ((Then) expr).getLeft();
                     Then then = (Then) ((ForAll) ((And) ((Then) expr).getLeft()).getRight()).getOperand();
+                    Expression original = then.getLeft();
                     Term var = ((ForAll) and.getRight()).var;
-                    expr1.setQuantifiers(new HashSet<String>());
-                    int freeCount = expr1.markFreeVariableOccurences(var.getName());
+                    original.setQuantifiers(new HashSet<String>());
+                    int freeCount = original.markFreeVariableOccurences(var.getName());
                     try {
-                        Set<Pair<Term, Term>> replaced = and.getLeft().getReplacedVariableOccurences(expr1);
+                        Set<Pair<Term, Term>> replaced = and.getLeft().getReplacedVariableOccurences(original);
                         boolean cond = true;
                         if (freeCount == 0) {
                             cond = false;
@@ -210,10 +211,10 @@ public class Checker5 extends Homework {
                         if (cond && !term.match(new Zero())) {
                             cond = false;
                         }
-                        if (cond && !then.getLeft().match(expr1)) {
+                        if (cond && !original.treeEquals(expr1)) {
                             cond = false;
                         }
-                        replaced = then.getRight().getReplacedVariableOccurences(expr1);
+                        replaced = then.getRight().getReplacedVariableOccurences(original);
                         if (freeCount == 0) {
                             cond = false;
                             f = true;//мы ничего не подставляем, но деревья одинаковые
@@ -286,7 +287,7 @@ public class Checker5 extends Homework {
 
 
             if (!f) {
-                System.out.println("Доказательство некорректно начиная с " + row + " высказывания: " + temp);
+                out.println("Доказательство некорректно начиная с " + row + " высказывания: " + temp);
                 ok = false;
                 break;
             }

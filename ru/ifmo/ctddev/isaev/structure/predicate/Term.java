@@ -206,15 +206,16 @@ public class Term extends AbstractExpression {
     @Override
     public Set<Pair<Term, Term>> getReplacedVariableOccurences(Expression originalExpr) throws TreeMismatchException {
         Set<Pair<Term, Term>> set = new HashSet<>();
-        if (!(originalExpr instanceof Term) || !hasSameArgumentLength((Term) originalExpr))
+        if (!(originalExpr instanceof Term) /*|| !hasSameArgumentLength((Term) originalExpr)*/)
             throw new TreeMismatchException(originalExpr, this);
         if (((Term) originalExpr).isFree) {
             set.add(new Pair<>((Term) originalExpr, this));
         }
-        for (int i = 0; i < arguments.length; i++) {
-            Term t = arguments[i];
-            set.addAll(t.getReplacedVariableOccurences(((Term) originalExpr).arguments[i]));
-        }
+        if (hasSameArgumentLength((Term) originalExpr))
+            for (int i = 0; i < arguments.length; i++) {
+                Term t = arguments[i];
+                set.addAll(t.getReplacedVariableOccurences(((Term) originalExpr).arguments[i]));
+            }
         return set;
     }
 }

@@ -55,7 +55,10 @@ public class PredicateParser extends LogicParser {
             return result;
         }
         if (tokens[position].equals(Lexeme.LEFT_P.s)) {
+            int backupPos = position;
+            try {
                 position++;
+
                 result = expr();
                 if (!tokens[position].equals(Lexeme.RIGHT_P.s)) {
                     StringBuilder sb = new StringBuilder();
@@ -67,6 +70,10 @@ public class PredicateParser extends LogicParser {
                     position++;
                 }
                 return result;
+            } catch (ParsingException e) {
+                position = backupPos;
+                return predicate();
+            }
         }
         return predicate();
     }
@@ -116,10 +123,10 @@ public class PredicateParser extends LogicParser {
                 }
                 if (success) {
                     while (tokens[position].equals(Lexeme.COMMA.s)) {
-                    position++;
-                    arguments.add(term());
-                }
-                result.setArguments(arguments.toArray(new Term[arguments.size()]));
+                        position++;
+                        arguments.add(term());
+                    }
+                    result.setArguments(arguments.toArray(new Term[arguments.size()]));
                     position++;
                 }
             }
