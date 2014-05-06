@@ -5,6 +5,8 @@ import ru.ifmo.ctddev.isaev.structure.Expression;
 import ru.ifmo.ctddev.isaev.structure.predicate.Predicate;
 import ru.ifmo.ctddev.isaev.structure.predicate.Term;
 
+import java.util.ArrayList;
+
 /**
  * User: Xottab
  * Date: 24.03.14
@@ -15,6 +17,12 @@ public class Equals extends Predicate {
 
     public Equals(Term term1, Term term2) {
         super(Lexeme.EQ.s, term1, term2);
+        left = arguments[0];
+        right = arguments[1];
+    }
+
+    public Equals(ArrayList<Term> list) {
+        super(Lexeme.EQ.s, list.get(0), list.get(1));
         left = arguments[0];
         right = arguments[1];
     }

@@ -32,7 +32,7 @@ public class Checker5 extends Homework {
         boolean ok = true;
         while (temp != null) {
             boolean f = false;
-            if (row == /*7497*/24) {
+            if (row == /*7497*/341) {
                 boolean c = true;
             }
             Expression expr = parse(temp);

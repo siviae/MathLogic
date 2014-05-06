@@ -16,7 +16,7 @@ import java.util.*;
 public class Term extends AbstractExpression {
     public Set<String> quantifiers;
     public boolean isFree = false;
-    protected String name;
+    public String name;
     protected Term[] arguments;
 
     public Term(String token) {

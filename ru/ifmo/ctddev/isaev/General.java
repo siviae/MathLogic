@@ -1,6 +1,7 @@
 package ru.ifmo.ctddev.isaev;
 
 import ru.ifmo.ctddev.isaev.hardcodedRules.AThenA;
+import ru.ifmo.ctddev.isaev.parser.ArithmeticParser;
 import ru.ifmo.ctddev.isaev.parser.Lexer;
 import ru.ifmo.ctddev.isaev.parser.LogicParser;
 import ru.ifmo.ctddev.isaev.parser.Parser;
@@ -44,13 +45,18 @@ public class General {
         Expression expression;
         String[] lexems = lexer.lex(s);
         parser.s = s;
-        expression = parser.parse(lexems);/*
+        if (parser instanceof ArithmeticParser) {
+            expression = parser.parse(s);
+        } else {
+            expression = parser.parse(lexems);
+        }/*
         if (parser instanceof PredicateParser) {
             expression.setQuantifiers(new HashSet<>());
         }*/
 
         return expression;
     }
+
     public static List<Expression> proofAThenA(Expression alpha) {
         List<Expression> result = new ArrayList<>();
         for (AThenA e : AThenA.values()) {

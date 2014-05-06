@@ -7,10 +7,7 @@ import ru.ifmo.ctddev.isaev.structure.AbstractExpression;
 import ru.ifmo.ctddev.isaev.structure.Expression;
 import ru.ifmo.ctddev.isaev.structure.logic.Variable;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * User: Xottab
@@ -27,6 +24,11 @@ public class Predicate extends AbstractExpression {
 
     public Predicate(String name, Term... terms) {
         this.arguments = terms;
+        this.name = name;
+    }
+
+    public Predicate(String name, ArrayList<Term> list) {
+        this.arguments = list.toArray(new Term[list.size()]);
         this.name = name;
     }
 

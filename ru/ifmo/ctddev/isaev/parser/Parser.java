@@ -20,4 +20,8 @@ public abstract class Parser {
     }
 
     protected abstract Expression expr() throws ParsingException;
+
+    public Expression parse(String s) throws ParsingException {
+        return null;
+    }
 }
