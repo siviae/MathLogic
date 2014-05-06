@@ -30,6 +30,12 @@ public class Term extends AbstractExpression {
         this.name = token;
     }
 
+    public Term(String token, ArrayList<Term> list) {
+        this.name = token;
+        this.arguments = list.toArray(new Term[list.size()]);
+        quantifiers = new HashSet<>(3);
+    }
+
     public String getName() {
         return name;
     }

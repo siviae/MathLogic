@@ -185,8 +185,12 @@ public class ArithmeticParser extends PredicateParser {
                             t = new Prime(list);
                             break;
                         }
+                        case "0": {
+                            t = new Zero();
+                            break;
+                        }
                         default: {
-                            throw new ParsingException("cannot parse: " + expression);
+                            t = new Term(t.name, list);
                         }
                     }
                     // t = new Function(t.name, list);
