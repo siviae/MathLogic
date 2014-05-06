@@ -32,7 +32,7 @@ public class Checker5 extends Homework {
         boolean ok = true;
         while (temp != null) {
             boolean f = false;
-            if (row == /*7497*/341) {
+            if (row == /*7497*/47) {
                 boolean c = true;
             }
             Expression expr = parse(temp);
@@ -77,7 +77,8 @@ public class Checker5 extends Homework {
                         && ((Then) expr).getLeft() instanceof ForAll) {
                     Term var = ((ForAll) ((Then) expr).getLeft()).var;
                     try {
-                        ((ForAll) ((Then) expr).getLeft()).getOperand().setQuantifiers(new HashSet<String>());
+                        ((ForAll) ((Then) expr).getLeft()).getOperand().setQuantifiers(new HashSet<>());
+                        ((Then) expr).getRight().setQuantifiers(new HashSet<>());
                         int freeCount = ((ForAll) ((Then) expr).getLeft()).getOperand().markFreeVariableOccurences(var.getName());
                         Set<Pair<Term, Term>> replaced = ((Then) expr).getRight().getReplacedVariableOccurences(((ForAll) ((Then) expr).getLeft()).getOperand());
                         //trees are matching
@@ -110,6 +111,7 @@ public class Checker5 extends Homework {
                                 Term t = pair.getValue();
                                 List<String> names = t.getTermNames();
                                 for (String s : names) {
+                                    //System.out.println(row);
                                     if (t.quantifiers.contains(s)) {
                                         cond = false;
                                         DenialReason.ERROR_1.create(row + 1, String.valueOf(term), ((ForAll) ((Then) expr).getLeft()).getOperand().toString(), var.getName());
@@ -132,6 +134,7 @@ public class Checker5 extends Homework {
                     Term var = ((Exists) ((Then) expr).getRight()).var;
                     try {
                         ((Exists) ((Then) expr).getRight()).getOperand().setQuantifiers(new HashSet<String>());
+                        ((Then) expr).getRight().setQuantifiers(new HashSet<String>());
                         int freeCount = ((Exists) ((Then) expr).getRight()).getOperand().markFreeVariableOccurences(var.getName());
                         Set<Pair<Term, Term>> replaced = ((Then) expr).getLeft().getReplacedVariableOccurences(((Exists) ((Then) expr).getRight()).getOperand());
                         boolean cond = true;
@@ -191,6 +194,7 @@ public class Checker5 extends Homework {
                     Expression original = then.getLeft();
                     Term var = ((ForAll) and.getRight()).var;
                     original.setQuantifiers(new HashSet<String>());
+                    and.getLeft().setQuantifiers(new HashSet<String>());
                     int freeCount = original.markFreeVariableOccurences(var.getName());
                     try {
                         Set<Pair<Term, Term>> replaced = and.getLeft().getReplacedVariableOccurences(original);
@@ -220,6 +224,7 @@ public class Checker5 extends Homework {
                         if (cond && !original.treeEquals(expr1)) {
                             cond = false;
                         }
+                        then.getRight().setQuantifiers(new HashSet<String>());
                         replaced = then.getRight().getReplacedVariableOccurences(original);
                         if (freeCount == 0) {
                             cond = false;

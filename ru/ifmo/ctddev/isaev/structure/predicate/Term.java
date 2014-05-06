@@ -158,6 +158,9 @@ public class Term extends AbstractExpression {
     @Override
     public void setQuantifiers(Set<String> quantifiers) {
         Set<String> set = new HashSet<>();
+        for (Term t : arguments) {
+            t.setQuantifiers(quantifiers);
+        }
         for (String s : quantifiers) {
             set.add(s);
         }
@@ -206,6 +209,7 @@ public class Term extends AbstractExpression {
                 result.addAll(arguments[i].getTermNames());
             }
         }
+        result.add(name);
         return result;
     }
 

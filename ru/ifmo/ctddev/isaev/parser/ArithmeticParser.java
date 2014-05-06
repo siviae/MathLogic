@@ -3,10 +3,7 @@ package ru.ifmo.ctddev.isaev.parser;
 import ru.ifmo.ctddev.isaev.exception.ParsingException;
 import ru.ifmo.ctddev.isaev.structure.Expression;
 import ru.ifmo.ctddev.isaev.structure.arithmetics.*;
-import ru.ifmo.ctddev.isaev.structure.logic.And;
-import ru.ifmo.ctddev.isaev.structure.logic.Not;
-import ru.ifmo.ctddev.isaev.structure.logic.Or;
-import ru.ifmo.ctddev.isaev.structure.logic.Then;
+import ru.ifmo.ctddev.isaev.structure.logic.*;
 import ru.ifmo.ctddev.isaev.structure.predicate.Exists;
 import ru.ifmo.ctddev.isaev.structure.predicate.ForAll;
 import ru.ifmo.ctddev.isaev.structure.predicate.Predicate;
@@ -108,17 +105,20 @@ public class ArithmeticParser extends PredicateParser {
             while (Character.isDigit(nextChar = getChar()))
                 end++;
             String name = expression.substring(start, end);
-            ArrayList<Term> list = null;
+            ArrayList<Term> list = new ArrayList<>();
             if (nextChar == '(') {
                 list = terms();
                 if (getChar() != ')')
                     throw new ParsingException("cannot parse: " + expression);
             } else
                 returnChar();
+            if (list.size() == 0) {
+                return new Variable(name);
+            }
             return new Predicate(name, list);
         } else {
             returnChar();
-            ArrayList<Term> list = new ArrayList<Term>();
+            ArrayList<Term> list = new ArrayList<>();
             list.add(term());
             if (getChar() != '=')
                 throw new ParsingException("cannot parse: " + expression);

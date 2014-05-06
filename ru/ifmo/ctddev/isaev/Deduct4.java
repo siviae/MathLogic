@@ -107,6 +107,7 @@ public class Deduct4 extends Homework {
                     Term var = ((ForAll) ((Then) expr).getLeft()).var;
                     try {
                         ((ForAll) ((Then) expr).getLeft()).getOperand().setQuantifiers(new HashSet<String>());
+                        ((Then) expr).getRight().setQuantifiers(new HashSet<String>());
                         int freeCount = ((ForAll) ((Then) expr).getLeft()).getOperand().markFreeVariableOccurences(var.getName());
                         Set<Pair<Term, Term>> replaced = ((Then) expr).getRight().getReplacedVariableOccurences(((ForAll) ((Then) expr).getLeft()).getOperand());
                         //trees are matching
@@ -161,7 +162,8 @@ public class Deduct4 extends Homework {
                         && ((Then) expr).getRight() instanceof Exists) {
                     Term var = ((Exists) ((Then) expr).getRight()).var;
                     try {
-                        ((Exists) ((Then) expr).getRight()).getOperand().setQuantifiers(new HashSet<String>());
+                        ((Exists) ((Then) expr).getRight()).getOperand().setQuantifiers(new HashSet<>());
+                        ((Then) expr).getLeft().setQuantifiers(new HashSet<>());
                         int freeCount = ((Exists) ((Then) expr).getRight()).getOperand().markFreeVariableOccurences(var.getName());
                         Set<Pair<Term, Term>> replaced = ((Then) expr).getLeft().getReplacedVariableOccurences(((Exists) ((Then) expr).getRight()).getOperand());
                         boolean cond = true;
