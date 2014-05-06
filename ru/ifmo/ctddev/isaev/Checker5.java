@@ -84,7 +84,9 @@ public class Checker5 extends Homework {
                         boolean cond = true;
                         if (freeCount == 0) {
                             cond = false;
-                            f = true;//todo вот это весьма сомнительно
+                            if (((ForAll) ((Then) expr).getLeft()).getOperand().treeEquals(((Then) expr).getRight())) {
+                                f = true;
+                            } //todo вот это весьма сомнительно
                         }
                         Term term = null;
                         if (cond) {
@@ -135,7 +137,9 @@ public class Checker5 extends Homework {
                         boolean cond = true;
                         if (freeCount == 0) {
                             cond = false;
-                            f = true;//мы ничего не подставляем, но деревья одинаковые
+                            if (((Exists) ((Then) expr).getRight()).getOperand().treeEquals(((Then) expr).getLeft())) {
+                                f = true;
+                            } //ничего не подставляем, но деревья одинаковые
                         }
                         Term term = null;
                         if (cond) {
@@ -193,7 +197,9 @@ public class Checker5 extends Homework {
                         boolean cond = true;
                         if (freeCount == 0) {
                             cond = false;
-                            f = true;//мы ничего не подставляем, но деревья одинаковые
+                            if (and.getLeft().treeEquals(original)) {
+                                f = true;
+                            } //ничего не подставляем, но деревья одинаковые
                         }
                         Term term = null;
                         if (cond) {

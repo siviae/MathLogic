@@ -113,7 +113,9 @@ public class Deduct4 extends Homework {
                         boolean cond = true;
                         if (freeCount == 0) {
                             cond = false;
-                            f = true;//todo вот это весьма сомнительно
+                            if (((ForAll) ((Then) expr).getLeft()).getOperand().treeEquals(((Then) expr).getRight())) {
+                                f = true;
+                            } //todo вот это весьма сомнительно
                         }
                         Term temp = null;
                         if (cond) {
@@ -165,7 +167,9 @@ public class Deduct4 extends Homework {
                         boolean cond = true;
                         if (freeCount == 0) {
                             cond = false;
-                            f = true;//мы ничего не подставляем, но деревья одинаковые
+                            if (((Exists) ((Then) expr).getRight()).getOperand().treeEquals(((Then) expr).getLeft())) {
+                                f = true;
+                            } //ничего не подставляем, но деревья одинаковые
                         }
                         Term temp = null;
                         if (cond) {
@@ -277,24 +281,26 @@ public class Deduct4 extends Homework {
                             ).toString());
                     Term var = ((ForAll) ((Then) expr).getRight()).var;
                     boolean cond = (prev != null);
-                    cond = cond && !((Then) prev).getLeft().getFreeVars().contains(var.getName());
-                    if (!cond) {
-                        DenialReason.ERROR_2.create(l + 1, var.getName(), ((Then) expr).getLeft().toString());
-                    }
-                    cond = cond && !hyposVars.contains(var.getName());
-                    if (!cond) {
-                        DenialReason.ERROR_3.create(l + 1, "правило", var.getName(), searchHypoByVar(var).toString(), prev.toString(), expr.toString());
-                    }
                     if (cond) {
-                        for (ForAllRule rule : ForAllRule.values()) {
-                            if (rule == ForAllRule.R_80) {
-                                boolean k = true;
-                            }
-                            result.add(rule.replace(alpha,
-                                    ((Then) expr).getLeft(),
-                                    ((ForAll) ((Then) expr).getRight()).getOperand()));
+                        cond = cond && !((Then) prev).getLeft().getFreeVars().contains(var.getName());
+                        if (!cond) {
+                            DenialReason.ERROR_2.create(l + 1, var.getName(), ((Then) expr).getLeft().toString());
                         }
-                        f = true;
+                        cond = cond && !hyposVars.contains(var.getName());
+                        if (!cond) {
+                            DenialReason.ERROR_3.create(l + 1, "правило", var.getName(), searchHypoByVar(var).toString(), prev.toString(), expr.toString());
+                        }
+                        if (cond) {
+                            for (ForAllRule rule : ForAllRule.values()) {
+                                if (rule == ForAllRule.R_80) {
+                                    boolean k = true;
+                                }
+                                result.add(rule.replace(alpha,
+                                        ((Then) expr).getLeft(),
+                                        ((ForAll) ((Then) expr).getRight()).getOperand()));
+                            }
+                            f = true;
+                        }
                     }
                 }
             }
@@ -309,21 +315,23 @@ public class Deduct4 extends Homework {
                             ).toString());
                     Term var = ((Exists) ((Then) expr).getLeft()).var;
                     boolean cond = (prev != null);
-                    cond = cond && !((Then) prev).getRight().getFreeVars().contains(var.getName());
-                    if (!cond) {
-                        DenialReason.ERROR_2.create(l + 1, var.getName(), ((Then) expr).getRight().toString());
-                    }
-                    cond = cond && !hyposVars.contains(var.getName());
-                    if (!cond) {
-                        DenialReason.ERROR_3.create(l + 1, "правило", var.getName(), searchHypoByVar(var).toString(), prev.toString(), expr.toString());
-                    }
                     if (cond) {
-                        for (ExistsRule rule : ExistsRule.values()) {
-                            result.add(rule.replace(alpha,
-                                    ((Exists) ((Then) expr).getLeft()).getOperand(),
-                                    ((Then) expr).getRight()));
+                        cond = cond && !((Then) prev).getRight().getFreeVars().contains(var.getName());
+                        if (!cond) {
+                            DenialReason.ERROR_2.create(l + 1, var.getName(), ((Then) expr).getRight().toString());
                         }
-                        f = true;
+                        cond = cond && !hyposVars.contains(var.getName());
+                        if (!cond) {
+                            DenialReason.ERROR_3.create(l + 1, "правило", var.getName(), searchHypoByVar(var).toString(), prev.toString(), expr.toString());
+                        }
+                        if (cond) {
+                            for (ExistsRule rule : ExistsRule.values()) {
+                                result.add(rule.replace(alpha,
+                                        ((Exists) ((Then) expr).getLeft()).getOperand(),
+                                        ((Then) expr).getRight()));
+                            }
+                            f = true;
+                        }
                     }
                 }
             }
