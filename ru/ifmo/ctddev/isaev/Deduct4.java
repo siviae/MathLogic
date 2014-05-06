@@ -149,6 +149,9 @@ public class Deduct4 extends Homework {
                             }
                         }
                         if (cond) {
+                            if (hyposVars.contains(var.getName())) {
+                                DenialReason.ERROR_4.create(l + 1, var.getName(), searchHypoByVar(var).toString(), expr.toString());
+                            }
                             f = true;
                         }
                     } catch (TreeMismatchException e) {
@@ -204,6 +207,9 @@ public class Deduct4 extends Homework {
                             }
                         }
                         if (cond) {
+                            if (hyposVars.contains(var.getName())) {
+                                DenialReason.ERROR_4.create(l + 1, var.getName(), searchHypoByVar(var).toString(), expr.toString());
+                            }
                             f = true;
                         }
                     } catch (TreeMismatchException e) {
